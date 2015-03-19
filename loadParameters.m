@@ -1,15 +1,33 @@
 
 %dataFileFolder = '\MatlabDataFiles\';
-addpath(genpath('MatlabDataFiles'));
+addpath(genpath('rawData'));
+addpath(genpath('sessionFiles'));
+addpath(genpath('structFiles'));
 addpath(genpath('subFunctions'));
+addpath(genpath('figureTools'));
+
+textFileDir = 'rawData/';
+sessionFileDir = 'sessionFiles/';
+structFileDir = 'structFiles/';
 
 [junk junk] = mkdir('OutputFigures');
 
+
 dataFileList = {...
-    'exp_data-2015-3-11-17-27',...
-    'exp_data-2015-3-11-17-28',...
-    'exp_data-2015-3-11-17-49',...
-    'exp_data-2015-3-11-17-54',...
-    'exp_data-2015-3-11-17-58',...
-    'exp_data-2015-3-9-15-43'
+    'exp_data-2015-3-16-17-18',...
+    'exp_data-2015-3-16-17-22',...
     };
+
+
+
+%% Here where I hardcode variables that should be in the text file.
+
+legLength = .87;
+obsHeightRatio_trialType = [ .15 .25 .35 .15 .25 .35 ];
+
+obsPositionIfWalkingUp = 2.4;
+obsPositionIfWalkingDown = -3.5;
+
+obsLW = [5,.03];
+
+%standingBoxOffset_Z = - 2;
