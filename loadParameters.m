@@ -25,8 +25,8 @@ dataFileList = {...
 legLength = .87;
 obsHeightRatio_trialType = [ .15 .25 .35 .15 .25 .35 ];
 
-obsPositionIfWalkingUp = 2.4;
-obsPositionIfWalkingDown = -3.5;
+obsPositionIfWalkingUp = -3.5;
+obsPositionIfWalkingDown = 2.4;
 
 obsLW = [5,.03];
 

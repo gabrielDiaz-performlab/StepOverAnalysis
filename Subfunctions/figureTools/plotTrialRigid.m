@@ -1,7 +1,7 @@
 function plotTrialRigid(sessionData,trialNum)
 
 trialData = sessionData.rawData_tr(trialNum);
-
+numFrames = size(trialData.rightFoot_fr_mkr_XYZ,1);
 % Create figure
 figure1 = figure(trialNum);
 set(gcf,'Renderer','OpenGL');
@@ -12,6 +12,7 @@ plotRigidMarkers(figure1,trialData.rightFoot_fr_mkr_XYZ,'r')
 plotRigidMarkers(figure1,trialData.leftFoot_fr_mkr_XYZ,'b')
 plotRigidMarkers(figure1,trialData.head_fr_mkr_XYZ,'k')
 plotRigidMarkers(figure1,trialData.spine_fr_mkr_XYZ,'g')
+
 
 %%
 
@@ -47,5 +48,28 @@ zlabel('Z (m)','FontWeight','bold','FontSize',12,'FontName','Arial');
 
 %%
 
-
 set(gcf,'position',[0,350,950,450])
+
+
+
+% FixMe:  foot posiion should be saved
+%%
+for frIdx = 1:10:numFrames
+
+    footPos_XYZ = squeeze(mean(trialData.rightFoot_fr_mkr_XYZ(frIdx,[ 1 3], :)));
+    footSize_LWH = [.25 .1 .07];
+    rotMat_d1_d2 = squeeze(trialData.rightFootRot_fr_d1_d2(frIdx,:,:)); 
+    plotBox(figure1,footPos_XYZ,footSize_LWH,rotMat_d1_d2,'r')
+    
+    
+	footPos_XYZ = squeeze(mean(trialData.leftFoot_fr_mkr_XYZ(frIdx,[ 1 3], :)));
+    footSize_LWH = [.25 .1 .07];
+    rotMat_d1_d2 = squeeze(trialData.leftFootRot_fr_d1_d2(frIdx,:,:)); 
+    plotBox(figure1,footPos_XYZ,footSize_LWH,rotMat_d1_d2,'b')
+    
+end
+%%
+    %function [] = plotBox(figHandle,boxPos_fr_XYZ,boxLWH,boxRot_d1_d2,color)
+
+%end
+%%

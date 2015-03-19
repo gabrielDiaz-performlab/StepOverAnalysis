@@ -1,9 +1,12 @@
-%FIXME:  Obstacle height should be a part of the text file.  PlotObs
+
 %FIXME:  Python variable sugests quat form of WXYZ, but it is in XYZW
 %FIXME:  Python obstacle_XYZ is actually Xpos, Ypos, Height
 
+%%%%%%%%%%%%
 %FIXME:  Python output needs:
-%   - headQuat + position
+%FIXME:  Rigid body posiion should be passed in from vizard (start of trial)
+%FIXME:  Rigid body sizes should be passed in from vizard (start of trial)
+%%%%%%%%%%%
 
 clc
 clear all
@@ -13,7 +16,6 @@ loadParameters
 % You just need to pass the .mat file name and the experiment Data structure will be generated
 sessionNumber = 1;
 
-
 sessionData = struct;
 
 parseTextFileToMat(sessionNumber)
@@ -22,7 +24,10 @@ dataFileString = sprintf('%s.mat',dataFileList{sessionNumber})
 
 sessionData.rawData_tr = generateRawData(dataFileString);
 
+%%
+
 plotTrialMarkers(sessionData,2)
+%plotTrialRigid(sessionData,2)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -53,8 +58,6 @@ ProcessedData = struct;
 N = length(sessionData.rawData_tr);
 processedData_tr = repmat(ProcessedData, N, 1 );
 sessionData.processedData_tr = processedData_tr;
-
-
 
 
 %plotTrial(sessionData,1)
