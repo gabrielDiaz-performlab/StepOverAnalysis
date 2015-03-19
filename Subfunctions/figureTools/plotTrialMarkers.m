@@ -2,12 +2,17 @@ function plotTrialMarkers(sessionData,trialNum)
 
 trialData = sessionData.rawData_tr(trialNum);
 
+trialData.subIsWalkingUpAxis
+
 % Create figure
 figure1 = figure(trialNum);
 hold on 
 
 
 %%
+headFirst_XYZ = squeeze(trialData.head_fr_mkr_XYZ(1,2,:));
+scatter3(headFirst_XYZ(1),headFirst_XYZ(2),headFirst_XYZ(3),400,'r','Filled')
+
 plotRigidMarkers(figure1,trialData.rightFoot_fr_mkr_XYZ,'r')
 plotRigidMarkers(figure1,trialData.leftFoot_fr_mkr_XYZ,'b')
 plotRigidMarkers(figure1,trialData.head_fr_mkr_XYZ,'k')

@@ -27,7 +27,8 @@ sessionData.rawData_tr = generateRawData(dataFileString);
 %%
 
 plotTrialMarkers(sessionData,2)
-%plotTrialRigid(sessionData,2)
+plotTrialMarkers(sessionData,3)
+%plotTrialRigid(sessionData,4)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -59,17 +60,8 @@ N = length(sessionData.rawData_tr);
 processedData_tr = repmat(ProcessedData, N, 1 );
 sessionData.processedData_tr = processedData_tr;
 
+[ sessionData ] = findFootCrossingTime(sessionData, trialNumber,1);
 
-%plotTrial(sessionData,1)
-
-%createfigure(X,Y,Z,'Foot Marker Position', Obstacle_XYZ);
-
-% %%
-% X = footData_fr_XYZ(:,1);
-% Y = footData_fr_XYZ(:,2);
-% Z = footData_fr_XYZ(:,3);
-% [ sessionData ] = findFootCrossingTime(sessionData, trialNumber,1);
-% 
 % % %
 % [ sessionData ] = findDistPlantedFootASO(sessionData, trialNumber);
 % [ sessionData ] = toeClearanceASO(sessionData, trialNumber);

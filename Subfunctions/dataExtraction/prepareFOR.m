@@ -13,8 +13,10 @@ if( length(size(dataInXZY)) > 2 )
     
     % data_fr_mkr_XYZ
     numMarkers = size(dataInXZY,2);
+   
     
     for mIdx = 1:numMarkers
+        
         % In matlab coordinates, Z is up
         dataOutXYZ(:,mIdx,:) = squeeze(dataInXZY(:,mIdx,[1 3 2]));
         

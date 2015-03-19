@@ -1,4 +1,4 @@
-function sessionData = findFootCrossingTime( sessionData, trIdx, showFigures )
+function sessionData = findFootCrossingTime( sessionData, trIdx )
 %Kamran Binaee
 % Find when each foot breaks the plane of the obstacle first
 % Identify which one crosses first
@@ -7,25 +7,27 @@ function sessionData = findFootCrossingTime( sessionData, trIdx, showFigures )
 %FINDTOECLEARANCE Summary of this function goes here
 %   Detailed explanation goes here
     
+    loadParameters
+
     trialStruct = sessionData.rawData_tr(trIdx);
     
-    %FIXME: Assumes walking up X axis
-    %FIXME: Obstacle has no width    
+    %FIXME: Obstacle has no width
     
-    Obstacle_X = trialStruct.obstacle_XYZ(3);
+    obstacleFront_Y = trialStruct.obstacle_XposYposHeight(2) - obsLW(2)/2;
     
     rightFoot_fr_mkr_XYZ = trialStruct.rightFoot_fr_mkr_XYZ;
-    rightFootX_frIdx_mIdx = squeeze(rightFoot_fr_mkr_XYZ(:,:,1));
-    [ rightFootMaxX_frIdx,maxRightMkrIdx_fr] = max(rightFootX_frIdx_mIdx,[],2);
+    rightFootY_frIdx_mIdx = squeeze(rightFoot_fr_mkr_XYZ(:,:,2));
+    [ rightFootMaxY_frIdx,maxRightMkrIdx_fr] = max(rightFootY_frIdx_mIdx,[],2);
     
     leftFoot_fr_mkr_XYZ = trialStruct.leftFoot_fr_mkr_XYZ;
-    leftFootX_frIdx_mIdx = squeeze(leftFoot_fr_mkr_XYZ(:,:,1));
-    [ leftFootMaxX_frIdx, maxLeftMkrIdx_fr] = max(leftFootX_frIdx_mIdx,[],2);
+    leftFootY_frIdx_mIdx = squeeze(leftFoot_fr_mkr_XYZ(:,:,1));
+    [ leftFootMaxY_frIdx, maxLeftMkrIdx_fr] = max(leftFootY_frIdx_mIdx,[],2);
     
     %%
+    keyboard
     
-    rightFootCrossingFr = find( rightFootMaxX_frIdx > Obstacle_X ,1,'first');
-    leftFootCrossingFr = find( leftFootMaxX_frIdx > Obstacle_X ,1,'first');
+    rightFootCrossingFr = find( rightFootMaxY_frIdx > obstacleFront_Y ,1,'first');
+    leftFootCrossingFr = find( leftFootMaxY_frIdx > obstacleFront_Y ,1,'first');
     
     rightFootMkrIdx = maxRightMkrIdx_fr(rightFootCrossingFr);
     leftFootMkrIdx = maxLeftMkrIdx_fr(leftFootCrossingFr);
@@ -40,7 +42,7 @@ function sessionData = findFootCrossingTime( sessionData, trIdx, showFigures )
     else
         %FIXME: Will this crash if it can't find anyhing > obstacle_X??
         % e.g. if they did not cross obstacle in time
-        print 'FindToeClearance: No crossing found'!;
+        display 'FindToeClearance: No crossing found'!;
         firstCrossingFr = -1;
         firstCrossingFoot = 'None';
     end
@@ -56,42 +58,40 @@ sessionData.processedData_tr(trIdx).firstCrossingFoot = firstCrossingFoot;
 
 display 'findFootOverPattern: [rightFootCrossingFr, leftFootCrossingFr, rightFootMkrIdx, leftFootMkrIdx, firstCrossingFoot]'
 
-%%
-
-figure1 = figure();
-hold on
-%subplot(3,1,1)
-hold on 
-axis equal
-
-% Create axes
-axes1 = axes('Parent',figure1,'FontWeight','bold','FontSize',12,...
-    'FontName','Arial');
-view(axes1,[45 14]);
-grid(axes1,'on');
-hold(axes1,'all');
-%axis([-2, 3, -2.5, -0.5, 0,2])
-axis equal
-
-% Create xlabel
-xlabel('X (m)','FontWeight','bold','FontSize',12,'FontName','Arial');
-
-% Create ylabel
-ylabel('Y (m)','FontWeight','bold','FontSize',12,'FontName','Arial');
-
-% Create zlabel
-zlabel('Z (m)','FontWeight','bold','FontSize',12,'FontName','Arial');
-
-rightFootUntilPassage_fr_mkr_XYZ  = trialStruct.rightFoot_fr_mkr_XYZ( 1:rightFootCrossingFr, :,:);
-
-keyboard
-plot3(rightFootUntilPassage_fr_mkr_XYZ(:,:,1), rightFootUntilPassage_fr_mkr_XYZ(:,:,3), rightFootUntilPassage_fr_mkr_XYZ(:,:,2));%,'Foot Marker Position', Obstacle_XYZ);
-
-
-
-end
-    
-   
+% %%
+% if( showFigures == 1) 
+%     figure1 = figure();
+%     hold on
+%     %subplot(3,1,1)
+%     hold on 
+%     axis equal
+% 
+%     % Create axes
+%     axes1 = axes('Parent',figure1,'FontWeight','bold','FontSize',12,...
+%         'FontName','Arial');
+%     view(axes1,[45 14]);
+%     grid(axes1,'on');
+%     hold(axes1,'all');
+%     %axis([-2, 3, -2.5, -0.5, 0,2])
+%     axis equal
+% 
+%     % Create xlabel
+%     xlabel('X (m)','FontWeight','bold','FontSize',12,'FontName','Arial');
+% 
+%     % Create ylabel
+%     ylabel('Y (m)','FontWeight','bold','FontSize',12,'FontName','Arial');
+% 
+%     % Create zlabel
+%     zlabel('Z (m)','FontWeight','bold','FontSize',12,'FontName','Arial');
+% 
+%     rightFootUntilPassage_fr_mkr_XYZ  = trialStruct.rightFoot_fr_mkr_XYZ( 1:rightFootCrossingFr, :,:);
+% 
+%     plot3(rightFootUntilPassage_fr_mkr_XYZ(:,:,1), rightFootUntilPassage_fr_mkr_XYZ(:,:,3), rightFootUntilPassage_fr_mkr_XYZ(:,:,2));%,'Foot Marker Position', Obstacle_XYZ);
+% 
+% 
+% end
+%     
+%    
    
     
 
