@@ -2,7 +2,6 @@ function parseTextFileToMat (sessionNumber)
     
     loadParameters
     textFileName = dataFileList{sessionNumber};
-    
     structFileName  = [ structFileDir textFileName '-struct.mat'];
     
     %% See if the txt has been parsed into a struct saved in a *.mat file.
@@ -12,9 +11,9 @@ function parseTextFileToMat (sessionNumber)
         fprintf('Could not find struct file %s. Parsing text file...\n', structFileName);
         
         textFileStruct = parseTextFiletoStruct(textFileName);
+        save( structFileName, 'textFileStruct');
         
-        save( structFileName, textFileStruct);
-       
+        
         fprintf ('Struct file %s.mat created from text file\n', structFileName)
 
     else

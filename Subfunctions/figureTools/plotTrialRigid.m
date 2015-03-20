@@ -54,19 +54,34 @@ set(gcf,'position',[0,350,950,450])
 
 % FixMe:  foot posiion should be saved
 %%
-for frIdx = 1:10:numFrames
+rFootBox = 0;
+lFootBox = 0;
 
+camtarget('manual')
+campos('manual')
+
+campos([29.6054  -24.6541    6.4757]);
+camtarget([0.5446    3.4096    0.7980]);
+
+for frIdx = 1:5:numFrames
+
+%     if( frIdx>1 )
+%         delete(rFootBox)
+%         delete(lFootBox)
+%     end
+    
     footPos_XYZ = squeeze(mean(trialData.rightFoot_fr_mkr_XYZ(frIdx,[ 1 3], :)));
     footSize_LWH = [.25 .1 .07];
     rotMat_d1_d2 = squeeze(trialData.rightFootRot_fr_d1_d2(frIdx,:,:)); 
-    plotBox(figure1,footPos_XYZ,footSize_LWH,rotMat_d1_d2,'r')
+    rFootBox = plotBox(figure1,footPos_XYZ,footSize_LWH,rotMat_d1_d2,'r');
     
     
 	footPos_XYZ = squeeze(mean(trialData.leftFoot_fr_mkr_XYZ(frIdx,[ 1 3], :)));
     footSize_LWH = [.25 .1 .07];
     rotMat_d1_d2 = squeeze(trialData.leftFootRot_fr_d1_d2(frIdx,:,:)); 
-    plotBox(figure1,footPos_XYZ,footSize_LWH,rotMat_d1_d2,'b')
+    lFootBox = plotBox(figure1,footPos_XYZ,footSize_LWH,rotMat_d1_d2,'b');
     
+    %pause(1/30)
 end
 %%
     %function [] = plotBox(figHandle,boxPos_fr_XYZ,boxLWH,boxRot_d1_d2,color)

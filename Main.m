@@ -14,9 +14,10 @@ close all
 
 loadParameters
 % You just need to pass the .mat file name and the experiment Data structure will be generated
-sessionNumber = 1;
+sessionNumber = 2;
 
 sessionData = struct;
+sessionData.fileID = dataFileList{sessionNumber};
 
 parseTextFileToMat(sessionNumber)
 
@@ -25,10 +26,15 @@ dataFileString = sprintf('%s.mat',dataFileList{sessionNumber})
 sessionData.rawData_tr = generateRawData(dataFileString);
 
 %%
+plotTrialMarkers(sessionData,1)
+%plotTrialRigid(sessionData,trIdx )  Not quite right, yet.  
+    
+for trIdx = 1:numel(sessionData.rawData_tr)
 
-plotTrialMarkers(sessionData,2)
-plotTrialMarkers(sessionData,3)
-%plotTrialRigid(sessionData,4)
+    
+    [sessionData figH ]= findStepsMod(sessionData, trIdx, 1)
+    
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -53,14 +59,14 @@ fprintf('** Trial 2 EndFr: %i \n \n', sessionData.rawData_tr(2).stopFr)
 
 % For example, here is a function to find Toe Clearance at step over
 % ExpData structure is passed to the function,
-% the height of the first toe to break the plane of the obstacle is returned
-
-ProcessedData = struct;
-N = length(sessionData.rawData_tr);
-processedData_tr = repmat(ProcessedData, N, 1 );
-sessionData.processedData_tr = processedData_tr;
-
-[ sessionData ] = findFootCrossingTime(sessionData, trialNumber,1);
+% % the height of the first toe to break the plane of the obstacle is returned
+% 
+% ProcessedData = struct;
+% N = length(sessionData.rawData_tr);
+% processedData_tr = repmat(ProcessedData, N, 1 );
+% sessionData.processedData_tr = processedData_tr;
+% 
+% [ sessionData ] = findFootCrossingTime(sessionData, trialNumber,1);
 
 % % %
 % [ sessionData ] = findDistPlantedFootASO(sessionData, trialNumber);

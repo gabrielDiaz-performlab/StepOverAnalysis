@@ -66,12 +66,12 @@ function createMatFile(structHandler, textFileDir, textFileName, matFileDir)
       %% ===========================================
       
       %%
-      varName = 'rightFootQUAT_WXYZ';
+      varName = 'rightFootQUAT_WXYZ'; % rightFootQUAT_XYZW
       numVals = 4;
 
       data_valIdx = extractVarFromLine(currentLine, varName, numVals  );
       
-      rightFootQUAT_fr_WXYZ(i,:) = [ -data_valIdx(2) data_valIdx(4) data_valIdx(3) data_valIdx(1) ];
+      rightFootQUAT_fr_WXYZ(i,:) = [ -data_valIdx(4) data_valIdx(1) data_valIdx(3) data_valIdx(2) ];
       
     
       %% ============= Left foot quat =============
@@ -80,7 +80,7 @@ function createMatFile(structHandler, textFileDir, textFileName, matFileDir)
       varInName = 'leftFootQUAT_WXYZ';
       numVals = 4;
       data_valIdx = extractVarFromLine(currentLine, varName, numVals  );
-      leftFootQUAT_fr_WXYZ(i,:) = [ -data_valIdx(2) data_valIdx(4) data_valIdx(3) data_valIdx(1) ];
+      leftFootQUAT_fr_WXYZ(i,:) = [ -data_valIdx(4) data_valIdx(1) data_valIdx(3) data_valIdx(2) ];
      
       
       
@@ -549,8 +549,12 @@ function createMatFile(structHandler, textFileDir, textFileName, matFileDir)
           currentIdx = currentIdx + 1;
       end  
       SZ =   str2num( tempVar );
-
-      S0_fr_XYZ(i,:) = [ SX SY SZ];
+      
+      try
+        S0_fr_XYZ(i,:) = [ SX SY SZ];
+      catch
+         keyboard 
+      end
 
       refIdx = strfind( currentLine, 'S1 [' );
       tempVar = '';

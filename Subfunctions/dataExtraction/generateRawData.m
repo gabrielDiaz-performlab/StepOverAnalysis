@@ -14,7 +14,6 @@ function trialStructs_tr =  generateRawData(MatFileName)
 %     # 6 Trial end
 %     # 7 Block end
 		
-        
     TrialStartFr_tIdx = find(eventFlag == 1 );
     TrialStopFr_tIdx = [TrialStartFr_tIdx(2:end)-1 length(shutterGlass_XYZ)];
     
@@ -134,26 +133,6 @@ function trialStructs_tr =  generateRawData(MatFileName)
         
         trialStructs_tr(tIdx).subIsWalkingUpAxis = subIsWalkingUpAxis;
         
-%         if(tIdx == 3)
-%             keyboard
-%             %%
-%             startFr = frIdxList(1)
-%             stopFr = frIdxList(end)
-%             
-%             preFORStart_XYZ = squeeze(RightFoot_fr_mkr_XYZ(startFr,2,:))'
-%             preFORStop_XYZ = squeeze(RightFoot_fr_mkr_XYZ(stopFr,2,:))'
-%             
-%             postFOR_fr_mkr_XYZ = prepareFOR( RightFoot_fr_mkr_XYZ(frIdxList,:,:), subIsWalkingUpAxis);
-%             
-%             postFORStart_XYZ =  squeeze(postFOR_fr_mkr_XYZ(1,2,:))'
-%             postFORStop_XYZ =  squeeze(postFOR_fr_mkr_XYZ(end,2,:))'
-%             
-%             %%
-%             keyboard
-%         
-%         end
-%         
-        % Data
         trialStructs_tr(tIdx).rightFoot_fr_mkr_XYZ = ...
             prepareFOR( RightFoot_fr_mkr_XYZ(frIdxList,:,:), subIsWalkingUpAxis);
         
@@ -186,15 +165,16 @@ function trialStructs_tr =  generateRawData(MatFileName)
         
         %%% Rotation matrices
         
-        rigidRotMatrix = [ cos(rotateRigidRads) sin(rotateRigidRads) 0 0; -sin(rotateRigidRads) cos(rotateRigidRads) 0 0; 0 0 1 0 ; 0 0 0 1];
+        rigidRotMatrix = [ cos(rotateRigidRads) sin(rotateRigidRads) 0 0; ...
+            -sin(rotateRigidRads) cos(rotateRigidRads) 0 0; 0 0 1 0 ; 0 0 0 1];
         
         rightFootRotTemp_fr_d1_d2 = zeros(length(frIdxList),4,4);
         leftFootRotTemp_fr_d1_d2 = zeros(length(frIdxList),4,4);
         
         for frIdx = 1:length(frIdxList)
             frInExpVec = frIdxList(frIdx);
-            rightFootRotTemp_fr_d1_d2(frIdx,:,:) = quaternion2matrix( squeeze(rightFootQUAT_fr_WXYZ(frInExpVec ,:,:,:,:))) * rigidRotMatrix;
-            leftFootRotTemp_fr_d1_d2(frIdx,:,:) = quaternion2matrix( squeeze(leftFootQUAT_fr_WXYZ(frInExpVec ,:,:,:,:))) * rigidRotMatrix;
+            rightFootRotTemp_fr_d1_d2(frIdx,:,:) = quaternion2matrix( squeeze(rightFootQUAT_fr_WXYZ(frInExpVec ,:,:,:,:)));
+            leftFootRotTemp_fr_d1_d2(frIdx,:,:) = quaternion2matrix( squeeze(leftFootQUAT_fr_WXYZ(frInExpVec ,:,:,:,:)));
             
         end
         

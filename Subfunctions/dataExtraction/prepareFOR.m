@@ -25,7 +25,7 @@ if( length(size(dataInXZY)) > 2 )
            dataOutXYZ(:,mIdx,:) = [dataOutXYZ(:,mIdx,1), (dataOutXYZ(:,mIdx,2) - standingBoxPosOnAxis),dataOutXYZ(:,mIdx,3)];
         else
             % Subtract box position and flip walking direction
-           dataOutXYZ(:,mIdx,:) = [dataOutXYZ(:,mIdx,1), -(dataOutXYZ(:,mIdx,2) - standingBoxPosOnAxis),dataOutXYZ(:,mIdx,3)];
+           dataOutXYZ(:,mIdx,:) = [-dataOutXYZ(:,mIdx,1), -(dataOutXYZ(:,mIdx,2) - standingBoxPosOnAxis),dataOutXYZ(:,mIdx,3)];
         end
         
     end
@@ -37,7 +37,7 @@ else
     
     if(subIsWalkingUpAxis)
         % Subtract box position
-        dataOutXYZ = [dataOutXYZ(:,1), (dataOutXYZ(:,2) - standingBoxPosOnAxis),dataOutXYZ(:,3)];
+        dataOutXYZ = [-dataOutXYZ(:,1), (dataOutXYZ(:,2) - standingBoxPosOnAxis),dataOutXYZ(:,3)];
     else
         % Subtract box position and flip walking direction
         dataOutXYZ = [dataOutXYZ(:,1), -(dataOutXYZ(:,2) - standingBoxPosOnAxis),dataOutXYZ(:,3)];
