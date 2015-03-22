@@ -26,9 +26,12 @@ dataFileString = sprintf('%s.mat',dataFileList{sessionNumber})
 sessionData.rawData_tr = generateRawData(dataFileString);
 
 %%
-plotTrialMarkers(sessionData,1)
-%plotTrialRigid(sessionData,trIdx )  Not quite right, yet.  
-    
+
+sessionData = filterMocapData(sessionData, 0);
+sessionData = interpolateMocapData(sessionData, 0);
+
+%%
+
 for trIdx = 1:numel(sessionData.rawData_tr)
 
     
@@ -36,6 +39,10 @@ for trIdx = 1:numel(sessionData.rawData_tr)
     
 end
 
+%plotTrialMarkers(sessionData,1)
+%plotTrialRigid(sessionData,trIdx )  Not quite right, yet.  
+
+%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% How to access data for one trial

@@ -1,4 +1,4 @@
-function     [sessionData figH] = findStepsMod(sessionData, trialNum, plotOn)
+function [sessionData figH] = findStepsMod(sessionData, trialNum, plotOn)
 
 if( plotOn)
     figH = figure(3);
@@ -45,115 +45,82 @@ end
 %% 20 March - Gabriel Diaz
 % Simplified code dramatically, likely at a cost.
 % Added a height threshold saved in through to loadParameters
+% 
+% trialData = sessionData.rawData_tr(trialNum);
+% 
+% spine_fr_mkr_XYZ = trialData.spine_fr_mkr_XYZ;
+% 
+% % Set average spine position over time
+% spine_fr_xyz = squeeze(nanmean(spine_fr_mkr_XYZ,2));
+% 
+% startXY = spine_fr_xyz(1,1:2);
+% endXY = spine_fr_xyz(end,1:2);
+% 
+% % Calculate average foot position over time
+% rightFoot_fr_XYZ = squeeze(nanmean(trialData.rightFoot_fr_mkr_XYZ(:,[1 4],:),2));
+% leftFoot_fr_XYZ = squeeze(nanmean(trialData.leftFoot_fr_mkr_XYZ(:,[1 4],:),2));
+% 
+% 
+% sessionData.rawData_tr(trialNum).spine_fr_xyz = spine_fr_xyz;
+% sessionData.rawData_tr(trialNum).rightFoot_fr_XYZ = rightFoot_fr_XYZ;
+% sessionData.rawData_tr(trialNum).leftFoot_fr_XYZ = leftFoot_fr_XYZ;
 
-trialData = sessionData.rawData_tr(trialNum);
+% %%
+% 
+% %%
+% % findSamplingRate: estimates sampling rate from data for use in
+% % filter, necessary b/c of variable sampling rate for vizard log
+% 
+% samplingRate = 1 / mean(diff(trialData.frameTime_fr));
+% 
+% %function [smoothedData] = butterLowZero( order, cutoff, sampleRate, x)
+% 
+% rightFoot_fr_XYZ = butterLowZero(order,cutoff,samplingRate, rightFoot_fr_XYZ);
+% sessionData.filtData_tr(trialNum).rightFoot_fr_XYZ = rightFoot_fr_XYZ ;
+% 
+% leftFoot_fr_XYZ = butterLowZero(order,cutoff,samplingRate, leftFoot_fr_XYZ);
+% sessionData.filtData_tr(trialNum).leftFoot_fr_XYZ = leftFoot_fr_XYZ ;
+% 
+% spine_fr_xyz  = butterLowZero(order,cutoff,samplingRate, spine_fr_xyz );
+% sessionData.filtData_tr(trialNum).spine_fr_xyz  = spine_fr_xyz  ;
+% 
+% %rAnkX = rightFoot_fr_XYZ(:,1);
+%lAnkX = leftFoot_fr_XYZ(:,1);
 
-spine_fr_mkr_XYZ = trialData.spine_fr_mkr_XYZ;
-
-% Set average spine position over time
-spine_fr_xyz = squeeze(nanmean(spine_fr_mkr_XYZ,2));
-
-startXY = spine_fr_xyz(1,1:2);
-endXY = spine_fr_xyz(end,1:2);
-
-% Calculate average foot position over time
-rFoot_fr_XYZ = squeeze(nanmean(trialData.rightFoot_fr_mkr_XYZ(:,[1 4],:),2));
-lFoot_fr_XYZ = squeeze(nanmean(trialData.leftFoot_fr_mkr_XYZ(:,[1 4],:),2));
-
-
-sessionData.rawData_tr(trialNum).spine_fr_xyz = spine_fr_xyz;
-sessionData.rawData_tr(trialNum).rFoot_fr_XYZ = rFoot_fr_XYZ;
-sessionData.rawData_tr(trialNum).lFoot_fr_XYZ = lFoot_fr_XYZ;
-
-%%
-
-%%
-% findSamplingRate: estimates sampling rate from data for use in
-% filter, necessary b/c of variable sampling rate for vizard log
-
-samplingRate = 1 / mean(diff(trialData.frameTime_fr));
-
-%function [smoothedData] = butterLowZero( order, cutoff, sampleRate, x)
-
-rFoot_fr_XYZ = butterLowZero(order,cutoff,samplingRate, rFoot_fr_XYZ);
-sessionData.filtData_tr(trialNum).rFoot_fr_XYZ = rFoot_fr_XYZ ;
-
-lFoot_fr_XYZ = butterLowZero(order,cutoff,samplingRate, lFoot_fr_XYZ);
-sessionData.filtData_tr(trialNum).lFoot_fr_XYZ = lFoot_fr_XYZ ;
-
-spine_fr_xyz  = butterLowZero(order,cutoff,samplingRate, spine_fr_xyz );
-sessionData.filtData_tr(trialNum).spine_fr_xyz  = spine_fr_xyz  ;
-
-%rAnkX = rFoot_fr_XYZ(:,1);
-%lAnkX = lFoot_fr_XYZ(:,1);
-
-loopLength = min ([length(rFoot_fr_XYZ), length(lFoot_fr_XYZ), length(spine_fr_xyz)]);
-
-%%
-
-% if plotOn == 1
-%
-%     figure(1)
-%
-%     subplot(231)
-%     hold on
-%     grid on
-%     plot(sessionData.filtData_tr(trialNum).rFoot_fr_XYZ(:,1),'r')
-%     plot(sessionData.rawData_tr(trialNum).rFoot_fr_XYZ(:,1),':b')
-%
-%
-%     subplot(232)
-%     hold on
-%     grid on
-%     plot(sessionData.filtData_tr(trialNum).rFoot_fr_XYZ(:,2),'r')
-%     plot(sessionData.rawData_tr(trialNum).rFoot_fr_XYZ(:,2),':b')
-%
-%     subplot(233)
-%     hold on
-%     grid on
-%     plot(sessionData.filtData_tr(trialNum).rFoot_fr_XYZ(:,3),'r')
-%     plot(sessionData.rawData_tr(trialNum).rFoot_fr_XYZ(:,3),':b')
-%
-%
-%     subplot(234)
-%     hold on
-%     grid on
-%     plot(sessionData.filtData_tr(trialNum).lFoot_fr_XYZ(:,1),'r')
-%     plot(sessionData.rawData_tr(trialNum).lFoot_fr_XYZ(:,1),':b')
-%
-%     subplot(235)
-%     hold on
-%     grid on
-%     plot(sessionData.filtData_tr(trialNum).lFoot_fr_XYZ(:,2),'r')
-%     plot(sessionData.rawData_tr(trialNum).lFoot_fr_XYZ(:,2),':b')
-%
-%     subplot(236)
-%     hold on
-%     grid on
-%     plot(sessionData.filtData_tr(trialNum).lFoot_fr_XYZ(:,3),'r')
-%     plot(sessionData.rawData_tr(trialNum).lFoot_fr_XYZ(:,3),':b')
-%
-%
-% end
-
+%loopLength = min ([length(rightFoot_fr_XYZ), length(leftFoot_fr_XYZ), length(spine_fr_xyz)]);
 
 %%
 
-rFootHeight_fr =  rFoot_fr_XYZ(:,3);
-lFootHeight_fr =  lFoot_fr_XYZ(:,3);
+spine_fr_xyz = squeeze(nanmean(sessionData.processedData_tr(trialNum).spine_fr_mkr_XYZ,2));
+rightFoot_fr_XYZ = squeeze(nanmean(sessionData.processedData_tr(trialNum).rightFoot_fr_mkr_XYZ(:,[1 4],:),2));
+leftFoot_fr_XYZ = squeeze(nanmean(sessionData.processedData_tr(trialNum).leftFoot_fr_mkr_XYZ(:,[1 4],:),2));
+head_fr_XYZ = squeeze(nanmean(sessionData.processedData_tr(trialNum).head_fr_mkr_XYZ(:,[4 5],:),2));
+
+sessionData.processedData_tr(trialNum).spine_fr_xyz = spine_fr_xyz;
+sessionData.processedData_tr(trialNum).rightFoot_fr_XYZ = rightFoot_fr_XYZ;
+sessionData.processedData_tr(trialNum).leftFoot_fr_XYZ = leftFoot_fr_XYZ;
+sessionData.processedData_tr(trialNum).head_fr_XYZ = head_fr_XYZ;
+
+%%
+
+rFootHeight_fr =  rightFoot_fr_XYZ(:,3);
+lFootHeight_fr =  leftFoot_fr_XYZ(:,3);
 
 % Cast foot data into a spine-centered frame of reference
-rFoot_fr_XYZ = rFoot_fr_XYZ - spine_fr_xyz;
-lFoot_fr_XYZ = lFoot_fr_XYZ - spine_fr_xyz;
+rightFoot_fr_XYZ = rightFoot_fr_XYZ - spine_fr_xyz;
+leftFoot_fr_XYZ = leftFoot_fr_XYZ - spine_fr_xyz;
 
 % Calculate velocities along the Y axis
 spineVelY = diff(spine_fr_xyz(:,2)) ./ diff( spine_fr_xyz(:,1));
+
 %%
 %find frame wherein feet are moving
 %timeElapsed_fr = [1/60 diff(trialData.frameTime_fr)];
 
-rAnkVelY = [0 diff(rFoot_fr_XYZ(:,2))'] ./ samplingRate;
-lAnkVelY = [0 diff(lFoot_fr_XYZ(:,2))'] ./ samplingRate;
+samplingRate = 1 / mean(diff(sessionData.rawData_tr(1).frameTime_fr));
+
+rAnkVelY = [0 diff(rightFoot_fr_XYZ(:,2))'] ./ samplingRate;
+lAnkVelY = [0 diff(leftFoot_fr_XYZ(:,2))'] ./ samplingRate;
 
 %%
 % Vectors for toe-offs and heel-strikes
@@ -340,11 +307,11 @@ if plotOn == 1
     
 end
 
-sessionData.processedData_tr(trialNum).rightToeOff_idx = rTO;
-sessionData.processedData_tr(trialNum).rightHeelStrike_idx = rHS;
+sessionData.dependentMeasures_tr(trialNum).rightToeOff_idx = rTO;
+sessionData.dependentMeasures_tr(trialNum).rightHeelStrike_idx = rHS;
 
-sessionData.processedData_tr(trialNum).leftToeOff_idx = lTO;
-sessionData.processedData_tr(trialNum).leftHeelStrike_idx = lHS;
+sessionData.dependentMeasures_tr(trialNum).leftToeOff_idx = lTO;
+sessionData.dependentMeasures_tr(trialNum).leftHeelStrike_idx = lHS;
 
 end
 
