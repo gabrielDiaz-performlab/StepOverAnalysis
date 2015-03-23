@@ -10,7 +10,11 @@ samplingRate = 1 / mean(diff(sessionData.rawData_tr(1).frameTime_fr));
 
 %% Filter marker data
 
-display 'filterMocapData: Recalculating sessionData.processedData_tr.'
+% display 'filterMocapData: Erasing and recalculating sessionData.processedData_tr.'
+% % If a processedData field exists, erase it.
+% if( any( strcmp(fieldnames(sessionData), 'processedData_tr')) )
+%     sessionData = rmfield(sessionData,'processedData_tr');
+% end
 
 for trIdx = 1:length(sessionData.rawData_tr)
     

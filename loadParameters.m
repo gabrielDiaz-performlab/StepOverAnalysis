@@ -20,8 +20,9 @@ dataFileList = {...
 
 %% Parameters used by algorithms
 
-% Step detection findStepsMod.m
+% Step detection findSteps.m
 footHeightThresh = .1;
+HSTOReorderThreshS = .2;
 
 % Butterworth in findStepsMod.m
 order = 7;
@@ -40,3 +41,4 @@ obsLW = [5,.03];
 
 
 %standingBoxOffset_Z = - 2;
+
