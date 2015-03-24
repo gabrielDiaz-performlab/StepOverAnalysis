@@ -1,4 +1,4 @@
-function [] = plotRigid(figureHandle,markerData_fr_mkr_XYZ,color)
+function [] = plotMarkersFromRigid(figureHandle,markerData_fr_mkr_XYZ,color)
 
 
 

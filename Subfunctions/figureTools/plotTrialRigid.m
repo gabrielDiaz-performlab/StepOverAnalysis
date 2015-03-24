@@ -8,10 +8,10 @@ set(gcf,'Renderer','OpenGL');
 hold on 
 
 %%
-plotRigidMarkers(figure1,trialData.rightFoot_fr_mkr_XYZ,'r')
-plotRigidMarkers(figure1,trialData.leftFoot_fr_mkr_XYZ,'b')
-plotRigidMarkers(figure1,trialData.head_fr_mkr_XYZ,'k')
-plotRigidMarkers(figure1,trialData.spine_fr_mkr_XYZ,'g')
+plotMarkersFromRigid(figure1,trialData.rightFoot_fr_mkr_XYZ,'r')
+plotMarkersFromRigid(figure1,trialData.leftFoot_fr_mkr_XYZ,'b')
+plotMarkersFromRigid(figure1,trialData.head_fr_mkr_XYZ,'k')
+plotMarkersFromRigid(figure1,trialData.spine_fr_mkr_XYZ,'g')
 
 
 %%

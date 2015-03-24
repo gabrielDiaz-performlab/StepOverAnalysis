@@ -37,19 +37,18 @@ sessionData = filterMocapData(sessionData, 0);
 
 %% Some methods for plotting a trial
 
-% [sessionData figH ]= findSteps(sessionData, 10, 1)
-% sessionData.dependentMeasures_tr(5)
+plotTrialMarkers(sessionData,1)
+
 
 %% Some per-trial functions
 
 for trIdx = 1:numel(sessionData.rawData_tr)
 
-    [ sessionData ]= findSteps(sessionData, trIdx, 0);
+    [ sessionData ] = findSteps(sessionData, trIdx, 0);
     [ sessionData ] = findFootCrossingTime(sessionData, trIdx,0);
     [ sessionData ] = toeClearanceASO(sessionData, trIdx);
     
 end
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
