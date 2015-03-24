@@ -65,10 +65,10 @@ camtarget([0.5446    3.4096    0.7980]);
 
 for frIdx = 1:5:numFrames
 
-%     if( frIdx>1 )
-%         delete(rFootBox)
-%         delete(lFootBox)
-%     end
+    if( frIdx>1 )
+        delete(rFootBox)
+        delete(lFootBox)
+    end
     
     footPos_XYZ = squeeze(mean(trialData.rightFoot_fr_mkr_XYZ(frIdx,[ 1 3], :)));
     footSize_LWH = [.25 .1 .07];
@@ -81,7 +81,7 @@ for frIdx = 1:5:numFrames
     rotMat_d1_d2 = squeeze(trialData.leftFootRot_fr_d1_d2(frIdx,:,:)); 
     lFootBox = plotBox(figure1,footPos_XYZ,footSize_LWH,rotMat_d1_d2,'b');
     
-    %pause(1/30)
+    pause(1/30)
 end
 %%
     %function [] = plotBox(figHandle,boxPos_fr_XYZ,boxLWH,boxRot_d1_d2,color)

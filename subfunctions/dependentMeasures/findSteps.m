@@ -356,7 +356,7 @@ if plotOn == 1
         vline(lHS(idx),'r',2,':')
     end
     
-    figDir = sprintf('outputFigures/StepFigs/%s/',sessionData.fileID);
+    figDir = sprintf('outputFigures/StepFigs/%s/',sessionData.expInfo.fileID);
     [junk junk] = mkdir(figDir );
     set(3,'Units','Normalized','Position',[0.0923611111111111 0.211111111111111 0.838888888888889 0.673333333333333]);
     saveas(figH,sprintf('%s%u.png',figDir,trialNum));

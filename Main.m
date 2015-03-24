@@ -15,6 +15,7 @@ clear all
 close all
 
 loadParameters
+
 % You just need to pass the .mat file name and the experiment Data structure will be generated
 sessionNumber = 1;
 
@@ -32,13 +33,13 @@ sessionData.expInfo
 
 %% Interpolate and filter
 
-sessionData = interpolateMocapData(sessionData, 0);
+sessionData = interpolateMocapData(sessionData, 1);
 sessionData = filterMocapData(sessionData, 0);
 
 %% Some methods for plotting a trial
 
-plotTrialMarkers(sessionData,1)
-
+%plotTrialMarkers(sessionData,2)
+%plotTrialRigid(sessionData,2)
 
 %% Some per-trial functions
 
@@ -46,12 +47,12 @@ for trIdx = 1:numel(sessionData.rawData_tr)
 
     [ sessionData ] = findSteps(sessionData, trIdx, 0);
     [ sessionData ] = findFootCrossingTime(sessionData, trIdx,0);
-    [ sessionData ] = toeClearanceASO(sessionData, trIdx);
+    [ sessionData ] = toeHeightAndClearanceASO(sessionData, trIdx);
     
 end
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% How to average over data and plot
 % Fixme:  create generalized function that calculate the mean/std
 % for any input variable of the form data_tr.
@@ -72,13 +73,13 @@ for cIdx = 1:2
             
             trOfType_tIdx = find( [sessionData.rawData_tr.trialType] == hIdx * cIdx );
             
-            if( sum( isnan([sessionData.dependentMeasures_tr(trOfType_tIdx).leadToeZDist]) ) > 0 )
+            if( sum( isnan([sessionData.dependentMeasures_tr(trOfType_tIdx).leadToeZASO]) ) > 0 )
                print( 'Found a NAN value!' )
                keyboard
             end
             
-            meanToeClearance_cIdx_hIdx(cIdx,hIdx) = mean([sessionData.dependentMeasures_tr(trOfType_tIdx).leadToeZDist]);
-            stdToeClearance_cIdx_hIdx(cIdx,hIdx) = std([sessionData.dependentMeasures_tr(trOfType_tIdx).leadToeZDist]);
+            meanToeClearance_cIdx_hIdx(cIdx,hIdx) = mean([sessionData.dependentMeasures_tr(trOfType_tIdx).leadToeZASO]);
+            stdToeClearance_cIdx_hIdx(cIdx,hIdx) = std([sessionData.dependentMeasures_tr(trOfType_tIdx).leadToeZASO]);
 
     end
 end
@@ -115,6 +116,7 @@ l2.XData = l2X-.005
 l1X = l1.XData;
 l1.XData = l1X+.005
 
+set(gca,'xtick',obsHeightRatios)
 xlim([obsHeightRatios(1)-.02 obsHeightRatios(end)+.02])
 ylim([0 1])
 
