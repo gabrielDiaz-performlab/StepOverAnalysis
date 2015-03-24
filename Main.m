@@ -6,6 +6,8 @@
 %FIXME:  Python output needs:
 %FIXME:  Rigid body posiion should be passed in from vizard (start of trial)
 %FIXME:  Rigid body sizes should be passed in from vizard (start of trial)
+%FIXME:  Block index and numBlocks
+%FIXME:  numTrialTypes
 %%%%%%%%%%%
 
 clc
@@ -16,32 +18,108 @@ loadParameters
 % You just need to pass the .mat file name and the experiment Data structure will be generated
 sessionNumber = 1;
 
-sessionData = struct;
-sessionData.fileID = dataFileList{sessionNumber};
+%sessionData = struct;
+%sessionData.fileID = dataFileList{sessionNumber};
 
 parseTextFileToMat(sessionNumber)
 
 dataFileString = sprintf('%s.mat',dataFileList{sessionNumber})
 
-sessionData.rawData_tr = generateRawData(dataFileString);
-
 %%
+sessionData = generateRawData(dataFileString);
+sessionData.expInfo.fileID = dataFileList{sessionNumber};
+sessionData.expInfo
 
+%% Interpolate and filter
 
 sessionData = interpolateMocapData(sessionData, 0);
 sessionData = filterMocapData(sessionData, 0);
 
-%%
-[sessionData figH ]= findSteps(sessionData, 10, 1)
-sessionData.dependentMeasures_tr(5)
+%% Some methods for plotting a trial
 
-%%
+% [sessionData figH ]= findSteps(sessionData, 10, 1)
+% sessionData.dependentMeasures_tr(5)
+
+%% Some per-trial functions
+
 for trIdx = 1:numel(sessionData.rawData_tr)
 
-    [sessionData figH ]= findSteps(sessionData, trIdx, 1)
+    [ sessionData ]= findSteps(sessionData, trIdx, 0);
+    [ sessionData ] = findFootCrossingTime(sessionData, trIdx,0);
+    [ sessionData ] = toeClearanceASO(sessionData, trIdx);
     
 end
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% How to average over data and plot
+% Fixme:  create generalized function that calculate the mean/std
+% for any input variable of the form data_tr.
+
+% condition (real vs virtual) vs height (s, m, tall).
+% Fixme: must average over trial types
+numConditions = 2;
+numObsheights = 3;
+meanToeClearance_cIdx_hIdx = nan(numConditions ,numObsheights);
+
+for cIdx = 1:2
+    for hIdx = 1:3
+        
+            % One way to do things.  I abandoned this approach for the more
+            % intuitive use of for loops.  I rarely do that.
+            %trInBlock_tIdx = find( [sessionData.rawData_tr.blockIdx] == bIdx);
+            %trOfType_tIdx = find( [sessionData.rawData_tr.trialType] == ttIdx);
+            
+            trOfType_tIdx = find( [sessionData.rawData_tr.trialType] == hIdx * cIdx );
+            
+            if( sum( isnan([sessionData.dependentMeasures_tr(trOfType_tIdx).leadToeZDist]) ) > 0 )
+               print( 'Found a NAN value!' )
+               keyboard
+            end
+            
+            meanToeClearance_cIdx_hIdx(cIdx,hIdx) = mean([sessionData.dependentMeasures_tr(trOfType_tIdx).leadToeZDist]);
+            stdToeClearance_cIdx_hIdx(cIdx,hIdx) = std([sessionData.dependentMeasures_tr(trOfType_tIdx).leadToeZDist]);
+
+    end
+end
+
+%%
+
+sessionData.summaryStats = struct;
+sessionData.summaryStats.meanToeClearance_cIdx_hIdx = meanToeClearance_cIdx_hIdx;
+sessionData.summaryStats.stdToeClearance_cIdx_hIdx = stdToeClearance_cIdx_hIdx;
+close all
+
+%%  Plot data
+% Fixme:  create generalized function that plot the mean/std
+% for any input variable of the form data_tr.
+
+figure(1)
+clf
+hold on
+
+xlabel('Obs Height / Leg Length')
+ylabel('Toe Clearance at Stepover (m)')
+
+obsHeightRatios = sessionData.expInfo.obsHeightRatios;
+
+l1 = errorbar( obsHeightRatios, meanToeClearance_cIdx_hIdx(1,:)',sessionData.summaryStats.stdToeClearance_cIdx_hIdx(1,:)','LineWidth',2);
+l2 = errorbar( obsHeightRatios, meanToeClearance_cIdx_hIdx(2,:)',sessionData.summaryStats.stdToeClearance_cIdx_hIdx(1,:)','LineWidth',2);
+
+%l1 = errorbar( sessionData.summaryStats.meanToeClearance_cIdx_hIdx(1,:)',sessionData.summaryStats.stdToeClearance_cIdx_hIdx(1,:)','LineWidth',2)
+%l2 = errorbar( sessionData.summaryStats.meanToeClearance_cIdx_hIdx(2,:)',sessionData.summaryStats.stdToeClearance_cIdx_hIdx(2,:)','LineWidth',2)
+
+l2X = l2.XData;
+l2.XData = l2X-.005
+
+l1X = l1.XData;
+l1.XData = l1X+.005
+
+xlim([obsHeightRatios(1)-.02 obsHeightRatios(end)+.02])
+ylim([0 1])
+
+%%
 %%
 %plotTrialMarkers(sessionData,1)
 %plotTrialRigid(sessionData,trIdx )  Not quite right, yet.  

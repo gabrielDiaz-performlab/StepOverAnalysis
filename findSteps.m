@@ -1,19 +1,19 @@
 function [sessionData figH] = findSteps(sessionData, trialNum, plotOn)
 
-if( plotOn)
-    figH = figure(3);
-    clf
-else
-    figH = []
-end
-
-loadParameters
-
 if nargin < 3
     
     plotOn = 0;
     
 end
+
+if( plotOn)
+    figH = figure(3);
+    clf
+else
+    figH = [];
+end
+
+loadParameters
 
 %% 26 June 2012 - Jonathan Matthis
 %
@@ -265,8 +265,8 @@ for toIdx = 1:numel(rTO)
         if( toeToHeelTime> 0 && toeToHeelTime <= HSTOReorderThreshS)
             
             theFrameInTheMiddle = round((lHS(hsIdx) + rTO(toIdx))/2);
-            lHS(hsIdx) = theFrameInTheMiddle-1;
-            rTO(toIdx) = theFrameInTheMiddle+1;
+            lHS(hsIdx) = theFrameInTheMiddle;%-1;
+            rTO(toIdx) = theFrameInTheMiddle;%+1;
             
         end
     end
@@ -282,8 +282,8 @@ for toIdx = 1:numel(lTO)
         if( toeToHeelTime> 0 && toeToHeelTime <= HSTOReorderThreshS)
             
             theFrameInTheMiddle = round((rHS(hsIdx) + lTO(toIdx))/2);
-            rHS(hsIdx) = theFrameInTheMiddle-1;
-            lTO(toIdx) = theFrameInTheMiddle+1;
+            rHS(hsIdx) = theFrameInTheMiddle;%-1;
+            lTO(toIdx) = theFrameInTheMiddle;%+1;
             
         end
     end
@@ -293,9 +293,9 @@ end
 if plotOn == 1
     
     %%
-    figure(3)
+    figure(3);
     
-    subplot(211)
+    subplot(211);
     hold on
     grid on
     ylim([-.7, 1])

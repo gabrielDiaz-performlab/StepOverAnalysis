@@ -1,8 +1,9 @@
-function sessionData = findFootCrossingTime( sessionData, trIdx )
-%Kamran Binaee
+function sessionData = findFootCrossingTime( sessionData, trIdx , plotData )
+
+% Kamran Binaee
 % Find when each foot breaks the plane of the obstacle first
 % Identify which one crosses first
-
+%FIXME:  Add plotting functionality to validate process
 
 %FINDTOECLEARANCE Summary of this function goes here
 %   Detailed explanation goes here
@@ -15,17 +16,20 @@ function sessionData = findFootCrossingTime( sessionData, trIdx )
     
     obstacleFront_Y = trialStruct.obstacle_XposYposHeight(2) - obsLW(2)/2;
     
+    % Get marker data for all markers on the feet
     rightFoot_fr_mkr_XYZ = trialStruct.rightFoot_fr_mkr_XYZ;
-    rightFootY_frIdx_mIdx = squeeze(rightFoot_fr_mkr_XYZ(:,:,2));
-    [ rightFootMaxY_frIdx,maxRightMkrIdx_fr] = max(rightFootY_frIdx_mIdx,[],2);
-    
     leftFoot_fr_mkr_XYZ = trialStruct.leftFoot_fr_mkr_XYZ;
-    leftFootY_frIdx_mIdx = squeeze(leftFoot_fr_mkr_XYZ(:,:,1));
+    
+    % Grab the position on Y axis
+    rightFootY_frIdx_mIdx = squeeze(rightFoot_fr_mkr_XYZ(:,:,2));
+    leftFootY_frIdx_mIdx = squeeze(leftFoot_fr_mkr_XYZ(:,:,2));
+    
+    % Find the Y data of the foot marker that is furthest up the Y axis
+    [ rightFootMaxY_frIdx,maxRightMkrIdx_fr] = max(rightFootY_frIdx_mIdx,[],2);
     [ leftFootMaxY_frIdx, maxLeftMkrIdx_fr] = max(leftFootY_frIdx_mIdx,[],2);
     
+
     %%
-    keyboard
-    
     rightFootCrossingFr = find( rightFootMaxY_frIdx > obstacleFront_Y ,1,'first');
     leftFootCrossingFr = find( leftFootMaxY_frIdx > obstacleFront_Y ,1,'first');
     
@@ -50,13 +54,13 @@ function sessionData = findFootCrossingTime( sessionData, trIdx )
 %% Here is where variables are saved out to sessionData.
 % This should happen in one place, for simplicity.
 
-sessionData.processedData_tr(trIdx).rightFootCrossingFr = rightFootCrossingFr;
-sessionData.processedData_tr(trIdx).leftFootCrossingFr = leftFootCrossingFr;
-sessionData.processedData_tr(trIdx).rightFootMkrIdx = rightFootMkrIdx;
-sessionData.processedData_tr(trIdx).leftFootMkrIdx = leftFootMkrIdx;
-sessionData.processedData_tr(trIdx).firstCrossingFoot = firstCrossingFoot;
+sessionData.dependentMeasures_tr(trIdx).rightFootCrossingFr = rightFootCrossingFr;
+sessionData.dependentMeasures_tr(trIdx).leftFootCrossingFr = leftFootCrossingFr;
+sessionData.dependentMeasures_tr(trIdx).rightFootMkrIdx = rightFootMkrIdx;
+sessionData.dependentMeasures_tr(trIdx).leftFootMkrIdx = leftFootMkrIdx;
+sessionData.dependentMeasures_tr(trIdx).firstCrossingFoot = firstCrossingFoot;
 
-display 'findFootOverPattern: [rightFootCrossingFr, leftFootCrossingFr, rightFootMkrIdx, leftFootMkrIdx, firstCrossingFoot]'
+%display 'In findFootOverPattern: rightFootCrossingFr, leftFootCrossingFr, rightFootMkrIdx, leftFootMkrIdx, firstCrossingFoot'
 
 % %%
 % if( showFigures == 1) 

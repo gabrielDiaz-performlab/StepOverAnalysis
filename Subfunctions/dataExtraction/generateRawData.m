@@ -1,7 +1,14 @@
-function trialStructs_tr =  generateRawData(MatFileName)
+function sessionStruct =  generateRawData(MatFileName)
     
     %MatFileName = 'Exp_RawMat_exp_data-2014-11-26-16-38.mat';
     load(MatFileName)
+    
+    
+    sessionStruct = struct;
+    
+    expInfo = struct;
+    expInfo.obstacleHeights = [];
+    expInfo.trialTypes = [];
     
 %     ################################################################
 %     ##  Eventflag
@@ -17,9 +24,9 @@ function trialStructs_tr =  generateRawData(MatFileName)
     TrialStartFr_tIdx = find(eventFlag == 1 );
     TrialStopFr_tIdx = [TrialStartFr_tIdx(2:end)-1 length(shutterGlass_XYZ)];
     
-    BlockIndex_tr = [1 1 1 1 1 1 2 2 2 2 2 2];
-    %FIXME:  Hacked in block numbers
+    blockIndex_tr = [1 1 1 1 1 1 2 2 2 2 2 2];
     
+    %FIXME:  Hacked in block numbers
     
     rightFootCollision_cIdx = find(eventFlag == 4 );
     leftFootCollision_cIdx = find(eventFlag == 5 );
@@ -51,8 +58,6 @@ function trialStructs_tr =  generateRawData(MatFileName)
     
     % FIXME:  subIsWalkingUpAxis should be drawn from data file.
     
-   
-    
     Head_fr_mkr_XYZ = zeros(m,4,3);
     for k = 0:4
         
@@ -63,8 +68,6 @@ function trialStructs_tr =  generateRawData(MatFileName)
         %Head_fr_mkr_XYZ(:,k,:) = prepareFOR( squeeze(Head_fr_mkr_XYZ(:,k,:)) , subIsWalkingUpAxis );
         
     end
-    
-    
     
     %% FIXME: Data export hardcoded for expected number of markers
     RightFoot_fr_mkr_XYZ = zeros(m,4,3);
@@ -98,14 +101,15 @@ function trialStructs_tr =  generateRawData(MatFileName)
     %% Assemble data into vector of trial structs
     
     % First, create an array of empty structs.
+    
     trialStruct = struct;
-    N = length(TrialStartFr_tIdx);
-    trialStructs_tr = repmat(trialStruct, N, 1 );
+    numTrials = length(TrialStartFr_tIdx);
+    trialStructs_tr = repmat(trialStruct, numTrials, 1 );
    
     %%  Now, fill each struct with data!
     
-    
-    for tIdx = 1:N
+    %% 
+    for tIdx = 1:numTrials
     
         % Add basic trial start/stop info
         trialStructs_tr(tIdx).startFr = TrialStartFr_tIdx(tIdx);
@@ -113,7 +117,7 @@ function trialStructs_tr =  generateRawData(MatFileName)
         
         trialStructs_tr(tIdx).trialType = trialType(TrialStartFr_tIdx(tIdx)); 
         
-        %trialStructs_tr.blockIdx = 
+        trialStructs_tr(tIdx).blockIdx = blockIndex_tr(tIdx);
         
         % Fix ME:
         %trialStructs_tr(tIdx).block = BlockIndex_tr(tIdx);
@@ -180,7 +184,27 @@ function trialStructs_tr =  generateRawData(MatFileName)
         
         trialStructs_tr(tIdx).rightFootRot_fr_d1_d2 = rightFootRotTemp_fr_d1_d2;
         trialStructs_tr(tIdx).leftFootRot_fr_d1_d2 = leftFootRotTemp_fr_d1_d2;
-
+    
+        % This will build an unordered vector of unique values that appear
+        % in the list of trials
+       
+        expInfo.obstacleHeights = sort(unique( [[expInfo.obstacleHeights] [trialStructs_tr(tIdx).obstacle_XposYposHeight(3)]] )); 
+        expInfo.trialTypes = sort(unique( [[expInfo.trialTypes] [trialStructs_tr(tIdx).trialType]] ));
+        
     end
+   
+    %% Set session struct and expStruct info
+    
+    sessionStruct.rawData_tr = trialStructs_tr;
+    
+    expInfo.numTrials = numTrials;
+    expInfo.numBlockTypes = numel(unique(blockIndex_tr));
+    expInfo.numTrialTypes = numel(unique([trialStructs_tr(tIdx).trialType]));
+    
+    expInfo.obsHeightRatios = [.15 .25 .35];
+    display(fprintf('FIXME: generateRawData - IMPORT LEG LENGTH RATIO ***CURRENTLY HARDCODED at %f %f %f **\n',expInfo.obsHeightRatios))
+    
+    
+    sessionStruct.expInfo = expInfo;
     
 end
