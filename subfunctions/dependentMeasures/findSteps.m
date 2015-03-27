@@ -232,24 +232,24 @@ end
 
 
 
-% %% Some cleanup
-% % Make sure the first event is a toe off, and last is a heel strike
-%
-% while( lTO(1) > lHS(1) )
-%     lHS(1) = [];
-% end
-%
-% while( rTO(1) > rHS(1) )
-%     rHS(1) = [];
-% end
-%
-% while( lTO(end) > lHS(end)  )
-%     lTO(end) = [];
-% end
-%
-% while( rTO(end) > rHS(end) )
-%     rTO(end) = [];
-% end
+%% Some cleanup
+% Make sure the first event is a toe off, and last is a heel strike
+
+while( lTO(1) > lHS(1) )
+    lHS(1) = [];
+end
+
+while( rTO(1) > rHS(1) )
+    rHS(1) = [];
+end
+
+while( lTO(end) > lHS(end)  )
+    lTO(end) = [];
+end
+
+while( rTO(end) > rHS(end) )
+    rTO(end) = [];
+end
 
 %% Find toe-offs that occur shortly before heelstrikes
 
@@ -364,10 +364,13 @@ if plotOn == 1
 end
 
 
-sessionData.dependentMeasures_tr(trialNum).rightToeOff_idx = rTO;
-sessionData.dependentMeasures_tr(trialNum).rightHeelStrike_idx = rHS;
+sessionData.dependentMeasures_tr(trialNum).rFoot.toeOff_idx = rTO;
+sessionData.dependentMeasures_tr(trialNum).rFoot.heelStrike_idx = rHS;
 
-sessionData.dependentMeasures_tr(trialNum).leftToeOff_idx = lTO;
-sessionData.dependentMeasures_tr(trialNum).leftHeelStrike_idx = lHS;
+sessionData.dependentMeasures_tr(trialNum).lFoot.toeOff_idx = lTO;
+sessionData.dependentMeasures_tr(trialNum).lFoot.heelStrike_idx = lHS;
+
+sessionData.dependentMeasures_tr(trialNum).bothFeet.toeOff_idx = sort([rTO lTO]);
+sessionData.dependentMeasures_tr(trialNum).bothFeet.heelStrike_idx = sort([rHS lHS]);
 
 end

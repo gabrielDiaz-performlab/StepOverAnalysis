@@ -14,11 +14,12 @@ dmTrialStruct = sessionData.dependentMeasures_tr(trIdx);
 
 %% Determine if step is with right or left foot, then X location of other foot
 
+
 stepFoot = dmTrialStruct.firstCrossingFoot;
 obsYLoc = rawTrialStruct.obstacle_XposYposHeight(2);
 obsHeight = rawTrialStruct.obstacle_XposYposHeight(3);
-rightCrossFrame = dmTrialStruct.rightFootCrossingFr;
-leftCrossFrame = dmTrialStruct.leftFootCrossingFr;
+rightCrossFrame = dmTrialStruct.rFoot.crossingFr;
+leftCrossFrame = dmTrialStruct.lFoot.crossingFr;
 
 %% 
 
