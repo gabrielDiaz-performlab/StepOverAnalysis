@@ -26,10 +26,12 @@ sessionNumber = 1;
 parseTextFileToMat(sessionNumber)
 
 dataFileString = sprintf('%s.mat',dataFileList{sessionNumber})
+%%
 
 sessionData = generateRawData(dataFileString);
 sessionData.expInfo.fileID = dataFileList{sessionNumber};
 
+%%
 sessionData.expInfo.numConditions = 2;
 sessionData.expInfo.numObsHeights = 3;
 
@@ -62,29 +64,55 @@ for trIdx = 1:numel(sessionData.rawData_tr)
     
 end
 
+
 %% Make some figures
 
-sessionData.dependentMeasures_tr
-
+dm = sessionData.dependentMeasures_tr;
+xData = sessionData.expInfo.obsHeightRatios;
 %%
+
 % Group trials by condition and obs height and take the average
-sessionData = mean_cIdx_hIdx(sessionData,'leadToeZASO',0)
+sessionData = mean_cIdx_hIdx(sessionData,[dm.leadToeZASO],'leadToeZASO');
+
 % Plot the mean / std calculated above
-leadToeZASO = plot_cIdx_hIdx(sessionData,'leadToeZASO',sessionData.expInfo.obsHeightRatios,'obstacle height','toeZ ASO');
+ss = sessionData.summaryStats;
+leadToeZASO = plot_cIdx_hIdx(xData,ss.meanLeadToeZASO_cIdx_hIdx,ss.stdLeadToeZASO_cIdx_hIdx,'obstacle height','toeZ ASO');
 title('Height ASO')
 
-% Group trials by condition and obs height and take the average
-sessionData = mean_cIdx_hIdx(sessionData,'leadToeZClearanceASO',0)
-% Plot the mean / std calculated above
-leadToeZASO2 = plot_cIdx_hIdx(sessionData,'leadToeZClearanceASO',sessionData.expInfo.obsHeightRatios,'obstacle height','toeZ clearance ASO');
-title('Clearance ASO')
-
+%%
 
 % Group trials by condition and obs height and take the average
-sessionData = mean_cIdx_hIdx(sessionData,'leadToeZClearanceASO',0)
+sessionData = mean_cIdx_hIdx(sessionData,[dm.leadToeZASO],'leadToeZClearanceASO');
+
 % Plot the mean / std calculated above
-leadToeZASO2 = plot_cIdx_hIdx(sessionData,'leadToeZClearanceASO',sessionData.expInfo.obsHeightRatios,'obstacle height','toeZ clearance ASO');
+ss = sessionData.summaryStats;
+leadToeZASO = plot_cIdx_hIdx(xData,ss.meanLeadToeZASO_cIdx_hIdx,ss.meanLeadToeZClearanceASO_cIdx_hIdx,'obstacle height (m)','toeZ ASO (m)');
 title('Clearance ASO')
 
 
 %%
+% Group trials by condition and obs height and take the average
+% Note that sessionData.dependentMeasures_tr.bothFeet, or dm.bothFeet
+% returns a bunch of structs.  You can turn them into an array using [] 
+dmBoth_tr = [dm.bothFeet];
+
+sessionData = mean_cIdx_hIdx(sessionData,[dmBoth_tr.stepDur_sIdx],'leadToeZClearanceASO');
+
+% Plot the mean / std calculated above
+ss = sessionData.summaryStats;
+leadToeZASO = plot_cIdx_hIdx(xData,ss.meanLeadToeZASO_cIdx_hIdx,ss.meanLeadToeZClearanceASO_cIdx_hIdx,'obstacle height (m)','toeZ ASO (m)');
+title('Clearance ASO')
+
+%%
+
+dmBothFeet = [sessionData.dependentMeasures_tr.bothFeet];
+
+% Group trials by condition and obs height and take the average
+sessionData = mean_cIdx_hIdx(sessionData,[dmBothFeet.stepDur_sIdx],'bothFeetStepDur');
+ss = sessionData.summaryStats;
+
+% Plot the mean / std calculated above
+leadToeZASO = plot_cIdx_hIdx(xData,ss.meanBothFeetStepDur_cIdx_hIdx,ss.stdBothFeetStepDur_cIdx_hIdx,'obstacle height (m)','step duration (s)');
+
+%leadToeZASO2 = plot_cIdx_hIdx(sessionData,'leadToeZClearanceASO',sessionData.expInfo.obsHeightRatios,'obstacle height','toeZ clearance ASO');
+title('Step Duration')

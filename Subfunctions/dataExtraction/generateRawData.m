@@ -49,7 +49,7 @@ function sessionStruct =  generateRawData(MatFileName)
     
     [m, n, p] = size(shutterGlass_XYZ);
     
-    TrialNumber = 1
+    TrialNumber = 1;
 
     if (m<1 || n<1)
         fprintf('.mat file is empty !!\n')

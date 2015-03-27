@@ -1,4 +1,4 @@
-function figH  = plot_cIdx_hIdx(sessionData,yVarStr,xData,xLabelStr,yLabelStr) 
+function figH  = plot_cIdx_hIdx(xData,meanYData_cIdx_hIdx,stdYData_cIdx_hIdx,xLabelStr,yLabelStr) 
 
 %%  Plot data
 % Fixme:  create generalized function that plot the mean/std
@@ -6,23 +6,24 @@ function figH  = plot_cIdx_hIdx(sessionData,yVarStr,xData,xLabelStr,yLabelStr)
 %yVarStr = 'LeadToeZASO';
 %xData = sessionData.expInfo.obsHeightRatios;
 
+%%
 
-figH = figure( sum(double( yVarStr )) );
+figH = figure( sum(double( yLabelStr )) );
 clf
 hold on
 
-% Make sure caps aren't an issue
-yVarStr = [upper(yVarStr(1)) yVarStr(2:end)];
-meanVarString = ['mean' yVarStr '_cIdx_hIdx'];
-stdVarString = ['std' yVarStr '_cIdx_hIdx'];
-
-if(sum(strcmp(fieldnames(sessionData.summaryStats),meanVarString ))==0)
-    fprintf('plot:  No such data in .plot  \n')
-    %return
-else
-    eval( [ 'meanYData_cIdx_hIdx = [sessionData.summaryStats.' meanVarString '];']);
-    eval( [ 'stdYData_cIdx_hIdx = [sessionData.summaryStats.' stdVarString '];']);
-end
+% % Make sure caps aren't an issue
+% yVarStr = [upper(yVarStr(1)) yVarStr(2:end)];
+% meanVarString = ['mean' yVarStr '_cIdx_hIdx'];
+% stdVarString = ['std' yVarStr '_cIdx_hIdx'];
+% 
+% if(sum(strcmp(fieldnames(sessionData.summaryStats),meanVarString ))==0)
+%     fprintf('plot:  No such data in .plot  \n')
+%     %return
+% else
+%     eval( [ 'meanYData_cIdx_hIdx = [sessionData.summaryStats.' meanVarString '];']);
+%     eval( [ 'stdYData_cIdx_hIdx = [sessionData.summaryStats.' stdVarString '];']);
+% end
 
 l1 = errorbar( xData, meanYData_cIdx_hIdx(1,:)',stdYData_cIdx_hIdx(1,:)','LineWidth',2);
 l2 = errorbar( xData, meanYData_cIdx_hIdx(2,:)',stdYData_cIdx_hIdx(1,:)','LineWidth',2);
@@ -41,10 +42,10 @@ set(gca,'xtick',xData);
 xlim([ min(allXData)-buff*range(allXData) max(allXData)+buff*range(allXData) ]);
 
 allYData = [ l1.YData l2.YData ];
-allYLData = [ l1.YData-l1.LData l2.YData-l2.LData l2.YData+l1.UData l2.YData+l2.UData ]; % lower part of error bar
+allYLData = [ l1.YData-l1.LData l2.YData-l2.LData]; % lower part of error bar
+allYUData = [ l1.YData+l1.UData l2.YData+l2.UData ]; % upper parts of error bar
 
-
-ylim([ min(allYLData)-buff*range(allYLData) max(allYLData)+ buff*range(allYLData) ]);
+ylim([ min(allYLData)-buff*range(allYData) max(allYUData)+ buff*range(allYData) ]);
 
 xlabel(xLabelStr)
 
