@@ -76,11 +76,14 @@ spineVelY = diff(spine_fr_xyz(:,2)) ./ diff( spine_fr_xyz(:,1));
 %find frame wherein feet are moving
 %timeElapsed_fr = [1/60 diff(trialData.frameTime_fr)];
 
-frameRate = mean(diff(sessionData.rawData_tr(1).frameTime_fr));
-samplingRate = 1/frameRate ;
+meanFrameDur = sessionData.expInfo.meanFrameDur;
+meanFrameRate = sessionData.expInfo.meanFrameRate;
 
-rAnkVelY = [0 diff(rightFoot_fr_XYZ(:,2))'] ./ samplingRate;
-lAnkVelY = [0 diff(leftFoot_fr_XYZ(:,2))'] ./ samplingRate;
+%frameRate = mean(diff(sessionData.rawData_tr(1).frameTime_fr));
+%meanFrameRate = 1/frameRate ;
+
+rAnkVelY = [0 diff(rightFoot_fr_XYZ(:,2))'] ./ meanFrameRate;
+lAnkVelY = [0 diff(leftFoot_fr_XYZ(:,2))'] ./ meanFrameRate;
 
 
 %% Find frames when foot is under a height threshold
@@ -131,7 +134,7 @@ for i = 1:maxIndex
             % Do NOT count as a TO if...
             % check1: nextRTO is less than HSTOReorderThreshS from last lTo
             % check2: nextRTO occurs before last heelstrike
-            if( ( numel(rTO) > 0 && (nextRTO - rTO(end)) * frameRate < HSTOReorderThreshS ) ||... % Check 1
+            if( ( numel(rTO) > 0 && (nextRTO - rTO(end)) * meanFrameDur < HSTOReorderThreshS ) ||... % Check 1
                     ( numel(rHS) > 0 && rHS(end) - nextRTO > 0)) % Check 2
                 
                 rUpIter = rUpIter + 1;
@@ -156,7 +159,7 @@ for i = 1:maxIndex
             % Do NOT count as a TO if...
             % check1: nextLTO is less than HSTOReorderThreshS from last lTo
             % check2: nextLTO occurs before last heelstrike
-            if( ( numel(lTO) > 0 && (nextLTO - lTO(end)) * frameRate < HSTOReorderThreshS ) ||... % check 1
+            if( ( numel(lTO) > 0 && (nextLTO - lTO(end)) * meanFrameDur < HSTOReorderThreshS ) ||... % check 1
                     ( numel(lHS) > 0 && lHS(end)- nextLTO > 0 )) % check 2
                 
                 lUpIter = lUpIter  + 1;
@@ -186,7 +189,7 @@ for i = 1:maxIndex
             % Do NOT count as a TO if...
             % check1: nextRHS is less than HSTOReorderThreshS from last rHS
             % check2: nextRHS occurs before last TO
-            if( ( numel(rHS) > 0 && (nextRHS - rHS(end)) * frameRate < HSTOReorderThreshS ) ||... % check 1
+            if( ( numel(rHS) > 0 && (nextRHS - rHS(end)) * meanFrameDur < HSTOReorderThreshS ) ||... % check 1
                     ( numel(rTO) > 0 && rTO(end)- nextRHS > 0 )) % check 2
                 
                 rDownIter = rDownIter + 1;
@@ -212,7 +215,7 @@ for i = 1:maxIndex
             % Do NOT count as a TO if...
             % check1: nextRHS is less than HSTOReorderThreshS from last rHS
             % check2: nextRHS occurs before last TO
-            if( ( numel(lHS) > 0 && (nextLHS - lHS(end)) * frameRate < HSTOReorderThreshS ) ||... % check 1
+            if( ( numel(lHS) > 0 && (nextLHS - lHS(end)) * meanFrameDur < HSTOReorderThreshS ) ||... % check 1
                     ( numel(lTO) > 0 && lTO(end)- nextLHS > 0 )) % check 2
                 lDownIter = lDownIter + 1;
             else
@@ -303,8 +306,8 @@ if plotOn == 1
     xlabel('Frame')
     ylabel('normalized velocity')
     
-    plot((rAnkVelY*samplingRate)./ max(abs(rAnkVelY*samplingRate)),'c')
-    plot((lAnkVelY*samplingRate)./ max(abs(lAnkVelY*samplingRate)),':m')
+    plot((rAnkVelY*meanFrameRate)./ max(abs(rAnkVelY*meanFrameRate)),'c')
+    plot((lAnkVelY*meanFrameRate)./ max(abs(lAnkVelY*meanFrameRate)),':m')
     legend('right','left','location','Best')
     
     hline(0,'k')

@@ -44,6 +44,7 @@ sessionData.expInfo
 
 save(sessionFilePath,'sessionData')
 
+
 %% Interpolate and filter
 
 % It seems that data is already interpolated.
@@ -51,31 +52,32 @@ save(sessionFilePath,'sessionData')
 % I should probably try and turn this off and see what happens,
 % Or import marker condition
 
+sessionData = calculateSamplingRate(sessionData);
 sessionData = interpolateMocapData(sessionData, 0);
 sessionData = filterMocapData(sessionData, 0);
-
-%% Some methods for plotting a trial
-
-%plotTrialMarkers(sessionData,2);
-plotTrialRigid(sessionData,2)
 
 %% Some per-trial functions
 
 for trIdx = 1:numel(sessionData.rawData_tr)
 
-    [ sessionData ] = findSteps(sessionData, trIdx, 1);
+    [ sessionData ] = findSteps(sessionData, trIdx, 0);
     [ sessionData ] = findFootCrossing(sessionData, trIdx,0);
     [ sessionData ] = stepLengthAndDur(sessionData,trIdx);
     
-    
     [ sessionData ] = toeHeightAndClearanceASO(sessionData, trIdx);
-    
-    %[ sessionData ] = stepLengthAndDurASO(sessionData,trIdx);
+    [ sessionData ] = stepLengthAndDurASO(sessionData,trIdx);
+    [ sessionData ] = findCOM(sessionData,trIdx);
+    [ sessionData ] = avgCOMVelocity(sessionData,trIdx);
     
 end
 
-
 %%
+
+%% Some methods for plotting a trial
+
+%plotTrialMarkers(sessionData,2);
+%plotTrialRigid(sessionData,2)
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Make some figures

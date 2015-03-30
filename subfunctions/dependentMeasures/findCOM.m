@@ -1,5 +1,11 @@
 %Carrie Griffo, Andrew Smith
-%Modified 2/23/15
+%Modified 3/29/15
+
+% This is a placeholder function that calculates the center of mass form
+% motion capture data.
+
+% This currently relies on a set of markers placed at the spine
+% In the future, this will rely on whole-body motion capture data
 
 function [sessionData] = findCOM(sessionData, trIdx)
 %findCOM calculates the COM for all frames in the data set.
@@ -16,7 +22,6 @@ for idx = 1:length(spine)
 end
 
 tempVar = [averageX; averageY; averageZ];
-size(tempVar)
-sessionData.COM  = tempVar;
+sessionData.processedData(trIdx).COM_fr_XYZ  = tempVar';
 
 end

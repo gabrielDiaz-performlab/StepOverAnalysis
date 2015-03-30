@@ -6,7 +6,8 @@ loadParameters
 % findSamplingRate: estimates sampling rate from data for use in
 % filter, necessary b/c of variable sampling rate for vizard log
 
-samplingRate = 1 / mean(diff(sessionData.rawData_tr(1).frameTime_fr));
+samplingRate = sessionData.expInfo.meanFrameRate;
+%1 / mean(diff(sessionData.rawData_tr(1).frameTime_fr));
 
 %% Interpolate marker data
 
@@ -260,33 +261,5 @@ for trIdx = 1:numTrials
         end
     end
 end
-%
-%             if( headInterpFrames_tr_mkr_XYZ_cFr(trIdx,:,mIdx)
-%
-%             subplot(230+xyzIdx)
-%             if( xyzIdx == 2)
-%                 title(sprintf('right foot, marker %u, XYZ subplots',mIdx))
-%             end
-%             hold on
-%             grid on
-%             plot(sessionData.rawData_tr(trIdx).rightFoot_fr_mkr_XYZ(:,mIdx ,xyzIdx),'r')
-%             plot(sessionData.rawData_tr(trIdx).rightFoot_fr_mkr_XYZ(:,mIdx ,xyzIdx),':b')
-%
-%
-%             subplot(233+xyzIdx)
-%             if( xyzIdx == 2)
-%                 title(sprintf('left foot, marker %u , XYZ subplots',mIdx))
-%             end
-%             hold on
-%             grid on
-%             plot(sessionData.rawData_tr(trIdx).leftFoot_fr_mkr_XYZ(:,mIdx ,xyzIdx),'r')
-%             plot(sessionData.rawData_tr(trIdx).leftFoot_fr_mkr_XYZ(:,mIdx ,xyzIdx),':b')
-%
-%         end
-%
-%         waitforbuttonpress
-%         clf
-%     end
-%
-% end
+
 
