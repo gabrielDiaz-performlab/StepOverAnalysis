@@ -1,8 +1,9 @@
 function sessionStruct =  generateRawData(MatFileName)
     
+    
     %MatFileName = 'Exp_RawMat_exp_data-2014-11-26-16-38.mat';
     load(MatFileName)
-    
+    loadParameters
     
     sessionStruct = struct;
     
@@ -201,7 +202,7 @@ function sessionStruct =  generateRawData(MatFileName)
     expInfo.numBlockTypes = numel(unique(blockIndex_tr));
     expInfo.numTrialTypes = numel(unique([trialStructs_tr(tIdx).trialType]));
     
-    expInfo.obsHeightRatios = [.15 .25 .35];
+    expInfo.obsHeightRatios = obsHeightRatios ;%[.15 .25 .35];
     display(fprintf('FIXME: generateRawData - IMPORT LEG LENGTH RATIO ***CURRENTLY HARDCODED at %f %f %f **\n',expInfo.obsHeightRatios))
     
     

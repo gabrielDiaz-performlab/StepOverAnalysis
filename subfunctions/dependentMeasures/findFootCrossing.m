@@ -96,7 +96,7 @@ sessionData.dependentMeasures_tr(trIdx).firstCrossingFoot = firstCrossingFoot;
 
 
 %%
-%sessionData.dependentMeasures_tr(trIdx).bothFeet.crossingStepIdx =
+sessionData.dependentMeasures_tr(trIdx).bothFeet.crossingStepIdx = bothFeetCrossingStepIdx;
 
 %%
 

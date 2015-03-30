@@ -38,7 +38,11 @@ obsPositionIfWalkingDown = 2.4;
 
 obsLW = [5,.03];
 
+numConditions = 2;
+numObsHeights = 3;
 
+obsHeightRatios = [.15 .25 .35];
+footSize_LWH = [.25 .1 .07];
 
 %standingBoxOffset_Z = - 2;
 

@@ -2,7 +2,6 @@ function plotTrialMarkers(sessionData,trialNum)
 
 trialData = sessionData.rawData_tr(trialNum);
 
-trialData.subIsWalkingUpAxis
 
 % Create figure
 figure1 = figure(trialNum);

@@ -32,11 +32,25 @@ end
 
 
 %%
+evalStr1 = ['sessionData.summaryStats.mean' upper(varOutStr(1)) varOutStr(2:end) '_cIdx_hIdx = dataMean_cIdx_hIdx;' ];
+evalStr2 = ['sessionData.summaryStats.std' upper(varOutStr(1)) varOutStr(2:end) '_cIdx_hIdx = dataStd_cIdx_hIdx;' ];
 
-eval(['sessionData.summaryStats.mean' upper(varOutStr(1)) varOutStr(2:end) '_cIdx_hIdx = dataMean_cIdx_hIdx;' ])
-eval(['sessionData.summaryStats.std' upper(varOutStr(1)) varOutStr(2:end) '_cIdx_hIdx = dataStd_cIdx_hIdx;' ])
+try
+    eval(evalStr1);
+catch
+    
+    fprintf('mean_cIdx:hIdx: Error evaluating: %s',evalStr1)
+end
 
-%eval(['sessionData.summaryStats.mean' upper(varNameStr(1)) varNameStr(2:end) '_cIdx_hIdx = dataMean_cIdx_hIdx;' ])
-%eval(['sessionData.summaryStats.std' upper(varNameStr(1)) varNameStr(2:end) '_cIdx_hIdx = dataStd_cIdx_hIdx;' ])
+try
+    eval(evalStr2);
+
+catch
+    
+    fprintf('mean_cIdx:hIdx: Error evaluating: %s',evalStr2)
+end
+
+%eval(['sessionData.summaryStats.mean' upper(varOutStr(1)) varOutStr(2:end) '_cIdx_hIdx = dataMean_cIdx_hIdx;' ])
+    %eval(['sessionData.summaryStats.std' upper(varOutStr(1)) varOutStr(2:end) '_cIdx_hIdx = dataStd_cIdx_hIdx;' ])
 
 
