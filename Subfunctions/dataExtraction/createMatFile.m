@@ -31,8 +31,8 @@ function createMatFile(structHandler, textFileDir, textFileName, matFileDir)
     S2_fr_XYZ = zeros(numberOfLines, 3);
     S3_fr_XYZ = zeros(numberOfLines, 3);
 
-    rightFootQUAT_fr_XYZW = zeros(numberOfLines, 4);
-    leftFootQUAT_fr_XYZW = zeros(numberOfLines, 4);
+    rightFootQUAT_fr_WXYZ = nan(numberOfLines, 4);
+    leftFootQUAT_fr_WXYZ = nan(numberOfLines, 4);
     
     for i = 1:numberOfLines
 
@@ -66,22 +66,33 @@ function createMatFile(structHandler, textFileDir, textFileName, matFileDir)
       %% ===========================================
       
       %%
-      varName = 'rightFootQUAT_WXYZ'; % rightFootQUAT_XYZW
+      varName = 'RightFootQUAT_XYZW'; % rightFootQUAT_XYZW
       numVals = 4;
 
-      data_valIdx = extractVarFromLine(currentLine, varName, numVals  );
-      
-      rightFootQUAT_fr_WXYZ(i,:) = [ -data_valIdx(4) data_valIdx(1) data_valIdx(3) data_valIdx(2) ];
-      
+      try
+          data_valIdx = extractVarFromLine(currentLine, varName, numVals  );
+          
+          rightFootQUAT_fr_WXYZ(i,:) = [ data_valIdx(1) data_valIdx(3) data_valIdx(2) -data_valIdx(4) ];
+      catch
+          keyboard
+      end
     
       %% ============= Left foot quat =============
       %% ===========================================
    
-      varInName = 'leftFootQUAT_WXYZ';
+      varInName = 'LightFootQUAT_XYZW';
       numVals = 4;
       data_valIdx = extractVarFromLine(currentLine, varName, numVals  );
-      leftFootQUAT_fr_WXYZ(i,:) = [ -data_valIdx(4) data_valIdx(1) data_valIdx(3) data_valIdx(2) ];
-     
+      
+      try
+          data_valIdx = extractVarFromLine(currentLine, varName, numVals  );
+          leftFootQUAT_fr_WXYZ(i,:) = [ data_valIdx(1) data_valIdx(3) data_valIdx(2) -data_valIdx(4) ];
+          %rightFootQUAT_fr_WXYZ(i,:) = [ data_valIdx(1) data_valIdx(3) data_valIdx(2) -data_valIdx(4) ];
+      catch
+          keyboard
+      end
+      
+      
       
       
       %% =========== Collision Location ============
@@ -665,6 +676,6 @@ function createMatFile(structHandler, textFileDir, textFileName, matFileDir)
     save ([matFileDir textFileName '.mat'],'frameTime','trialType',...
         'eventFlag', 'obstacle_XYZ','collision_XYZ','shutterGlass_XYZ',...
         'rightFoot_XYZ','leftFoot_XYZ','spinal_XYZ',...
-        'leftFootQUAT_fr_WXYZ','rightFootQUAT_fr_WXYZ')
+        'rightFootQUAT_fr_WXYZ','leftFootQUAT_fr_WXYZ')
 end
 

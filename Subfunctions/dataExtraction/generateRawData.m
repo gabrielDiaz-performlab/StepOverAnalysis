@@ -22,12 +22,13 @@ function sessionStruct =  generateRawData(MatFileName)
 %     # 6 Trial end
 %     # 7 Block end
 		
-    TrialStartFr_tIdx = find(eventFlag == 1 );
+    TrialStartFr_tIdx = find(eventFlag == 6 );
     TrialStopFr_tIdx = [TrialStartFr_tIdx(2:end)-1 length(shutterGlass_XYZ)];
     
     blockIndex_tr = [1 1 1 1 1 1 2 2 2 2 2 2];
     
     %FIXME:  Hacked in block numbers
+    
     
     rightFootCollision_cIdx = find(eventFlag == 4 );
     leftFootCollision_cIdx = find(eventFlag == 5 );
@@ -177,10 +178,19 @@ function sessionStruct =  generateRawData(MatFileName)
         leftFootRotTemp_fr_d1_d2 = zeros(length(frIdxList),4,4);
         
         for frIdx = 1:length(frIdxList)
-            frInExpVec = frIdxList(frIdx);
-            rightFootRotTemp_fr_d1_d2(frIdx,:,:) = quaternion2matrix( squeeze(rightFootQUAT_fr_WXYZ(frInExpVec ,:,:,:,:)));
-            leftFootRotTemp_fr_d1_d2(frIdx,:,:) = quaternion2matrix( squeeze(leftFootQUAT_fr_WXYZ(frInExpVec ,:,:,:,:)));
             
+            frInExpVec = frIdxList(frIdx);
+            
+            rQuat_WXYZ = squeeze(rightFootQUAT_fr_WXYZ(frInExpVec ,:,:,:,:));
+            lQuat_WXYZ = squeeze(leftFootQUAT_fr_WXYZ(frInExpVec ,:,:,:,:));
+            
+            if( subIsWalkingUpAxis == 0 )
+                rQuat_WXYZ([2 3]) = -rQuat_WXYZ([2 3]);
+                lQuat_WXYZ([2 3]) = -lQuat_WXYZ([2 3]);
+            end
+            
+            leftFootRotTemp_fr_d1_d2(frIdx,:,:) = quaternion2matrix(lQuat_WXYZ);
+            rightFootRotTemp_fr_d1_d2(frIdx,:,:) = quaternion2matrix(rQuat_WXYZ);
         end
         
         trialStructs_tr(tIdx).rightFootRot_fr_d1_d2 = rightFootRotTemp_fr_d1_d2;
