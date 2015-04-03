@@ -22,10 +22,12 @@ function sessionStruct =  generateRawData(MatFileName)
 %     # 6 Trial end
 %     # 7 Block end
 		
-    TrialStartFr_tIdx = find(eventFlag == 6 );
+    TrialStartFr_tIdx = find(eventFlag == 1 );
     TrialStopFr_tIdx = [TrialStartFr_tIdx(2:end)-1 length(shutterGlass_XYZ)];
     
-    blockIndex_tr = [1 1 1 1 1 1 2 2 2 2 2 2];
+    %%
+    blockIndex_tr = blockNum(TrialStartFr_tIdx);
+    sessionStruct.expInfo.legLengthCM  = legLengthCM(1);
     
     %FIXME:  Hacked in block numbers
     

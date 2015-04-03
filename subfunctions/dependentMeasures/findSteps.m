@@ -47,6 +47,11 @@ loadParameters
 % Added a height threshold saved in through to loadParameters
 
 
+rightFoot_fr_XYZ = sessionData.processedData_tr(trialNum).rightFoot_fr_XYZ;
+leftFoot_fr_XYZ = sessionData.processedData_tr(trialNum).leftFoot_fr_XYZ;
+spine_fr_xyz= sessionData.processedData_tr(trialNum).spine_fr_xyz;
+
+
 % Before subtracting spine position, get height
 rFootHeight_fr =  rightFoot_fr_XYZ(:,3);
 lFootHeight_fr =  leftFoot_fr_XYZ(:,3);

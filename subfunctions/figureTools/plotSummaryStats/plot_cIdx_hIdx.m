@@ -8,6 +8,8 @@ function figH  = plot_cIdx_hIdx(xData,meanYData_cIdx_hIdx,stdYData_cIdx_hIdx,xLa
 
 %%
 
+loadParameters
+
 figH = figure( sum(double( yLabelStr )) );
 clf
 hold on
@@ -25,8 +27,8 @@ hold on
 %     eval( [ 'stdYData_cIdx_hIdx = [sessionData.summaryStats.' stdVarString '];']);
 % end
 
-l1 = errorbar( xData, meanYData_cIdx_hIdx(1,:)',stdYData_cIdx_hIdx(1,:)','LineWidth',2);
-l2 = errorbar( xData, meanYData_cIdx_hIdx(2,:)',stdYData_cIdx_hIdx(1,:)','LineWidth',2);
+l1 = errorbar( xData, meanYData_cIdx_hIdx(1,:)',stdYData_cIdx_hIdx(1,:)','LineWidth',2,'LineStyle',lineStyle_cond(1));
+l2 = errorbar( xData, meanYData_cIdx_hIdx(2,:)',stdYData_cIdx_hIdx(1,:)','LineWidth',2,'LineStyle',lineStyle_cond(2));
 
 buff = 0.1;
 
