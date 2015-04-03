@@ -3,8 +3,12 @@ function plotTrialRigid(sessionData,trialNum)
 loadParameters
 
 trialData = sessionData.rawData_tr(trialNum);
-
 numFrames = size(trialData.rightFoot_fr_mkr_XYZ,1);
+
+if( sessionData.rawData_tr(trialNum).subIsWalkingUpAxis == 0 )
+    fprintf('Trial is flipped\n')
+end
+
 % Create figure
 figure1 = figure(trialNum);
 clf
@@ -12,16 +16,15 @@ set(gcf,'Renderer','OpenGL');
 hold on 
 axis off
 
-
 %% Plot markers over time
 
-plotMarkersFromRigid(figure1,trialData.rightFoot_fr_mkr_XYZ,'r')
-plotMarkersFromRigid(figure1,trialData.leftFoot_fr_mkr_XYZ,'b')
-plotMarkersFromRigid(figure1,trialData.head_fr_mkr_XYZ,'k')
-plotMarkersFromRigid(figure1,trialData.spine_fr_mkr_XYZ,'g')
+% plotMarkersFromRigid(figure1,trialData.rightFoot_fr_mkr_XYZ,'r')
+% plotMarkersFromRigid(figure1,trialData.leftFoot_fr_mkr_XYZ,'b')
+% plotMarkersFromRigid(figure1,trialData.head_fr_mkr_XYZ,'k')
+% plotMarkersFromRigid(figure1,trialData.spine_fr_mkr_XYZ,'g')
 
 %% Plot obstacle
-plotObs(sessionData,trialNum,'c')
+plotObs(sessionData,trialNum,'c');
 
 axis([-2, 2, -0.5, 7.5, 0,2.25])
 axis equal
@@ -73,7 +76,7 @@ footSize_LWH = [.25 .1 .07];
 rotMat_d1_d2 = squeeze(trialData.leftFootRot_fr_d1_d2(frIdx,:,:));
 lFootBox = plotBox(figure1,footPos_XYZ,footSize_LWH,rotMat_d1_d2,'b');
 
-for frIdx = 1:3:numFrames
+for frIdx = 1:5:numFrames
    
     camPos_XYZ = [1 spine_fr_xyz(frIdx,2) .7];
     camTarg_XYZ = [0 spine_fr_xyz(frIdx,2) .7];

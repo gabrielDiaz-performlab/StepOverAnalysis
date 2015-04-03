@@ -4,7 +4,7 @@ function sessionData = mean_cIdx_hIdx(sessionData,data_tr,varOutStr)
 % Fixme:  create generalized function that calculate the mean/std
 % for any input variable of the form data_tr.
 
-
+loadParameters
 %%
 % condition (real vs virtual) vs height (s, m, tall).
 % Fixme: must average over trial types
@@ -17,16 +17,21 @@ dataStd_cIdx_hIdx = nan(numConditions ,numObsHeights);
 for cIdx = 1:numConditions
     for hIdx = 1:numObsHeights
         
-        trOfType_tIdx = find( [sessionData.rawData_tr.trialType] == hIdx * cIdx );
+        trOfType_tIdx = find( [sessionData.rawData_tr.trialType] == hIdx + ((cIdx-1)*3)  );
             
             if( sum( isnan([data_tr(trOfType_tIdx)]) ) > 0 )
-               print( 'Found a NAN value!' )
-               return
+               fprintf( 'Found a NAN value!\n' )
             end
             
-            dataMean_cIdx_hIdx(cIdx,hIdx) = mean([data_tr(trOfType_tIdx)]);
-            dataStd_cIdx_hIdx(cIdx,hIdx) = std([data_tr(trOfType_tIdx)]);
-
+            yData_tr = data_tr(trOfType_tIdx);
+            yData_tr = removeOutliers(yData_tr,outlierThreshold)
+            
+            dataMean_cIdx_hIdx(cIdx,hIdx) = nanmean([yData_tr ]);
+            dataStd_cIdx_hIdx(cIdx,hIdx) = nanstd(yData_tr);
+            
+%             if( cIdx == 2 && hIdx == 1)
+%                 keyboard
+%             end
     end
 end
 

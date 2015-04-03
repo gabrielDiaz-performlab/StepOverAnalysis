@@ -15,9 +15,17 @@ if(sum(strcmp(fieldnames(dmTrialStruct),'bothFeet'))==0)
    return 
 end
 
+% If a stepover was not found, set stepLengthASO and stepDurASO_sIdx to nan
+if( isnan(dmTrialStruct.bothFeet.crossingStepIdx) )
+    %fprintf('stepLengthAndDurASO: Subject did not pass the obstacle. \n');
+    sessionData.dependentMeasures_tr(trIdx).stepLengthASO = nan;
+    sessionData.dependentMeasures_tr(trIdx).stepDurASO_sIdx = nan;
+    return
+end
+
 bf = dmTrialStruct.bothFeet;
 crossStepIdx = bf.crossingStepIdx;
-
+    
 stepLength = bf.stepDist_sIdx(crossStepIdx);
 stepDur_sIdx = bf.stepDur_sIdx(crossStepIdx);
 

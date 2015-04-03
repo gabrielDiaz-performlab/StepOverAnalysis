@@ -40,7 +40,12 @@ elseif strcmp(stepFoot, 'Left')
     trailToeZASO= rawTrialStruct.rightFoot_fr_mkr_XYZ(rightCrossFrame,1,3); %FIXME: Which marker is toe?
     
 else
-    print('toeClearanceASO: Unknown initial step foot');
+    fprintf('toeClearanceASO: Subject did not pass the obstacle. \n');
+    
+    leadToeZClearanceASO  = NaN;
+    trailToeZClearanceASO  = NaN;
+    leadToeZASO  = NaN;
+    trailToeZASO  = NaN;
 end
 
 sessionData.dependentMeasures_tr(trIdx).leadToeZClearanceASO = leadToeZClearanceASO;

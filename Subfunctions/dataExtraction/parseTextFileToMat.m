@@ -2,6 +2,7 @@ function parseTextFileToMat (sessionNumber)
     
     loadParameters
     textFileName = dataFileList{sessionNumber};
+    textFilePath = ['rawData/' textFileName ];
     structFilePath  = [ structFileDir textFileName '-struct.mat'];
     
     
@@ -11,7 +12,7 @@ function parseTextFileToMat (sessionNumber)
         %fprintf('.mat File Not Found Parsing The TextFile %s\n', textFileName);
         fprintf('Could not find struct file %s. Parsing text file...\n', structFilePath  );
         
-        textFileStruct = parseTextFiletoStruct(textFileName);
+        textFileStruct = parseTextFiletoStruct(textFilePath);
         save( structFilePath  , 'textFileStruct');
         
         fprintf ('Struct file %s.mat created from text file\n', structFilePath  )

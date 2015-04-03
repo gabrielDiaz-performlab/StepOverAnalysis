@@ -19,7 +19,7 @@ close all
 loadParameters
 
 % You just need to pass the .mat file name and the experiment Data structure will be generated
-sessionNumber = 1;
+sessionNumber = 2;
 
 parseTextFileToMat(sessionNumber)
 
@@ -56,10 +56,19 @@ sessionData = calculateSamplingRate(sessionData);
 sessionData = interpolateMocapData(sessionData, 0);
 sessionData = filterMocapData(sessionData, 0);
 
+%%
+
+sessionData = avgTrialDuration(sessionData);
+sessionData.expInfo.meanTrialDuration
+
+% (40 * 60 ) / 10
+
 %% Some per-trial functions
 
 for trIdx = 1:numel(sessionData.rawData_tr)
-
+    
+    [ sessionData ] = calcMeanRigidBodyPos(sessionData, trIdx);
+    
     [ sessionData ] = findSteps(sessionData, trIdx, 0);
     [ sessionData ] = findFootCrossing(sessionData, trIdx,0);
     [ sessionData ] = stepLengthAndDur(sessionData,trIdx);
@@ -71,12 +80,10 @@ for trIdx = 1:numel(sessionData.rawData_tr)
     
 end
 
-%%
-
-%% Some methods for plotting a trial
+% Some methods for plotting a trial
 
 %plotTrialMarkers(sessionData,2);
-%plotTrialRigid(sessionData,2)
+%plotTrialRigid(sessionData,3)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -94,6 +101,17 @@ sessionData = mean_cIdx_hIdx(sessionData,[dm.leadToeZASO],'leadToeZASO');
 ss = sessionData.summaryStats;
 fig_leadToeZASO = plot_cIdx_hIdx(xData,ss.meanLeadToeZASO_cIdx_hIdx,ss.stdLeadToeZASO_cIdx_hIdx,'obstacle height','lead toe Z ASO');
 title('lead toe height ASO')
+ylim([0 .6])
+
+% %% Lead Toe Height ASO BY REPETITION
+% 
+% % Group trials by condition and obs height and take the average
+% %sessionData = mean_cIdx_hIdx(sessionData,[dm.leadToeZASO],'leadToeZASO');
+% % Plot the mean / std calculated above
+% ss = sessionData.summaryStats;
+% fig_leadToeZASO_REP = plot_cIdx_hIdx_REP(sessionData,[sessionData.dependentMeasures_tr.leadToeZASO],'repetition','lead toe Z ASO');
+% title('lead toe height ASO by repetition')
+% ylim([0.2 .6])
 
 %% Lead Toe Clearance ASO
 
@@ -102,8 +120,9 @@ sessionData = mean_cIdx_hIdx(sessionData,[dm.leadToeZASO],'leadToeZClearanceASO'
 
 % Plot the mean / std calculated above
 ss = sessionData.summaryStats;
-fig_leadToeClearanceASO = plot_cIdx_hIdx(xData,ss.meanLeadToeZClearanceASO_cIdx_hIdx,ss.meanLeadToeZClearanceASO_cIdx_hIdx,'obstacle height (m)','toeZ ASO (m)');
+fig_leadToeClearanceASO = plot_cIdx_hIdx(xData,ss.meanLeadToeZClearanceASO_cIdx_hIdx,ss.stdLeadToeZClearanceASO_cIdx_hIdx,'obstacle height (m)','toeZ ASO (m)');
 title('lead toe clearance ASO')
+ylim([0 1])
 
 %% Trail Toe Height ASO
 
@@ -114,6 +133,7 @@ sessionData = mean_cIdx_hIdx(sessionData,[dm.trailToeZASO],'trailToeZASO');
 ss = sessionData.summaryStats;
 fig_leadToeZASO = plot_cIdx_hIdx(xData,ss.meanTrailToeZASO_cIdx_hIdx,ss.stdTrailToeZASO_cIdx_hIdx,'obstacle height','trail toe Z ASO');
 title('trail toe height ASO')
+ylim([0 1])
 
 %% Trail Toe Clearance ASO
 
@@ -124,6 +144,10 @@ sessionData = mean_cIdx_hIdx(sessionData,[dm.trailToeZClearanceASO],'trailToeZCl
 ss = sessionData.summaryStats;
 fig_leadToeClearanceASO = plot_cIdx_hIdx(xData,ss.meanTrailToeZClearanceASO_cIdx_hIdx,ss.stdTrailToeZClearanceASO_cIdx_hIdx,'obstacle height (m)','toeZ ASO (m)');
 title('trail toe clearance ASO')
+ylim([0 .6])
+
+%%
+
 
 
 
@@ -140,9 +164,6 @@ sessionData = mean_cIdx_hIdx(sessionData,[dmBoth_tr.stepDur_sIdx],'stepDuration'
 ss = sessionData.summaryStats;
 fig_stepDur = plot_cIdx_hIdx(xData,ss.meanLeadToeZASO_cIdx_hIdx,ss.meanLeadToeZClearanceASO_cIdx_hIdx,'obstacle height (m)','toeZ ASO (m)');
 title('Step duration')
-
-
-
 
 %% Step duration ASO  
 % this one is a bit tricky because the variable of interest (dep. measure)
@@ -164,7 +185,11 @@ crossingStepIdx_tr = [dmBoth_tr .crossingStepIdx];
 crossingStepDur_tr = nan(1,numel(stepDur_tr_cSIdx));
 
 for trIdx = 1:numel(stepDur_tr_cSIdx)
-    crossingStepDur_tr(trIdx) = stepDur_tr_cSIdx{trIdx}(crossingStepIdx_tr(trIdx));
+    if( ~isnan(crossingStepIdx_tr(trIdx)))
+        crossingStepDur_tr(trIdx) = stepDur_tr_cSIdx{trIdx}(crossingStepIdx_tr(trIdx));
+    else
+        crossingStepDur_tr(trIdx) = NaN;
+    end
 end
 
 % Group trials by condition and obs height and take the average
@@ -173,10 +198,11 @@ ss = sessionData.summaryStats;
 
 % Plot the mean / std calculated above
 leadToeZASO = plot_cIdx_hIdx(xData,ss.meanBothFeetStepDur_cIdx_hIdx,ss.stdBothFeetStepDur_cIdx_hIdx,'obstacle height (m)','step duration ASO (s)');
-
+ylim([0 .6]);
 %leadToeZASO2 = plot_cIdx_hIdx(sessionData,'leadToeZClearanceASO',sessionData.expInfo.obsHeightRatios,'obstacle height','toeZ clearance ASO');
 title('Step Duration ASO')
 
 %%
 
 save(sessionFilePath,'sessionData')
+

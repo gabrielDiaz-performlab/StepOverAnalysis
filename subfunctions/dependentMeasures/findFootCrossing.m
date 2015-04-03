@@ -64,23 +64,38 @@ end
 rTO_sIdx = sessionData.dependentMeasures_tr(trIdx).rFoot.toeOff_idx;
 rHS_sIdx = sessionData.dependentMeasures_tr(trIdx).rFoot.heelStrike_idx;
 
-rightFootCrossingStepIdx = intersect(find( rTO_sIdx < rightFootCrossingFr,1,'last'), find( rHS_sIdx > rightFootCrossingFr,1,'first'));
+if( isempty(rightFootCrossingFr) )
+    rightFootCrossingStepIdx  = NaN;
+else
+    rightFootCrossingStepIdx = intersect(find( rTO_sIdx < rightFootCrossingFr,1,'last'), find( rHS_sIdx > rightFootCrossingFr,1,'first'));
+end
 
 lTO_sIdx = sessionData.dependentMeasures_tr(trIdx).lFoot.toeOff_idx;
 lHS_sIdx = sessionData.dependentMeasures_tr(trIdx).lFoot.heelStrike_idx;
 
-leftFootCrossingStepIdx = intersect(find( lTO_sIdx < leftFootCrossingFr,1,'last'), find( lHS_sIdx > leftFootCrossingFr,1,'first'));
+if( isempty(rightFootCrossingFr) )
+    leftFootCrossingStepIdx= NaN;
+else
+    leftFootCrossingStepIdx = intersect(find( lTO_sIdx < leftFootCrossingFr,1,'last'), find( lHS_sIdx > leftFootCrossingFr,1,'first'));
+end
+
+%%
 
 bothTO_sIdx = sessionData.dependentMeasures_tr(trIdx).bothFeet.toeOff_idx;
 bothHS_sIdx = sessionData.dependentMeasures_tr(trIdx).bothFeet.heelStrike_idx;
+
 firstCrossingFrame = min( [rightFootCrossingFr leftFootCrossingFr]);
 
-bothFeetCrossingStepIdx = intersect(find( bothTO_sIdx < firstCrossingFrame ,1,'last'), find( bothHS_sIdx > firstCrossingFrame  ,1,'first'));
+if( isempty(firstCrossingFrame ) )
+    bothFeetCrossingStepIdx= NaN;
+else
+    bothFeetCrossingStepIdx = intersect(find( bothTO_sIdx < firstCrossingFrame ,1,'last'), find( bothHS_sIdx > firstCrossingFrame  ,1,'first'));
+end
+
+
 
 %% Here is where variables are saved out to sessionData.
 % This should happen in one place, for simplicity.
-
-
 
 sessionData.dependentMeasures_tr(trIdx).rFoot.crossingFr = rightFootCrossingFr;
 sessionData.dependentMeasures_tr(trIdx).lFoot.crossingFr = leftFootCrossingFr;
@@ -95,7 +110,6 @@ sessionData.dependentMeasures_tr(trIdx).lFoot.crossingStepIdx  = leftFootCrossin
 sessionData.dependentMeasures_tr(trIdx).firstCrossingFoot = firstCrossingFoot;
 
 
-%%
 sessionData.dependentMeasures_tr(trIdx).bothFeet.crossingStepIdx = bothFeetCrossingStepIdx;
 
 %%

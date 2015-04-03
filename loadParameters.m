@@ -14,8 +14,8 @@ structFileDir = 'structFiles/';
 
 
 dataFileList = {...
-    'exp_data-2015-3-16-17-18',...
-    'exp_data-2015-3-16-17-22',...
+    'exp_data-2015-4-1-19-9'...
+    'exp_data-2015-4-2-15-32'
     };
 
 %% Parameters used by algorithms
@@ -46,3 +46,9 @@ footSize_LWH = [.25 .1 .07];
 
 %standingBoxOffset_Z = - 2;
 
+%% Figure colors / linestyles
+
+lineStyle_cond = ['-',':'];
+lineColor_height = ['r','g','b'];
+
+outlierThreshold = 2;

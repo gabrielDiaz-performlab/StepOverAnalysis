@@ -37,10 +37,10 @@ else
     
     if(subIsWalkingUpAxis)
         % Subtract box position
-        dataOutXYZ = [-dataOutXYZ(:,1), (dataOutXYZ(:,2) - standingBoxPosOnAxis),dataOutXYZ(:,3)];
+        dataOutXYZ = [dataOutXYZ(:,1), (dataOutXYZ(:,2) - standingBoxPosOnAxis),dataOutXYZ(:,3)];
     else
         % Subtract box position and flip walking direction
-        dataOutXYZ = [dataOutXYZ(:,1), -(dataOutXYZ(:,2) - standingBoxPosOnAxis),dataOutXYZ(:,3)];
+        dataOutXYZ = [-dataOutXYZ(:,1), -(dataOutXYZ(:,2) - standingBoxPosOnAxis),dataOutXYZ(:,3)];
     end
     
 end
