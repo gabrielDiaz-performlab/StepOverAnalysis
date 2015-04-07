@@ -6,14 +6,7 @@ function [sessionData] = avgCOMVelocity(sessionData, trIdx)
 rawTrialStruct = sessionData.rawData_tr(trIdx);
 proTrialStruct = sessionData.processedData_tr(trIdx);
 
-try
-    COM_fr_XYZ = sessionData.processedData.COM_fr_XYZ;
-catch 
-    COM_fr_XYZ = findCOM(sessionData,trIdx);
-end
-
-
-
+COM_fr_XYZ = sessionData.processedData_tr.COM_fr_XYZ;
 
 %% This pushing isn't necessary.  
 % %velocity = distance / time

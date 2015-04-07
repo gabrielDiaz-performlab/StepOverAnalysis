@@ -49,6 +49,7 @@ footSize_LWH = [.25 .1 .07];
 %% Figure colors / linestyles
 
 lineStyle_cond = ['-',':'];
-lineColor_height = ['r','g','b'];
+lineColor_cond = ['r','b'];
+figBufferPro = .3
 
 outlierThreshold = 2;

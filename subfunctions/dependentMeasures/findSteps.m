@@ -357,6 +357,9 @@ if plotOn == 1
     
 end
 
+sessionData.dependentMeasures_tr(trialNum).rFoot = struct;
+sessionData.dependentMeasures_tr(trialNum).lFoot = struct;
+sessionData.dependentMeasures_tr(trialNum).bothFeet = struct;
 
 sessionData.dependentMeasures_tr(trialNum).rFoot.toeOff_idx = rTO;
 sessionData.dependentMeasures_tr(trialNum).rFoot.heelStrike_idx = rHS;

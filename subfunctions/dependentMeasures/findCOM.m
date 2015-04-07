@@ -22,6 +22,6 @@ for idx = 1:length(spine)
 end
 
 tempVar = [averageX; averageY; averageZ];
-sessionData.processedData(trIdx).COM_fr_XYZ  = tempVar';
+sessionData.processedData_tr(trIdx).COM_fr_XYZ  = tempVar';
 
 end

@@ -1,16 +1,18 @@
-function figH  = plot_cIdx_hIdx(xData,meanYData_cIdx_hIdx,stdYData_cIdx_hIdx,xLabelStr,yLabelStr) 
+function figH  = plot_cIdx_hIdx(xData,meanYData_cIdx_hIdx,stdYData_cIdx_hIdx,varString) %,xLabelStr,yLabelStr) 
 
 %%  Plot data
-% Fixme:  create generalized function that plot the mean/std
-% for any input variable of the form data_tr.
-%yVarStr = 'LeadToeZASO';
-%xData = sessionData.expInfo.obsHeightRatios;
-
-%%
 
 loadParameters
 
-figH = figure( sum(double( yLabelStr )) );
+% if( isempty(inputname(2)) )
+%     fprintf('Please assign your Y data means (argIn #2) to a variable with a UNIQUE name before passing into plot_cIdx_hIdx \n')
+%     fprintf('This variable name is used to generate a unique number specific to this variable.\n')
+%     figH = NaN;
+%     return
+% end
+
+%%
+figH = figure( sum(double( varString )) );
 clf
 hold on
 
@@ -27,34 +29,37 @@ hold on
 %     eval( [ 'stdYData_cIdx_hIdx = [sessionData.summaryStats.' stdVarString '];']);
 % end
 
-l1 = errorbar( xData, meanYData_cIdx_hIdx(1,:)',stdYData_cIdx_hIdx(1,:)','LineWidth',2,'LineStyle',lineStyle_cond(1));
-l2 = errorbar( xData, meanYData_cIdx_hIdx(2,:)',stdYData_cIdx_hIdx(1,:)','LineWidth',2,'LineStyle',lineStyle_cond(2));
 
-buff = 0.1;
+l1 = errorbar( xData, meanYData_cIdx_hIdx(1,:)',stdYData_cIdx_hIdx(1,:)','LineWidth',3,'LineStyle',lineStyle_cond(1),'Color',lineColor_cond(1),'Marker','o','MarkerFaceColor',lineColor_cond(1),'MarkerSize',10,'MarkerEdgeColor','k');
+l2 = errorbar( xData, meanYData_cIdx_hIdx(2,:)',stdYData_cIdx_hIdx(1,:)','LineWidth',3,'LineStyle',lineStyle_cond(2),'Color',lineColor_cond(2),'Marker','o','MarkerFaceColor',lineColor_cond(2),'MarkerSize',10,'MarkerEdgeColor','k');
+
+
 
 allXData = [ l1.XData l2.XData ];
 
 l2X = l2.XData;
-l2.XData = l2X-0.25*buff*range(allXData);
+l2.XData = l2X-0.2*figBufferPro*range(allXData);
 
 l1X = l1.XData;
-l1.XData = l1X+0.25*buff*range(allXData);
+l1.XData = l1X+0.2*figBufferPro*range(allXData);
 
 set(gca,'xtick',xData);
-xlim([ min(allXData)-buff*range(allXData) max(allXData)+buff*range(allXData) ]);
+xlim([ min(allXData)-figBufferPro*range(allXData) max(allXData)+figBufferPro*range(allXData) ]);
 
 allYData = [ l1.YData l2.YData ];
 allYLData = [ l1.YData-l1.LData l2.YData-l2.LData]; % lower part of error bar
 allYUData = [ l1.YData+l1.UData l2.YData+l2.UData ]; % upper parts of error bar
 
-ylim([ min(allYLData)-buff*range(allYData) max(allYUData)+ buff*range(allYData) ]);
+ylim([ min(allYLData)-figBufferPro*range(allYData) max(allYUData)+ figBufferPro*range(allYData) ]);
 
-xlabel(xLabelStr)
+xlabel({'obstacle heights', '(in units of leg length)'})
 
-if(nargin < 4)
-    ylabel(meanVarString)
-else
-    ylabel(yLabelStr)
-end
+% xlabel(xLabelStr)
+% 
+% if(nargin < 4)
+%     ylabel(meanVarString)
+% else
+%     ylabel(yLabelStr)
+% end
 
 

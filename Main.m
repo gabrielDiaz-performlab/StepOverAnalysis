@@ -21,29 +21,18 @@ loadParameters
 % You just need to pass the .mat file name and the experiment Data structure will be generated
 sessionNumber = 2;
 
-parseTextFileToMat(sessionNumber)
-
 dataFileString = sprintf('%s.mat',dataFileList{sessionNumber})
 
 textFileName = dataFileList{sessionNumber};
-structFilePath  = [ structFileDir textFileName '-struct.mat'];
 
-%%
 
-sessionFilePath = [ sessionFileDir textFileName '.mat'];
-sessionData = generateRawData(sessionFilePath );
+%% Generate or open session file struct
 
-%%
+sessionData = generateSessionStruct(sessionNumber);
 
-sessionData.expInfo.fileID = dataFileList{sessionNumber};
+%% Reset the struct for a fresh analysis
 
-sessionData.expInfo.numConditions = numConditions ;
-sessionData.expInfo.numObsHeights = numObsHeights ;
-
-sessionData.expInfo
-
-save(sessionFilePath,'sessionData')
-
+sessionData = cleanSessionData(sessionData);
 
 %% Interpolate and filter
 
@@ -53,13 +42,12 @@ save(sessionFilePath,'sessionData')
 % Or import marker condition
 
 sessionData = calculateSamplingRate(sessionData);
-sessionData = interpolateMocapData(sessionData, 0);
-sessionData = filterMocapData(sessionData, 0);
+sessionData = interpAndFilterData(sessionData, 0);
 
 %%
 
 sessionData = avgTrialDuration(sessionData);
-sessionData.expInfo.meanTrialDuration
+sessionData.expInfo.meanTrialDuration;
 
 % (40 * 60 ) / 10
 
@@ -74,12 +62,16 @@ for trIdx = 1:numel(sessionData.rawData_tr)
     [ sessionData ] = stepLengthAndDur(sessionData,trIdx);
     
     [ sessionData ] = toeHeightAndClearanceASO(sessionData, trIdx);
+    
     [ sessionData ] = stepLengthAndDurASO(sessionData,trIdx);
     [ sessionData ] = findCOM(sessionData,trIdx);
     [ sessionData ] = avgCOMVelocity(sessionData,trIdx);
+    [ sessionData ] = maxVelAndHeightAXS(sessionData,trIdx) ;
     
 end
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Some methods for plotting a trial
 
 %plotTrialMarkers(sessionData,2);
@@ -89,120 +81,70 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Make some figures
 
+figH = struct;
 dm = sessionData.dependentMeasures_tr;
-xData = sessionData.expInfo.obsHeightRatios;
 
-%% Lead Toe Height ASO
-
-% Group trials by condition and obs height and take the average
-sessionData = mean_cIdx_hIdx(sessionData,[dm.leadToeZASO],'leadToeZASO');
-
-% Plot the mean / std calculated above
-ss = sessionData.summaryStats;
-fig_leadToeZASO = plot_cIdx_hIdx(xData,ss.meanLeadToeZASO_cIdx_hIdx,ss.stdLeadToeZASO_cIdx_hIdx,'obstacle height','lead toe Z ASO');
-title('lead toe height ASO')
-ylim([0 .6])
 
 % %% Lead Toe Height ASO BY REPETITION
 % 
 % % Group trials by condition and obs height and take the average
-% %sessionData = mean_cIdx_hIdx(sessionData,[dm.leadToeZASO],'leadToeZASO');
+% %sessionData = cNp_cIdx_hIdx(sessionData,[dm.leadToeZASO],'leadToeZASO');
 % % Plot the mean / std calculated above
 % ss = sessionData.summaryStats;
 % fig_leadToeZASO_REP = plot_cIdx_hIdx_REP(sessionData,[sessionData.dependentMeasures_tr.leadToeZASO],'repetition','lead toe Z ASO');
 % title('lead toe height ASO by repetition')
 % ylim([0.2 .6])
 
-%% Lead Toe Clearance ASO
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% duration of crossing step
 
-% Group trials by condition and obs height and take the average
-sessionData = mean_cIdx_hIdx(sessionData,[dm.leadToeZASO],'leadToeZClearanceASO');
+[sessionData figH.stepDurASO] = cNp_cIdx_hIdx(sessionData,'stepDurASO_sIdx')  
+ylabel({'crossing step','duration (s)' })
 
-% Plot the mean / std calculated above
-ss = sessionData.summaryStats;
-fig_leadToeClearanceASO = plot_cIdx_hIdx(xData,ss.meanLeadToeZClearanceASO_cIdx_hIdx,ss.stdLeadToeZClearanceASO_cIdx_hIdx,'obstacle height (m)','toeZ ASO (m)');
-title('lead toe clearance ASO')
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% lead max velocity AXS (at crossing step)
+
+[sessionData figH.leadFootVelAXS] = cNp_cIdx_hIdx(sessionData,'leadFootMaxVelAXS')  
+ylabel({'lead foot','max velocity ASX (m/s)' })
+ylim([0 7])
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% lead max  height AXS (at crossing step)
+    
+[sessionData figH.leadFootMaxZAXS] = cNp_cIdx_hIdx(sessionData,'leadFootMaxZAXS')  
+ylabel({'lead foot','max height ASX (m)' })
 ylim([0 1])
 
-%% Trail Toe Height ASO
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% lead clearance ASO (at step-over frame)
+    
+[sessionData figH.leadToeZClearanceASO] = cNp_cIdx_hIdx(sessionData,'leadToeZClearanceASO')  
+ylabel({'lead toe','max clearance ASO (m)' })
+ylim([0 0.5])
 
-% Group trials by condition and obs height and take the average
-sessionData = mean_cIdx_hIdx(sessionData,[dm.trailToeZASO],'trailToeZASO');
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% trail max velocity AXS (at crossing step)
 
-% Plot the mean / std calculated above
-ss = sessionData.summaryStats;
-fig_leadToeZASO = plot_cIdx_hIdx(xData,ss.meanTrailToeZASO_cIdx_hIdx,ss.stdTrailToeZASO_cIdx_hIdx,'obstacle height','trail toe Z ASO');
-title('trail toe height ASO')
+[sessionData figH.trailFootVelAXS] = cNp_cIdx_hIdx(sessionData,'trailFootMaxVelAXS')  
+ylabel({'trail foot','max velocity ASX (m/s)' })
+ylim([0 7])
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% trail max height AXS (at crossing step)
+    
+[sessionData figH.trailFootMaxZAXS] = cNp_cIdx_hIdx(sessionData,'trailFootMaxZAXS')  
+ylabel({'trail foot','max height ASX (m)' })
 ylim([0 1])
 
-%% Trail Toe Clearance ASO
-
-% Group trials by condition and obs height and take the average
-sessionData = mean_cIdx_hIdx(sessionData,[dm.trailToeZClearanceASO],'trailToeZClearanceASO');
-
-% Plot the mean / std calculated above
-ss = sessionData.summaryStats;
-fig_leadToeClearanceASO = plot_cIdx_hIdx(xData,ss.meanTrailToeZClearanceASO_cIdx_hIdx,ss.stdTrailToeZClearanceASO_cIdx_hIdx,'obstacle height (m)','toeZ ASO (m)');
-title('trail toe clearance ASO')
-ylim([0 .6])
-
-%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% trail clearance ASO (at step-over frame)
+    
+[sessionData figH.trailToeZClearanceASO] = cNp_cIdx_hIdx(sessionData,'trailToeZClearanceASO')  
+ylabel({'trail toe','max clearance ASO (m)' })
+ylim([0 0.5])
 
 
+tileFigs
 
 
-%% Average step duration
-
-% Group trials by condition and obs height and take the average
-% Note that sessionData.dependentMeasures_tr.bothFeet, or dm.bothFeet
-% returns a bunch of structs.  You can turn them into an array using [] 
-dmBoth_tr = [dm.bothFeet];
-
-sessionData = mean_cIdx_hIdx(sessionData,[dmBoth_tr.stepDur_sIdx],'stepDuration');
-
-% Plot the mean / std calculated above
-ss = sessionData.summaryStats;
-fig_stepDur = plot_cIdx_hIdx(xData,ss.meanLeadToeZASO_cIdx_hIdx,ss.meanLeadToeZClearanceASO_cIdx_hIdx,'obstacle height (m)','toeZ ASO (m)');
-title('Step duration')
-
-%% Step duration ASO  
-% this one is a bit tricky because the variable of interest (dep. measure)
-% is a struct buried withn a list of structs.  Yikes.
-% Let me try and break this down for yah...
-% We want to get at sessionData.dependentMeasures_tr.bothFeet.stepDur_sIdx
-% sessionData = struct
-% .dependentMeasures_tr = array of structs N trials long
-% ...and within each of these structs is another struct, bothFeet
-% bothFeet contains an array stepDur_sIdx.  
-% Yikes.  So that's...
-% struct.array(1:numTrials).struct.array(1:numSteps)
-
-%%%%% Here's how to get at the data buried in stepDur_sIdx
-dmBoth_tr  = [dm.bothFeet]; % Avoids a pesky matlab error.
-
-stepDur_tr_cSIdx = {dmBoth_tr .stepDur_sIdx}; % This creates a vector of cells.  Type in the var to see.
-crossingStepIdx_tr = [dmBoth_tr .crossingStepIdx]; 
-crossingStepDur_tr = nan(1,numel(stepDur_tr_cSIdx));
-
-for trIdx = 1:numel(stepDur_tr_cSIdx)
-    if( ~isnan(crossingStepIdx_tr(trIdx)))
-        crossingStepDur_tr(trIdx) = stepDur_tr_cSIdx{trIdx}(crossingStepIdx_tr(trIdx));
-    else
-        crossingStepDur_tr(trIdx) = NaN;
-    end
-end
-
-% Group trials by condition and obs height and take the average
-sessionData = mean_cIdx_hIdx(sessionData,crossingStepDur_tr,'bothFeetStepDur');
-ss = sessionData.summaryStats;
-
-% Plot the mean / std calculated above
-leadToeZASO = plot_cIdx_hIdx(xData,ss.meanBothFeetStepDur_cIdx_hIdx,ss.stdBothFeetStepDur_cIdx_hIdx,'obstacle height (m)','step duration ASO (s)');
-ylim([0 .6]);
-%leadToeZASO2 = plot_cIdx_hIdx(sessionData,'leadToeZClearanceASO',sessionData.expInfo.obsHeightRatios,'obstacle height','toeZ clearance ASO');
-title('Step Duration ASO')
-
-%%
-
-save(sessionFilePath,'sessionData')
 
