@@ -7,5 +7,5 @@ outlierIdx = [];
 outlierIdx  = [outlierIdx  find( variable > nanmean(variable)+nanstd(variable)*threshold) ];
 outlierIdx  = [outlierIdx  find( variable < nanmean(variable)-nanstd(variable)*threshold)];
 
-fprintf('Removed %u outliers',numel(outlierIdx))
+% fprintf('Removed %u outliers \n',numel(outlierIdx))
 newVariable ( outlierIdx) = NaN;

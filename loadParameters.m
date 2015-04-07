@@ -50,6 +50,6 @@ footSize_LWH = [.25 .1 .07];
 
 lineStyle_cond = ['-',':'];
 lineColor_cond = ['r','b'];
-figBufferPro = .3
+figBufferPro = .3;
 
 outlierThreshold = 2;

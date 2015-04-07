@@ -1,4 +1,4 @@
-function sessionData = calcMean_cIdx_hIdx(sessionData,data_tr,varOutStr)
+function sessionData = calcMean_cIdx_hIdx(sessionData,data_tr,varOutStr,removeOutliersBool)
 
 %% How to average over data and plot
 % Fixme:  create generalized function that calculate the mean/std
@@ -14,6 +14,11 @@ numObsHeights = sessionData.expInfo.numObsHeights;
 dataMean_cIdx_hIdx = nan(numConditions ,numObsHeights);
 dataStd_cIdx_hIdx = nan(numConditions ,numObsHeights);
 
+
+if( nargin > 3 && removeOutliersBool == 1 )
+    fprintf('dataStd_cIdx_hIdx: Removing outliers \n');
+end
+
 for cIdx = 1:numConditions
     for hIdx = 1:numObsHeights
         
@@ -24,7 +29,10 @@ for cIdx = 1:numConditions
             end
             
             yData_tr = data_tr(trOfType_tIdx);
-            yData_tr = removeOutliers(yData_tr,outlierThreshold)
+            
+            if( nargin > 3 && removeOutliersBool == 1)
+                yData_tr = removeOutliers(yData_tr,outlierThreshold);
+            end
             
             dataMean_cIdx_hIdx(cIdx,hIdx) = nanmean([yData_tr ]);
             dataStd_cIdx_hIdx(cIdx,hIdx) = nanstd(yData_tr);

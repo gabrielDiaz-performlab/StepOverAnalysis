@@ -98,48 +98,48 @@ dm = sessionData.dependentMeasures_tr;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % duration of crossing step
 
-[sessionData figH.stepDurASO] = cNp_cIdx_hIdx(sessionData,'stepDurASO_sIdx')  
+[sessionData figH.stepDurASO] = cNp_cIdx_hIdx(sessionData,'stepDurASO_sIdx');
 ylabel({'crossing step','duration (s)' })
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % lead max velocity AXS (at crossing step)
 
-[sessionData figH.leadFootVelAXS] = cNp_cIdx_hIdx(sessionData,'leadFootMaxVelAXS')  
+[sessionData figH.leadFootVelAXS] = cNp_cIdx_hIdx(sessionData,'leadFootMaxVelAXS');
 ylabel({'lead foot','max velocity ASX (m/s)' })
 ylim([0 7])
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % lead max  height AXS (at crossing step)
     
-[sessionData figH.leadFootMaxZAXS] = cNp_cIdx_hIdx(sessionData,'leadFootMaxZAXS')  
+[sessionData figH.leadFootMaxZAXS] = cNp_cIdx_hIdx(sessionData,'leadFootMaxZAXS');
 ylabel({'lead foot','max height ASX (m)' })
 ylim([0 1])
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % lead clearance ASO (at step-over frame)
     
-[sessionData figH.leadToeZClearanceASO] = cNp_cIdx_hIdx(sessionData,'leadToeZClearanceASO')  
+[sessionData figH.leadToeZClearanceASO] = cNp_cIdx_hIdx(sessionData,'leadToeZClearanceASO');
 ylabel({'lead toe','max clearance ASO (m)' })
 ylim([0 0.5])
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % trail max velocity AXS (at crossing step)
 
-[sessionData figH.trailFootVelAXS] = cNp_cIdx_hIdx(sessionData,'trailFootMaxVelAXS')  
+[sessionData figH.trailFootVelAXS] = cNp_cIdx_hIdx(sessionData,'trailFootMaxVelAXS');
 ylabel({'trail foot','max velocity ASX (m/s)' })
 ylim([0 7])
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % trail max height AXS (at crossing step)
     
-[sessionData figH.trailFootMaxZAXS] = cNp_cIdx_hIdx(sessionData,'trailFootMaxZAXS')  
+[sessionData figH.trailFootMaxZAXS] = cNp_cIdx_hIdx(sessionData,'trailFootMaxZAXS');
 ylabel({'trail foot','max height ASX (m)' })
 ylim([0 1])
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % trail clearance ASO (at step-over frame)
     
-[sessionData figH.trailToeZClearanceASO] = cNp_cIdx_hIdx(sessionData,'trailToeZClearanceASO')  
+[sessionData figH.trailToeZClearanceASO] = cNp_cIdx_hIdx(sessionData,'trailToeZClearanceASO');
 ylabel({'trail toe','max clearance ASO (m)' })
 ylim([0 0.5])
 
