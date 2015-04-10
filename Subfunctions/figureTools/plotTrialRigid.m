@@ -59,7 +59,7 @@ camproj('orthographic')
 camva('manual') 
 camva(60)
 
-spine_fr_xyz = sessionData.processedData_tr.spine_fr_xyz;
+spine_fr_xyz = sessionData.processedData_tr(trialNum).spine_fr_xyz;
 
 frIdx = 1;
 

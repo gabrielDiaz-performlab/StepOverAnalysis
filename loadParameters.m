@@ -1,21 +1,26 @@
 
 %dataFileFolder = '\MatlabDataFiles\';
-addpath(genpath('rawData'));
-addpath(genpath('sessionFiles'));
-addpath(genpath('structFiles'));
+addpath(genpath('data'));
+%addpath(genpath('sessionFiles'));
+%addpath(genpath('structFiles'));
+
 addpath(genpath('subFunctions'));
 addpath(genpath('figureTools'));
 
-textFileDir = 'rawData/';
-sessionFileDir = 'sessionFiles/';
-structFileDir = 'structFiles/';
+% textFileDir = 'rawData/';
+% structFileDir = 'structFiles/';
+% sessionFileDir = 'sessionFiles/';
+
+textFileDir = 'data/raw/';
+parsedTextFileDir = 'data/parsedTXT/';
+sessionFileDir = 'data/sessionFiles/';
 
 [junk junk] = mkdir('OutputFigures');
 
 
 dataFileList = {...
-    'exp_data-2015-4-1-19-9'...
     'exp_data-2015-4-2-15-32'
+    'exp_data-2015-4-9-16-18'
     };
 
 %% Parameters used by algorithms

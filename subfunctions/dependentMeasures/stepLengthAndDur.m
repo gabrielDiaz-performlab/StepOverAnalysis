@@ -51,8 +51,12 @@ leftFootY_frIdx_mIdx = squeeze(leftFoot_fr_mkr_XYZ(:,:,2));
 
 startPos_sIdx_Y = rightFootMaxY_frIdx(rTO_sIdx);
 endPos_sIdx_Y = rightFootMinY_frIdx(rHS_sIdx);
-rightFootDist_sIDX = (endPos_sIdx_Y-startPos_sIdx_Y);
 
+try
+    rightFootDist_sIDX = (endPos_sIdx_Y-startPos_sIdx_Y);
+catch
+    keyboard
+end
 startPos_sIdx_Y = leftFootMaxY_frIdx(lTO_sIdx);
 endPos_sIdx_Y = leftFootMinY_frIdx(lHS_sIdx);
 leftFootDist_sIDX = (endPos_sIdx_Y-startPos_sIdx_Y );

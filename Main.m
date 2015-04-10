@@ -23,15 +23,11 @@ sessionNumber = 2;
 
 dataFileString = sprintf('%s.mat',dataFileList{sessionNumber})
 
-textFileName = dataFileList{sessionNumber};
-
-
 %% Generate or open session file struct
+sessionData = loadSession(sessionNumber);
 
-sessionData = generateSessionStruct(sessionNumber);
-
-%% Reset the struct for a fresh analysis
-
+%% If you want, you can reset the struct for a fresh analysis
+% A safer thing to do.
 sessionData = cleanSessionData(sessionData);
 
 %% Interpolate and filter
@@ -143,8 +139,19 @@ ylim([0 1])
 ylabel({'trail toe','max clearance ASO (m)' })
 ylim([0 0.5])
 
+%% Visually organiez figures
 
-tileFigs
+% To automatically tile figures
+%tileFigs
 
+% Or, use my function "getFigureLayout" to save existing oranization to
+% clipboard for pasting tinto code, as done below
+set(1434,'Units','Normalized','Position',[0.56 0.2 0.39 0.47]);
+set(1913,'Units','Normalized','Position',[0.51 0.34 0.39 0.47]);
+set(1639,'Units','Normalized','Position',[0.46 0.43 0.39 0.47]);
+set(1568,'Units','Normalized','Position',[0.12 0.27 0.39 0.47]);
+set(2047,'Units','Normalized','Position',[0.058 0.36 0.39 0.47]);
+set(1773,'Units','Normalized','Position',[0.011 0.43 0.39 0.47]);
+set(1473,'Units','Normalized','Position',[0.27 0.01 0.39 0.47]);
 
 

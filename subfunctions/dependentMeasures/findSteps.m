@@ -121,6 +121,8 @@ for i = 1:maxIndex
         
         nextRTO = rFootUnderHeightThresh_idx( find( rFootUnderHeightThresh_idx <= rAnkVelY_upIdx(rUpIter),1,'last')) -1;
         
+        if( nextRTO == 0 ) nextRTO  = 1; end
+            
         if( ~isempty(nextRTO))
             % Do NOT count as a TO if...
             % check1: nextRTO is less than HSTOReorderThreshS from last lTo
@@ -145,6 +147,7 @@ for i = 1:maxIndex
     if leftlookingfor == 2 && lUpIter <= numel(lAnkVelY_upIdx)
         
         nextLTO = lFootUnderHeightThresh_idx( find( lFootUnderHeightThresh_idx <= lAnkVelY_upIdx(lUpIter),1,'last')) -1;
+        if( nextLTO == 0 ) nextLTO  = 1; end
         
         if( ~isempty(nextLTO))
             % Do NOT count as a TO if...
@@ -229,19 +232,19 @@ end
 %% Some cleanup
 % Make sure the first event is a toe off, and last is a heel strike
 
-while( lTO(1) > lHS(1) )
+while( lTO(1) >= lHS(1) )
     lHS(1) = [];
 end
 
-while( rTO(1) > rHS(1) )
+while( rTO(1) >= rHS(1) )
     rHS(1) = [];
 end
 
-while( lTO(end) > lHS(end)  )
+while( lTO(end) >= lHS(end)  )
     lTO(end) = [];
 end
 
-while( rTO(end) > rHS(end) )
+while( rTO(end) >= rHS(end) )
     rTO(end) = [];
 end
 
@@ -254,7 +257,6 @@ for toIdx = 1:numel(rTO)
         
         % Calc time between tO and hS
         toeToHeelTime = frameTime_fr(lHS(hsIdx)) - frameTime_fr(rTO(toIdx)) ;
-        
         % If TO occured < HSTOReorderThreshS before HS
         if( toeToHeelTime> 0 && toeToHeelTime <= HSTOReorderThreshS)
             

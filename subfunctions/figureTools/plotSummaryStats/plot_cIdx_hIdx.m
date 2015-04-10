@@ -38,10 +38,10 @@ l2 = errorbar( xData, meanYData_cIdx_hIdx(2,:)',stdYData_cIdx_hIdx(1,:)','LineWi
 allXData = [ l1.XData l2.XData ];
 
 l2X = l2.XData;
-l2.XData = l2X-0.2*figBufferPro*range(allXData);
+l2.XData = l2X - .1 * figBufferPro * range(allXData);
 
 l1X = l1.XData;
-l1.XData = l1X+0.2*figBufferPro*range(allXData);
+l1.XData = l1X+ .1 * figBufferPro *range(allXData);
 
 set(gca,'xtick',xData);
 xlim([ min(allXData)-figBufferPro*range(allXData) max(allXData)+figBufferPro*range(allXData) ]);
