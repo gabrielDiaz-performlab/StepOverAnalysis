@@ -28,40 +28,29 @@ for trIdx = 1:length(sessionData.rawData_tr)
     
     for mIdx = 1:size(rawData.spine_fr_mkr_XYZ,2)
         for xyzIdx = 1:3
-            processedData.spine_fr_mkr_XYZ(:,mIdx,xyzIdx) = butterLowZero(order,cutoff,samplingRate,rawData.spine_fr_mkr_XYZ(:,mIdx,xyzIdx));
+            
+            sessionData.processedData_tr(trIdx).spine_fr_mkr_XYZ(:,mIdx,xyzIdx) = butterLowZero(order,cutoff,samplingRate,rawData.spine_fr_mkr_XYZ(:,mIdx,xyzIdx));
         end
     end
     
     for mIdx = 1:size(rawData.rightFoot_fr_mkr_XYZ,2)
         for xyzIdx = 1:3
-            processedData.rightFoot_fr_mkr_XYZ(:,mIdx,xyzIdx) = butterLowZero(order,cutoff,samplingRate,rawData.rightFoot_fr_mkr_XYZ(:,mIdx,xyzIdx));
+            sessionData.processedData_tr(trIdx).rightFoot_fr_mkr_XYZ(:,mIdx,xyzIdx) = butterLowZero(order,cutoff,samplingRate,rawData.rightFoot_fr_mkr_XYZ(:,mIdx,xyzIdx));
         end
     end
     
     for mIdx = 1:size(rawData.leftFoot_fr_mkr_XYZ,2)
         for xyzIdx = 1:3
-            processedData.leftFoot_fr_mkr_XYZ(:,mIdx,xyzIdx) = butterLowZero(order,cutoff,samplingRate,rawData.leftFoot_fr_mkr_XYZ(:,mIdx,xyzIdx));
+            sessionData.processedData_tr(trIdx).leftFoot_fr_mkr_XYZ(:,mIdx,xyzIdx) = butterLowZero(order,cutoff,samplingRate,rawData.leftFoot_fr_mkr_XYZ(:,mIdx,xyzIdx));
         end
     end
     
     for mIdx = 1:size(rawData.head_fr_mkr_XYZ,2)
         for xyzIdx = 1:3
-            processedData.head_fr_mkr_XYZ(:,mIdx,xyzIdx) = butterLowZero(order,cutoff,samplingRate,rawData.head_fr_mkr_XYZ(:,mIdx,xyzIdx));
+            sessionData.processedData_tr(trIdx).head_fr_mkr_XYZ(:,mIdx,xyzIdx) = butterLowZero(order,cutoff,samplingRate,rawData.head_fr_mkr_XYZ(:,mIdx,xyzIdx));
         end
     end
     
-%     %% Average rigid body position
-%     
-%     spine_fr_xyz = squeeze(nanmean(processedData.spine_fr_mkr_XYZ,2));
-%     rFoot_fr_XYZ = squeeze(nanmean(processedData.rightFoot_fr_mkr_XYZ(:,[1 4],:),2));
-%     lFoot_fr_XYZ = squeeze(nanmean(processedData.leftFoot_fr_mkr_XYZ(:,[1 4],:),2));
-%     
-%     processedData.spine_fr_xyz = spine_fr_xyz;
-%     processedData.rightFoot_fr_XYZ = rFoot_fr_XYZ;
-%     processedData.leftFoot_fr_XYZ = lFoot_fr_XYZ;
-%     
-      sessionData.processedData_tr(trIdx) = processedData;
-%     
     
     %%
     if plotOn == 1

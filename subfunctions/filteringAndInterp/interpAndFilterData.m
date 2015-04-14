@@ -25,247 +25,77 @@ end
 for trIdx = 1:numTrials
     
     rawData = sessionData.rawData_tr(trIdx);
-    %sessionData.rawData_tr(trIdx) = struct;
-    processedData  = struct;
+    
+    data_cFr_mkr_XYZ = [{rawData.leftFoot_fr_mkr_XYZ},...
+    {rawData.rightFoot_fr_mkr_XYZ},...
+    {rawData.spine_fr_mkr_XYZ},...
+    {rawData.head_fr_mkr_XYZ}];
+
     frameTime_fr = sessionData.rawData_tr(trIdx).frameTime_fr;
     
-    headInterpFrames_mkr_XYZ_cFr = cell(size(rawData.spine_fr_mkr_XYZ,2),3);
-    rFootInterpFrames_mkr_XYZ_cFr = cell(size(rawData.rightFoot_fr_mkr_XYZ,2),3);
-    lFootInterpFrames_mkr_XYZ_cFr = cell(size(rawData.leftFoot_fr_mkr_XYZ,2),3);
-    spineInterpFrames_mkr_XYZ_cFr = cell(size(rawData.head_fr_mkr_XYZ,2),3);
+    processedData = struct;
     
-    
-    foundNanLFoot_mkr_XYZ = zeros(10,3);
-    foundNanHead_mkr_XYZ = zeros(10,3);
-    foundNanRFoot_mkr_XYZ = zeros(10,3);
-    foundNanSpine_mkr_XYZ = zeros(10,3);
-    
-    %     headInterpFrames_mkr_XYZ_cFr = nan(size(rawData.spine_fr_mkr_XYZ,2),3);
-    %     rFootInterpFrames_mkr_XYZ_cFr = nan(size(rawData.rightFoot_fr_mkr_XYZ,2),3);
-    %     lFootInterpFrames_mkr_XYZ_cFr = nan(size(rawData.leftFoot_fr_mkr_XYZ,2),3);
-    %     spineInterpFrames_mkr_XYZ_cFr = nan(size(rawData.head_fr_mkr_XYZ,2),3);
-    %
-    %     sessionData.processedData(trIdx).headInterpFrames_mkr_XYZ_cFr = headInterpFrames_mkr_XYZ_cFr;
-    %     sessionData.processedData(trIdx).rFootInterpFrames_mkr_XYZ_cFr = rFootInterpFrames_mkr_XYZ_cFr;
-    %     sessionData.processedData(trIdx).lFootInterpFrames_mkr_XYZ_cFr = lFootInterpFrames_mkr_XYZ_cFr;
-    %     sessionData.processedData(trIdx).spineInterpFrames_mkr_XYZ_cFr = spineInterpFrames_mkr_XYZ_cFr;
-    
-    for mIdx = 1:size(rawData.spine_fr_mkr_XYZ,2)
-        for xyzIdx = 1:3
-            
-            goodIdx = find( ~isnan(rawData.spine_fr_mkr_XYZ(:,mIdx,xyzIdx) ));
-            
-            if( numel(goodIdx) < size(rawData.spine_fr_mkr_XYZ,1) )
+    % Get data from cell
+    for cIdx = 1:length(data_cFr_mkr_XYZ);
+        
+        data_fr_mkr_XYZ = data_cFr_mkr_XYZ{cIdx};
+        interpData_fr_mkr_XYZ = data_cFr_mkr_XYZ{cIdx};
+        
+        for mIdx = 1:size(data_cFr_mkr_XYZ,2)
+            for xyzIdx = 1:3
                 
-                numFrames = size(rawData.spine_fr_mkr_XYZ(:,mIdx,xyzIdx),1);
+                % Find number that are not equal to NaN
+                goodIdx = find( ~isnan(data_fr_mkr_XYZ(:,mIdx,xyzIdx) ));
                 
-                spineInterpFrames_mkr_XYZ_cFr(mIdx,xyzIdx) = ...
-                    {setdiff(1:numFrames,goodIdx)};
+                % Note that if the marker was not seen during capture, it could be
+                % set to NAN for the entire trial in checkForExclusions.m
+                % This would mean that numel(goodIdx) == 0 (all are NaN)
                 
-                try
-                    processedData.spine_fr_mkr_XYZ(:,mIdx,xyzIdx) = interp1(...
-                        frameTime_fr(goodIdx),...
-                        rawData.spine_fr_mkr_XYZ(goodIdx,mIdx,xyzIdx),...
-                        frameTime_fr,...
-                        'spline','extrap');
-                catch
-                    processedData.spine_fr_mkr_XYZ(:,mIdx,xyzIdx) = rawData.spine_fr_mkr_XYZ(:,mIdx,xyzIdx);
-                    fprintf('Unable to interpolate spine data\n')
+                if( numel(goodIdx)  > 0 && numel(goodIdx) < size(data_fr_mkr_XYZ,1) )
+                    
+                    numFrames = size(data_fr_mkr_XYZ(:,mIdx,xyzIdx),1);
+                    
+                    %spineInterpFrames_mkr_XYZ_cFr(mIdx,xyzIdx) = ...
+                    %    {setdiff(1:numFrames,goodIdx)};
+                    
+                    try
+                        display('Interpolated!')
+                        %processedData.spine_fr_mkr_XYZ(:,mIdx,xyzIdx) =
+                        interpData_fr_mkr_XYZ(:,mIdx,xyzIdx) = interp1(...
+                            frameTime_fr(goodIdx),...
+                            data_fr_mkr_XYZ(goodIdx,mIdx,xyzIdx),...
+                            frameTime_fr,...
+                            'spline','extrap');
+                    catch
+                        keyboard
+                        %processedData.spine_fr_mkr_XYZ(:,mIdx,xyzIdx) = rawData.spine_fr_mkr_XYZ(:,mIdx,xyzIdx);
+                        %fprintf('Unable to interpolate spine data\n')
+                    end
+                    
+                    %foundNanSpine_mkr_XYZ(mIdx,xyzIdx) = 1;
+                    
+                    fprintf('Found NANS in trial %u\n',trIdx)
                 end
                 
-                foundNanSpine_mkr_XYZ(mIdx,xyzIdx) = 1;
-                
-                fprintf('Found NANS in trial %u\n',trIdx)
-                
-            else
-                processedData.spine_fr_mkr_XYZ(:,mIdx,xyzIdx) = rawData.spine_fr_mkr_XYZ(:,mIdx,xyzIdx);
             end
         end
-    end
-    
-    for mIdx = 1:size(rawData.rightFoot_fr_mkr_XYZ,2)
-        for xyzIdx = 1:3
-            
-            goodIdx = find( ~isnan(rawData.rightFoot_fr_mkr_XYZ(:,mIdx,xyzIdx) ));
-            
-            if( numel(goodIdx) < size(rawData.rightFoot_fr_mkr_XYZ,1) )
-                
-                numFrames = size(rawData.rightFoot_fr_mkr_XYZ(:,mIdx,xyzIdx),1);
-                
-                rFootInterpFrames_mkr_XYZ_cFr(mIdx,xyzIdx) = ...
-                    {setdiff(1:numFrames,goodIdx)};
-                
-                foundNanRFoot_mkr_XYZ(mIdx,xyzIdx) = 1;
-                
-                
-                processedData.rightFoot_fr_mkr_XYZ(:,mIdx,xyzIdx) = interp1(...
-                    frameTime_fr(goodIdx),...
-                    rawData.rightFoot_fr_mkr_XYZ(goodIdx,mIdx,xyzIdx),...
-                    frameTime_fr,...
-                    'spline','extrap');
-                
-                fprintf('Found NANS in trial %u\n',trIdx)
-                
-            else
-                processedData.rightFoot_fr_mkr_XYZ(:,mIdx,xyzIdx) = rawData.rightFoot_fr_mkr_XYZ(:,mIdx,xyzIdx);
-            end
-            
-            
+        
+        if( cIdx == 1)
+            processedData.leftFoot_fr_mkr_XYZ  = interpData_fr_mkr_XYZ;
+        elseif(cIdx == 2)
+            processedData.rightFoot_fr_mkr_XYZ  = interpData_fr_mkr_XYZ;
+        elseif(cIdx == 3)
+            processedData.spine_fr_mkr_XYZ  = interpData_fr_mkr_XYZ;
+        elseif(cIdx == 4)
+            processedData.head_fr_mkr_XYZ  = interpData_fr_mkr_XYZ;
         end
-    end
-    
-    
-    for mIdx = 1:size(rawData.leftFoot_fr_mkr_XYZ,2)
-        for xyzIdx = 1:3
-            
-            goodIdx = find( ~isnan(rawData.leftFoot_fr_mkr_XYZ(:,mIdx,xyzIdx) ));
-            
-            if( numel(goodIdx) < size(rawData.leftFoot_fr_mkr_XYZ,1) )
-                
-                numFrames = size(rawData.leftFoot_fr_mkr_XYZ(:,mIdx,xyzIdx),1);
-                
-                lFootInterpFrames_mkr_XYZ_cFr(mIdx,xyzIdx) = ...
-                    {setdiff(1:numFrames,goodIdx)};
-                
-                foundNanLFoot_mkr_XYZ(mIdx,xyzIdx)= 1;
-                
-                
-                processedData.leftFoot_fr_mkr_XYZ(:,mIdx,xyzIdx) = interp1(...
-                    frameTime_fr(goodIdx),...
-                    rawData.leftFoot_fr_mkr_XYZ(goodIdx,mIdx,xyzIdx),...
-                    frameTime_fr,...
-                    'spline','extrap');
-                
-                fprintf('Found NANS in trial %u\n',trIdx)
-                
-            else
-                processedData.leftFoot_fr_mkr_XYZ(:,mIdx,xyzIdx) = rawData.leftFoot_fr_mkr_XYZ(:,mIdx,xyzIdx);
-            end
-            
-            
-            
-        end
-    end
-    
-    for mIdx = 1:size(rawData.head_fr_mkr_XYZ,2)
-        for xyzIdx = 1:3
-            
-            goodIdx = find( ~isnan(rawData.head_fr_mkr_XYZ(:,mIdx,xyzIdx) ));
-            
-            if( numel(goodIdx) < size(rawData.head_fr_mkr_XYZ,1) )
-                
-                numFrames = size(rawData.head_fr_mkr_XYZ(:,mIdx,xyzIdx),1);
-                
-                headInterpFrames_mkr_XYZ_cFr(mIdx,xyzIdx) = ...
-                    {setdiff(1:numFrames,goodIdx)};
-                
-                foundNanHead_mkr_XYZ(mIdx,xyzIdx) = 1;
-                
-                processedData.head_fr_mkr_XYZ(:,mIdx,xyzIdx) = interp1(...
-                    frameTime_fr(goodIdx),...
-                    rawData.head_fr_mkr_XYZ(goodIdx,mIdx,xyzIdx),...
-                    frameTime_fr,...
-                    'spline','extrap');
-                
-                fprintf('Found NANS in trial %u\n',trIdx)
-                
-            else
-                
-                processedData.head_fr_mkr_XYZ(:,mIdx,xyzIdx) = rawData.head_fr_mkr_XYZ(:,mIdx,xyzIdx);
-            end
-            
-        end
+        
     end
     
     sessionData.processedData_tr(trIdx) = processedData;
     
-    %     sessionData.rawData_tr(trIdx).headInterpFrames_mkr_XYZ_cFr = headInterpFrames_mkr_XYZ_cFr;
-    %     sessionData.rawData_tr(trIdx).lFootInterpFrames_mkr_XYZ_cFr = lFootInterpFrames_mkr_XYZ_cFr;
-    %     sessionData.rawData_tr(trIdx).rFootInterpFrames_mkr_XYZ_cFr = rFootInterpFrames_mkr_XYZ_cFr;
-    %     sessionData.rawData_tr(trIdx).spineInterpFrames_mkr_XYZ_cFr = spineInterpFrames_mkr_XYZ_cFr;
-    
-    %%
-    if plotOn == 1
-        
-        figure(1)
-        hold on
-        clf
-        
-        for mIdx = 1:size(rawData.rightFoot_fr_mkr_XYZ,2)
-            for xyzIdx = 1:3
-                if(  foundNanLFoot_mkr_XYZ(mIdx,xyzIdx)|| foundNanHead_mkr_XYZ(mIdx,xyzIdx) || foundNanRFoot_mkr_XYZ(mIdx,xyzIdx) || foundNanSpine_mkr_XYZ(mIdx,xyzIdx) )
-                    
-                    %                 if( numel(spineInterpFrames_mkr_XYZ_cFr{mIdx,xyzIdx}) > 0 ||...
-                    %                         numel(headInterpFrames_mkr_XYZ_cFr{mIdx,xyzIdx}) > 0 ||...
-                    %                         numel(lFootInterpFrames_mkr_XYZ_cFr{mIdx,xyzIdx}) > 0 ||...
-                    %                         numel(rFootInterpFrames_mkr_XYZ_cFr{mIdx,xyzIdx}) > 0 )
-                    
-                    subplot(1,3,1)
-                    cla
-                    hold on
-                    XYZstring = 'XYZ';
-                    title(sprintf('Trial %u, RFoot, Marker %u, %s data',trIdx,mIdx,XYZstring(xyzIdx)))
-                    
-                    interpFr = rFootInterpFrames_mkr_XYZ_cFr{mIdx,xyzIdx};
-                    
-                    plot(sessionData.rawData_tr(trIdx).rightFoot_fr_mkr_XYZ(:,mIdx ,xyzIdx),':b')
-                    plot(sessionData.processedData_tr(trIdx).rightFoot_fr_mkr_XYZ(:,mIdx,xyzIdx),'r:')
-                    plot(interpFr,sessionData.processedData_tr(trIdx).rightFoot_fr_mkr_XYZ(interpFr,mIdx,xyzIdx),'rx')
-                    
-                    
-                    subplot(1,3,2)
-                    hold on
-                    cla
-                    %ylim([-.3,2])
-                    XYZstring = 'XYZ';
-                    title(sprintf('Trial %u, LFoot, Marker %u, %s data',trIdx,mIdx,XYZstring(xyzIdx)))
-                    
-                    interpFr = lFootInterpFrames_mkr_XYZ_cFr{mIdx,xyzIdx};
-                    
-                    plot(sessionData.rawData_tr(trIdx).leftFoot_fr_mkr_XYZ(:,mIdx ,xyzIdx),':b')
-                    plot(sessionData.processedData_tr(trIdx).leftFoot_fr_mkr_XYZ(:,mIdx,xyzIdx),'r:')
-                    plot(interpFr,sessionData.processedData_tr(trIdx).leftFoot_fr_mkr_XYZ(interpFr,mIdx,xyzIdx),'rx')
-                    
-                    
-                    
-                    
-                    
-                    subplot(1,3,3)
-                    cla
-                    hold on
-                    %ylim([-.3,2])
-                    XYZstring = 'XYZ';
-                    title(sprintf('Trial %u, Head, Marker %u, %s data',trIdx,mIdx,XYZstring(xyzIdx)))
-                    
-                    interpFr = headInterpFrames_mkr_XYZ_cFr{mIdx,xyzIdx};
-                    
-                    plot(sessionData.rawData_tr(trIdx).leftFoot_fr_mkr_XYZ(:,mIdx ,xyzIdx),':b')
-                    plot(sessionData.processedData_tr(trIdx).head_fr_mkr_XYZ(:,mIdx,xyzIdx),'r:')
-                    plot(interpFr,sessionData.processedData_tr(trIdx).head_fr_mkr_XYZ(interpFr,mIdx,xyzIdx),'rx')
-                    
-                    
-                    figure(1)
-                    cla
-                    hold on
-                    %ylim([-.3,2])
-                    XYZstring = 'XYZ';
-                    title(sprintf('Trial %u, Spine, Marker %u, %s data',trIdx,mIdx,XYZstring(xyzIdx)))
-                    
-                    interpFr = spineInterpFrames_mkr_XYZ_cFr{mIdx,xyzIdx};
-                    
-                    plot(sessionData.rawData_tr(trIdx).spine_fr_mkr_XYZ(:,mIdx ,xyzIdx),':b')
-                    plot(sessionData.processedData_tr(trIdx).spine_fr_mkr_XYZ(:,mIdx,xyzIdx),'r:')
-                    plot(interpFr,sessionData.processedData_tr(trIdx).spine_fr_mkr_XYZ(interpFr,mIdx,xyzIdx),'rx')
-                    
-                    keyboard
-                    clf
-                end
-                
-                
-            end
-        end
-    end
 end
+
 
 sessionData = filterMocapData(sessionData, 0);
 

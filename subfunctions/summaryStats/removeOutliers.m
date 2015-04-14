@@ -1,4 +1,4 @@
-function newVariable  = removeOutliers(variable,threshold)
+function [newVariable outlierVals outlierIdx] = removeOutliers(variable,threshold)
 
 % replaces outliers with nan values
 newVariable = variable;
@@ -8,4 +8,5 @@ outlierIdx  = [outlierIdx  find( variable > nanmean(variable)+nanstd(variable)*t
 outlierIdx  = [outlierIdx  find( variable < nanmean(variable)-nanstd(variable)*threshold)];
 
 % fprintf('Removed %u outliers \n',numel(outlierIdx))
+outlierVals = newVariable ( outlierIdx);
 newVariable ( outlierIdx) = NaN;

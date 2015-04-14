@@ -4,10 +4,6 @@
 function [ sessionData ] = stepLengthAndDurASO(sessionData, trIdx)
 
 
-%rawTrialStruct = sessionData.rawData_tr(trIdx);
-%proTrialStruct = sessionData.processedData_tr(trIdx);
-
-
 dmTrialStruct = sessionData.dependentMeasures_tr(trIdx);
 
 if(sum(strcmp(fieldnames(dmTrialStruct),'bothFeet'))==0)
@@ -15,26 +11,57 @@ if(sum(strcmp(fieldnames(dmTrialStruct),'bothFeet'))==0)
    return 
 end
 
-% If a stepover was not found, set stepLengthASO and stepDurASO_sIdx to nan
-if( isnan(dmTrialStruct.bothFeet.crossingStepIdx) )
-    %fprintf('stepLengthAndDurASO: Subject did not pass the obstacle. \n');
-    sessionData.dependentMeasures_tr(trIdx).stepLengthASO = nan;
-    sessionData.dependentMeasures_tr(trIdx).stepDurASO_sIdx = nan;
+if( isnan(dmTrialStruct.lFoot.crossingStepIdx) || isnan(dmTrialStruct.rFoot.crossingStepIdx)  )
+    
+    sessionData.dependentMeasures_tr(trIdx).leadStepLengthASO = nan;
+    sessionData.dependentMeasures_tr(trIdx).leadStepDurASO = nan;
+    
+    sessionData.dependentMeasures_tr(trIdx).trailStepLengthASO = nan;
+    sessionData.dependentMeasures_tr(trIdx).trailStepDurASO = nan;
+    
+    sessionData.rawData_tr(trIdx).excludeTrial = 1;
+    sessionData.rawData_tr(trIdx).excludeTrialExplanation{end+1} = 'stepLengthAndDurASO: At least one foot did not pass the barrier.'
+    
     return
 end
 
-bf = dmTrialStruct.bothFeet;
-crossStepIdx = bf.crossingStepIdx;
+%%
+if( strcmp( dmTrialStruct.firstCrossingFoot, 'Left' ) ) 
     
-stepLength = bf.stepDist_sIdx(crossStepIdx);
-stepDur_sIdx = bf.stepDur_sIdx(crossStepIdx);
+    leadFoot = sessionData.dependentMeasures_tr(trIdx).lFoot;
+    trailFoot = sessionData.dependentMeasures_tr(trIdx).rFoot;
+    
+elseif( strcmp( dmTrialStruct.firstCrossingFoot, 'Right' ) )
+    
+    leadFoot = sessionData.dependentMeasures_tr(trIdx).rFoot;
+    trailFoot = sessionData.dependentMeasures_tr(trIdx).lFoot;
+    
+else
+   error('invalid entry for sessionData.dependentMeasures_tr(trIdx).firstCrossingFoot') 
+end
 
-%%
 
-sessionData.dependentMeasures_tr(trIdx).stepLengthASO = stepLength;
-sessionData.dependentMeasures_tr(trIdx).stepDurASO_sIdx = stepLength;
+%% FIND LEAD STEP LENGTH / DURATION
 
-%%
+crossStepIdx = leadFoot.crossingStepIdx;
+leadStepLengthASO = leadFoot.stepDist_sIdx(crossStepIdx);
+leadStepDurASO = leadFoot.stepDur_sIdx(crossStepIdx);
+
+%% FIND TRAIL STEP LENGTH / DURATION
+
+crossStepIdx = trailFoot.crossingStepIdx;
+trailStepLengthASO = trailFoot.stepDist_sIdx(crossStepIdx);
+trailStepDurASO = trailFoot.stepDur_sIdx(crossStepIdx);
+
+%% SAVE TO SESSIONDATA
+
+sessionData.dependentMeasures_tr(trIdx).leadStepLengthASO = leadStepLengthASO;
+sessionData.dependentMeasures_tr(trIdx).leadStepDurASO = leadStepDurASO;
+
+sessionData.dependentMeasures_tr(trIdx).trailStepLengthASO = trailStepLengthASO;
+sessionData.dependentMeasures_tr(trIdx).trailStepDurASO = trailStepDurASO;
+
+
 
 
 

@@ -53,13 +53,14 @@ startPos_sIdx_Y = rightFootMaxY_frIdx(rTO_sIdx);
 endPos_sIdx_Y = rightFootMinY_frIdx(rHS_sIdx);
 
 try
-    rightFootDist_sIDX = (endPos_sIdx_Y-startPos_sIdx_Y);
+    rightFootDist_sIdx = (endPos_sIdx_Y-startPos_sIdx_Y);
 catch
     keyboard
 end
+
 startPos_sIdx_Y = leftFootMaxY_frIdx(lTO_sIdx);
 endPos_sIdx_Y = leftFootMinY_frIdx(lHS_sIdx);
-leftFootDist_sIDX = (endPos_sIdx_Y-startPos_sIdx_Y );
+leftFootDist_sIdx = (endPos_sIdx_Y-startPos_sIdx_Y );
 
 %%
 
@@ -68,7 +69,7 @@ sessionData.dependentMeasures_tr(trIdx).rFoot.stepDur_sIdx = frameTime_fr(rHS_sI
 sessionData.dependentMeasures_tr(trIdx).bothFeet.stepDur_sIdx = [frameTime_fr(lHS_sIdx)-frameTime_fr(lTO_sIdx) frameTime_fr(rHS_sIdx)-frameTime_fr(rTO_sIdx)];
 
 
-sessionData.dependentMeasures_tr(trIdx).lFoot.stepDist_sIDX = rightFootDist_sIDX;
-sessionData.dependentMeasures_tr(trIdx).rFoot.stepDist_sIDX = leftFootDist_sIDX;
-sessionData.dependentMeasures_tr(trIdx).bothFeet.stepDist_sIdx = [ rightFootDist_sIDX; leftFootDist_sIDX ];
+sessionData.dependentMeasures_tr(trIdx).lFoot.stepDist_sIdx = rightFootDist_sIdx;
+sessionData.dependentMeasures_tr(trIdx).rFoot.stepDist_sIdx = leftFootDist_sIdx;
+sessionData.dependentMeasures_tr(trIdx).bothFeet.stepDist_sIdx = [ rightFootDist_sIdx; leftFootDist_sIdx ];
 

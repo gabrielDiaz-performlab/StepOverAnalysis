@@ -1,10 +1,10 @@
-function plotTrialMarkers(sessionData,trialNum)
+function figH = plotTrialMarkers(sessionData,trialNum)
 
 trialData = sessionData.rawData_tr(trialNum);
 
 
 % Create figure
-figure1 = figure(trialNum);
+figH = figure(trialNum);
 hold on 
 
 
@@ -12,10 +12,10 @@ hold on
 headFirst_XYZ = squeeze(trialData.head_fr_mkr_XYZ(1,2,:));
 scatter3(headFirst_XYZ(1),headFirst_XYZ(2),headFirst_XYZ(3),400,'r','Filled')
 
-plotMarkersFromRigid(figure1,trialData.rightFoot_fr_mkr_XYZ,'r')
-plotMarkersFromRigid(figure1,trialData.leftFoot_fr_mkr_XYZ,'b')
-plotMarkersFromRigid(figure1,trialData.head_fr_mkr_XYZ,'k')
-plotMarkersFromRigid(figure1,trialData.spine_fr_mkr_XYZ,'g')
+plotMarkersFromRigid(figH,trialData.rightFoot_fr_mkr_XYZ,'r')
+plotMarkersFromRigid(figH,trialData.leftFoot_fr_mkr_XYZ,'b')
+plotMarkersFromRigid(figH,trialData.head_fr_mkr_XYZ,'k')
+plotMarkersFromRigid(figH,trialData.spine_fr_mkr_XYZ,'g')
 
 plotObs(sessionData,trialNum,'c')
 

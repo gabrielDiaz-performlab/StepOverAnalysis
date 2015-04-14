@@ -1,40 +1,54 @@
-function figH  = plot_cIdx_hIdx(xData,meanYData_cIdx_hIdx,stdYData_cIdx_hIdx,varString) %,xLabelStr,yLabelStr) 
+function figH  = plot_cIdx_hIdx(sessionData,varString,showIndividualTrials) %,xLabelStr,yLabelStr) 
 
 %%  Plot data
 
 loadParameters
-
-% if( isempty(inputname(2)) )
-%     fprintf('Please assign your Y data means (argIn #2) to a variable with a UNIQUE name before passing into plot_cIdx_hIdx \n')
-%     fprintf('This variable name is used to generate a unique number specific to this variable.\n')
-%     figH = NaN;
-%     return
-% end
 
 %%
 figH = figure( sum(double( varString )) );
 clf
 hold on
 
-% % Make sure caps aren't an issue
-% yVarStr = [upper(yVarStr(1)) yVarStr(2:end)];
-% meanVarString = ['mean' yVarStr '_cIdx_hIdx'];
-% stdVarString = ['std' yVarStr '_cIdx_hIdx'];
-% 
-% if(sum(strcmp(fieldnames(sessionData.summaryStats),meanVarString ))==0)
-%     fprintf('plot:  No such data in .plot  \n')
-%     %return
-% else
-%     eval( [ 'meanYData_cIdx_hIdx = [sessionData.summaryStats.' meanVarString '];']);
-%     eval( [ 'stdYData_cIdx_hIdx = [sessionData.summaryStats.' stdVarString '];']);
-% end
 
+evalStr1 = ['summaryStruct = sessionData.summaryStats.' lower(varString(1)) varString(2:end) ';' ];
+eval(evalStr1)
+
+xData = sessionData.expInfo.obsHeightRatios;
+
+meanYData_cIdx_hIdx = summaryStruct.mean_cIdx_hIdx;
+stdYData_cIdx_hIdx = summaryStruct.std_cIdx_hIdx;
+values_cIdx_hIdx = summaryStruct.values_cIdx_hIdx;
 
 l1 = errorbar( xData, meanYData_cIdx_hIdx(1,:)',stdYData_cIdx_hIdx(1,:)','LineWidth',3,'LineStyle',lineStyle_cond(1),'Color',lineColor_cond(1),'Marker','o','MarkerFaceColor',lineColor_cond(1),'MarkerSize',10,'MarkerEdgeColor','k');
 l2 = errorbar( xData, meanYData_cIdx_hIdx(2,:)',stdYData_cIdx_hIdx(1,:)','LineWidth',3,'LineStyle',lineStyle_cond(2),'Color',lineColor_cond(2),'Marker','o','MarkerFaceColor',lineColor_cond(2),'MarkerSize',10,'MarkerEdgeColor','k');
 
+%% Plot Scatterplot xdata
+if (showIndividualTrials )
+    
+    numConditions = sessionData.expInfo.numConditions;
+    numObsHeights = sessionData.expInfo.numObsHeights;
+    allScatterData  = [];
+    
+    for cIdx = 1:numConditions
+        for hIdx = 1:numObsHeights
+            
+            scatH = scatter(repmat(xData(hIdx),1,numel(values_cIdx_hIdx{cIdx,hIdx})),values_cIdx_hIdx{cIdx,hIdx},15,lineColor_cond(cIdx),'filled','MarkerFaceColor',lineColor_cond(cIdx));
+            allScatterData = [allScatterData values_cIdx_hIdx{cIdx,hIdx}];
+            
+            if( cIdx == 1)
+                scatHX = scatH.XData;
+                scatH.XData = scatHX + .03 * figBufferPro * range(sessionData.expInfo.obsHeightRatios);
+            else
+                scatHX = scatH.XData;
+                scatH.XData = scatHX -.03 * figBufferPro * range(sessionData.expInfo.obsHeightRatios);
+            end
+            
+        end
+    end
+    
+end
 
-
+%%
 allXData = [ l1.XData l2.XData ];
 
 l2X = l2.XData;
@@ -46,20 +60,8 @@ l1.XData = l1X+ .1 * figBufferPro *range(allXData);
 set(gca,'xtick',xData);
 xlim([ min(allXData)-figBufferPro*range(allXData) max(allXData)+figBufferPro*range(allXData) ]);
 
-allYData = [ l1.YData l2.YData ];
-allYLData = [ l1.YData-l1.LData l2.YData-l2.LData]; % lower part of error bar
-allYUData = [ l1.YData+l1.UData l2.YData+l2.UData ]; % upper parts of error bar
-
-ylim([ min(allYLData)-figBufferPro*range(allYData) max(allYUData)+ figBufferPro*range(allYData) ]);
-
 xlabel({'obstacle heights', '(in units of leg length)'})
 
-% xlabel(xLabelStr)
-% 
-% if(nargin < 4)
-%     ylabel(meanVarString)
-% else
-%     ylabel(yLabelStr)
-% end
 
+% allScatterData
 

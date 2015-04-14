@@ -205,11 +205,17 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
         trialStructs_tr(tIdx).rightFootRot_fr_d1_d2 = rightFootRotTemp_fr_d1_d2;
         trialStructs_tr(tIdx).leftFootRot_fr_d1_d2 = leftFootRotTemp_fr_d1_d2;
     
+        trialStructs_tr(tIdx).excludeTrial = 0;
+        trialStructs_tr(tIdx).excludeTrialExplanation = [];
+        trialStructs_tr(tIdx).trialModifications_cModIdx = [];
+        
+        
         % This will build an unordered vector of unique values that appear
         % in the list of trials
        
         expInfo.obstacleHeights = sort(unique( [[expInfo.obstacleHeights] [trialStructs_tr(tIdx).obstacle_XposYposHeight(3)]] )); 
         expInfo.trialTypes = sort(unique( [[expInfo.trialTypes] [trialStructs_tr(tIdx).trialType]] ));
+        
         
     end
    
@@ -223,11 +229,13 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
     
     expInfo.eventFlag_fr = eventFlag;
     
+    expInfo.changeLog_cChangeIdx = [];
+    
     %rightFootCollision_cIdx = find(eventFlag == 4 );
     %leftFootCollision_cIdx = find(eventFlag == 5 );
     
     expInfo.obsHeightRatios = obsHeightRatios ;%[.15 .25 .35];
-    display(fprintf('FIXME: generateRawData - IMPORT LEG LENGTH RATIO ***CURRENTLY HARDCODED at %f %f %f **\n',expInfo.obsHeightRatios))
+    %display(fprintf('FIXME: generateRawData - IMPORT LEG LENGTH RATIO ***CURRENTLY HARDCODED at %f %f %f **\n',expInfo.obsHeightRatios))
     
     
     sessionStruct.expInfo = expInfo;

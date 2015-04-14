@@ -18,26 +18,32 @@ dmTrialStruct = sessionData.dependentMeasures_tr(trIdx);
 stepFoot = dmTrialStruct.firstCrossingFoot;
 obsYLoc = rawTrialStruct.obstacle_XposYposHeight(2);
 obsHeight = rawTrialStruct.obstacle_XposYposHeight(3);
+
 rightCrossFrame = dmTrialStruct.rFoot.crossingFr;
 leftCrossFrame = dmTrialStruct.lFoot.crossingFr;
+
+rightCrossMkrIdx = dmTrialStruct.rFoot.firstCrossingMkrIdx;
+leftCrossMkrIdx = dmTrialStruct.lFoot.firstCrossingMkrIdx;
 
 %% 
 
 if strcmp(stepFoot, 'Right')
     
-    leadToeZClearanceASO = rawTrialStruct.rightFoot_fr_mkr_XYZ(rightCrossFrame,1,3) - obsHeight; %FIXME: Which marker is toe?
-    trailToeZClearanceASO = rawTrialStruct.leftFoot_fr_mkr_XYZ(leftCrossFrame,1,3) - obsHeight; %FIXME: Which marker is toe?
+    %%
     
-    leadToeZASO = rawTrialStruct.rightFoot_fr_mkr_XYZ(rightCrossFrame,1,3); %FIXME: Which marker is toe?
-    trailToeZASO= rawTrialStruct.leftFoot_fr_mkr_XYZ(leftCrossFrame,1,3); %FIXME: Which marker is toe?
+    leadToeZClearanceASO = rawTrialStruct.rightFoot_fr_mkr_XYZ(rightCrossFrame,rightCrossMkrIdx,3) - obsHeight; 
+    trailToeZClearanceASO = rawTrialStruct.leftFoot_fr_mkr_XYZ(leftCrossFrame,leftCrossMkrIdx ,3) - obsHeight; 
+    
+    leadToeZASO = rawTrialStruct.rightFoot_fr_mkr_XYZ(rightCrossFrame,rightCrossMkrIdx,3); 
+    trailToeZASO= rawTrialStruct.leftFoot_fr_mkr_XYZ(leftCrossFrame,leftCrossMkrIdx,3); 
     
 elseif strcmp(stepFoot, 'Left')
     
-    leadToeZClearanceASO = rawTrialStruct.leftFoot_fr_mkr_XYZ(leftCrossFrame,1,3) - obsHeight; %FIXME: Which marker is toe?
-    trailToeZClearanceASO = rawTrialStruct.rightFoot_fr_mkr_XYZ(rightCrossFrame,1,3) - obsHeight; %FIXME: Which marker is toe?
+    leadToeZClearanceASO = rawTrialStruct.leftFoot_fr_mkr_XYZ(leftCrossFrame,leftCrossMkrIdx,3) - obsHeight; 
+    trailToeZClearanceASO = rawTrialStruct.rightFoot_fr_mkr_XYZ(rightCrossFrame,rightCrossMkrIdx,3) - obsHeight; 
     
-    leadToeZASO = rawTrialStruct.leftFoot_fr_mkr_XYZ(leftCrossFrame,1,3); %FIXME: Which marker is toe?
-    trailToeZASO= rawTrialStruct.rightFoot_fr_mkr_XYZ(rightCrossFrame,1,3); %FIXME: Which marker is toe?
+    leadToeZASO = rawTrialStruct.leftFoot_fr_mkr_XYZ(leftCrossFrame,leftCrossMkrIdx,3);
+    trailToeZASO= rawTrialStruct.rightFoot_fr_mkr_XYZ(rightCrossFrame,rightCrossMkrIdx,3);
     
 else
     fprintf('toeClearanceASO: Subject did not pass the obstacle. \n');

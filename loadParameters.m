@@ -15,13 +15,15 @@ textFileDir = 'data/raw/';
 parsedTextFileDir = 'data/parsedTXT/';
 sessionFileDir = 'data/sessionFiles/';
 
-[junk junk] = mkdir('OutputFigures');
+[junk junk] = mkdir('figures');
 
 
 dataFileList = {...
-    'exp_data-2015-4-2-15-32'
     'exp_data-2015-4-9-16-18'
+    'exp_data-2015-4-10-15-31'
     };
+
+legLengthHardCoded_sIdx = [90 90 100];
 
 %% Parameters used by algorithms
 

@@ -25,6 +25,7 @@ function parseTextFile(textFileDir, textFileName)
 
 
     fclose(fid);
+    
     %%
     % Read the text file into memory
     textData  = textread([textFileName '.txt'], '%s','delimiter', '\n');

@@ -10,11 +10,18 @@
 %FIXME:  numTrialTypes
 %FIXME:  marker condition
 %FIXME:  leg length ratios
+
+%FIXME:  Rigid body - marker positions in a LOCAL frame of reference
+% ...or, set interp/post processing to the correct value (better) and save
+% condition
+
 %%%%%%%%%%%
 
 clc
 clear all
 close all
+
+tic
 
 loadParameters
 
@@ -27,8 +34,13 @@ dataFileString = sprintf('%s.mat',dataFileList{sessionNumber})
 sessionData = loadSession(sessionNumber);
 
 %% If you want, you can reset the struct for a fresh analysis
-% A safer thing to do.
+% For example, if you cahnge parameters.  I suggest this is done every
+% time, just in case.  
+
 sessionData = cleanSessionData(sessionData);
+sessionData = checkForExclusions(sessionData);
+
+% FIXME:  Leg length data in .txt file is not correct!
 
 %% Interpolate and filter
 
@@ -38,14 +50,13 @@ sessionData = cleanSessionData(sessionData);
 % Or import marker condition
 
 sessionData = calculateSamplingRate(sessionData);
-sessionData = interpAndFilterData(sessionData, 0);
+sessionData = interpAndFilterData(sessionData, 0); %Fixme - add trialModification messages
 
 %%
 
 sessionData = avgTrialDuration(sessionData);
 sessionData.expInfo.meanTrialDuration;
 
-% (40 * 60 ) / 10
 
 %% Some per-trial functions
 
@@ -62,7 +73,7 @@ for trIdx = 1:numel(sessionData.rawData_tr)
     [ sessionData ] = stepLengthAndDurASO(sessionData,trIdx);
     [ sessionData ] = findCOM(sessionData,trIdx);
     [ sessionData ] = avgCOMVelocity(sessionData,trIdx);
-    [ sessionData ] = maxVelAndHeightAXS(sessionData,trIdx) ;
+    [ sessionData ] = maxVelAndHeightAXS(sessionData,trIdx);
     
 end
 
@@ -77,81 +88,100 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Make some figures
 
-figH = struct;
+
 dm = sessionData.dependentMeasures_tr;
 
 
-% %% Lead Toe Height ASO BY REPETITION
-% 
+%% Lead Toe Height ASO BY REPETITION
+
 % % Group trials by condition and obs height and take the average
-% %sessionData = cNp_cIdx_hIdx(sessionData,[dm.leadToeZASO],'leadToeZASO');
+% sessionData = cNp_cIdx_hIdx(sessionData,'leadToeZASO');
 % % Plot the mean / std calculated above
 % ss = sessionData.summaryStats;
 % fig_leadToeZASO_REP = plot_cIdx_hIdx_REP(sessionData,[sessionData.dependentMeasures_tr.leadToeZASO],'repetition','lead toe Z ASO');
 % title('lead toe height ASO by repetition')
 % ylim([0.2 .6])
 
+%% Set plotting parameters
+
+removeOutliers = 1
+showIndividualTrials= 1;
+sessionFigH = struct;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% duration of crossing step
+%% Step Duration
 
-[sessionData figH.stepDurASO] = cNp_cIdx_hIdx(sessionData,'stepDurASO_sIdx');
-ylabel({'crossing step','duration (s)' })
+% duration of lead crossing step
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% lead max velocity AXS (at crossing step)
+[sessionData sessionFigH.leadStepDurASO] = cNp_cIdx_hIdx(sessionData,'leadStepDurASO',removeOutliers,showIndividualTrials);
+ylabel({'lead step','duration (s)' })
+ylim([.5 1 ])
 
-[sessionData figH.leadFootVelAXS] = cNp_cIdx_hIdx(sessionData,'leadFootMaxVelAXS');
-ylabel({'lead foot','max velocity ASX (m/s)' })
-ylim([0 7])
+% duration of trail crossing step
+[sessionData sessionFigH.trailStepDurASO] = cNp_cIdx_hIdx(sessionData,'trailStepDurASO',removeOutliers,showIndividualTrials);
+ylabel({'trail step','duration (s)' })
+ylim([.5 1 ])
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% lead max  height AXS (at crossing step)
-    
-[sessionData figH.leadFootMaxZAXS] = cNp_cIdx_hIdx(sessionData,'leadFootMaxZAXS');
-ylabel({'lead foot','max height ASX (m)' })
-ylim([0 1])
-
+%% Clearance ASO
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % lead clearance ASO (at step-over frame)
     
-[sessionData figH.leadToeZClearanceASO] = cNp_cIdx_hIdx(sessionData,'leadToeZClearanceASO');
-ylabel({'lead toe','max clearance ASO (m)' })
+[sessionData sessionFigH.leadToeZClearanceASO] = cNp_cIdx_hIdx(sessionData,'leadToeZClearanceASO',removeOutliers,showIndividualTrials);
+ylabel({'lead toe','clearance ASO (m)' })
 ylim([0 0.5])
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% trail max velocity AXS (at crossing step)
-
-[sessionData figH.trailFootVelAXS] = cNp_cIdx_hIdx(sessionData,'trailFootMaxVelAXS');
-ylabel({'trail foot','max velocity ASX (m/s)' })
-ylim([0 7])
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% trail max height AXS (at crossing step)
-    
-[sessionData figH.trailFootMaxZAXS] = cNp_cIdx_hIdx(sessionData,'trailFootMaxZAXS');
-ylabel({'trail foot','max height ASX (m)' })
-ylim([0 1])
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % trail clearance ASO (at step-over frame)
     
-[sessionData figH.trailToeZClearanceASO] = cNp_cIdx_hIdx(sessionData,'trailToeZClearanceASO');
-ylabel({'trail toe','max clearance ASO (m)' })
+[sessionData sessionFigH.trailToeZClearanceASO] = cNp_cIdx_hIdx(sessionData,'trailToeZClearanceASO',removeOutliers,showIndividualTrials);
+ylabel({'trail toe','clearance ASO (m)' })
 ylim([0 0.5])
 
-%% Visually organiez figures
+%% Max Velocity AXS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% lead max velocity AXS (at crossing step)
 
+[sessionData sessionFigH.leadFootVelAXS] = cNp_cIdx_hIdx(sessionData,'leadFootMaxVelAXS',removeOutliers,showIndividualTrials);
+ylabel({'lead foot','max velocity ASX (m/s)' })
+ylim([0 7])
+
+% trail max velocity AXS (at crossing step)
+
+[sessionData sessionFigH.trailFootVelAXS] = cNp_cIdx_hIdx(sessionData,'trailFootMaxVelAXS',removeOutliers,showIndividualTrials);
+ylabel({'trail foot','max velocity ASX (m/s)' })
+ylim([0 7])
+
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Height AXS
+%lead max  height AXS (at crossing step)
+     
+[sessionData sessionFigH.leadFootMaxZAXS] = cNp_cIdx_hIdx(sessionData,'leadFootMaxZAXS',removeOutliers,showIndividualTrials);
+ylabel({'lead foot','max height ASX (m)' })
+ylim([0 1])
+% trail max height AXS (at crossing step)
+    
+[sessionData sessionFigH.trailFootMaxZAXS] = cNp_cIdx_hIdx(sessionData,'trailFootMaxZAXS',removeOutliers,showIndividualTrials);
+ylabel({'trail foot','max height ASX (m)' })
+ylim([0 1])
+
+
+%% Visually organize figures
+
+
+%%
 % To automatically tile figures
-%tileFigs
+tileFigs
 
 % Or, use my function "getFigureLayout" to save existing oranization to
-% clipboard for pasting tinto code, as done below
-set(1434,'Units','Normalized','Position',[0.56 0.2 0.39 0.47]);
-set(1913,'Units','Normalized','Position',[0.51 0.34 0.39 0.47]);
-set(1639,'Units','Normalized','Position',[0.46 0.43 0.39 0.47]);
-set(1568,'Units','Normalized','Position',[0.12 0.27 0.39 0.47]);
-set(2047,'Units','Normalized','Position',[0.058 0.36 0.39 0.47]);
-set(1773,'Units','Normalized','Position',[0.011 0.43 0.39 0.47]);
-set(1473,'Units','Normalized','Position',[0.27 0.01 0.39 0.47]);
+% % clipboard for pasting tinto code, as done below
+% set(1434,'Units','Normalized','Position',[0.56 0.2 0.39 0.47]);
+% set(1913,'Units','Normalized','Position',[0.51 0.34 0.39 0.47]);
+% set(1639,'Units','Normalized','Position',[-69.54 0.43 0.39 0.47]);
+% set(1568,'Units','Normalized','Position',[0.12 0.27 0.39 0.47]);
+% set(2047,'Units','Normalized','Position',[0.058 0.36 0.39 0.47]);
+% set(1773,'Units','Normalized','Position',[0.011 0.43 0.39 0.47]);
+% set(1473,'Units','Normalized','Position',[0.27 0.01 0.39 0.47]);
 
-
+toc
+%%
+saveFigStructToDir(dataFileList{sessionNumber},sessionFigH);

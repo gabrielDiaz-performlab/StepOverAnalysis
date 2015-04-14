@@ -5,27 +5,27 @@
 % Averaging is computed in subfunction:  calcMean_cIdx_hIdx
 % Plotting is performed in subfunction: plot_cIdx_hIdx
 
-function [sessionData figH] = cNp_cIdx_hIdx(sessionData,varString)
-
-dm = sessionData.dependentMeasures_tr;
-
-
-data_tr = eval( [ '[' sprintf('dm.%s',varString) ']' ]);
-
+function [sessionData figH] = cNp_cIdx_hIdx(sessionData,varString,removeOutliersBool,showIndividualTrials)
 
 %% Group trials by condition and obs height and take the average
 %%
+% The third variable is a bool that enables the removal of outliers
+if( removeOutliersBool == 1)
+    sessionData = calcMean_cIdx_hIdx(sessionData,varString,removeOutliersBool);
+else
+    % By default, leave outliers in.
+    sessionData = calcMean_cIdx_hIdx(sessionData,varString,0);
+end
 
-sessionData = calcMean_cIdx_hIdx(sessionData,data_tr,varString);
 xData = sessionData.expInfo.obsHeightRatios;
 
-evalStr1 = ['dataMean_cIdx_hIdx = sessionData.summaryStats.mean' upper(varString(1)) varString(2:end) '_cIdx_hIdx;' ];
-evalStr2 = ['dataStd_cIdx_hIdx = sessionData.summaryStats.std' upper(varString(1)) varString(2:end) '_cIdx_hIdx;' ];
+%%
 
+evalStr1 = ['summaryStruct = sessionData.summaryStats.' lower(varString(1)) varString(2:end) ';' ];
 eval(evalStr1);
-eval(evalStr2);
 
+%%
 % VARSTRING IS USED TO CREATE A UNIQUE FIGURE NUMBER
-figH = plot_cIdx_hIdx(xData,dataMean_cIdx_hIdx,dataStd_cIdx_hIdx,varString);
+figH = plot_cIdx_hIdx(sessionData,varString,showIndividualTrials);
 
 
