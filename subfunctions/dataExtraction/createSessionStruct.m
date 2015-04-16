@@ -28,26 +28,13 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
     %%
     blockIndex_tr = blockNum(TrialStartFr_tIdx);
     sessionStruct.expInfo.legLengthCM  = legLengthCM(1);
+
     
-    %FIXME:  Hacked in block numbers
+    rightFootCollisionFr_cIdx = find(eventFlag == 4 );
+    leftFootCollisionFr_idx = find(eventFlag == 5 );
     
-    rightFootCollision_cIdx = find(eventFlag == 4 );
-    leftFootCollision_idx = find(eventFlag == 5 );
     BlockEndFr_tIdx = find(eventFlag == 7 );
-    
-    %TrialIndex = extractTrialIndex(trialType);
-    %TrialIndex = sort(TrialIndex,1)
-    %TrialStartFr_tIdx = TrialIndex(:,2);
-    %TrialStopFr_tIdx = TrialIndex(:,3);
-    %TrialType_tIdx = TrialIndex(:,1);
-    
-    %[TrialStartFr_tIdx sortIdx]  = sort(TrialIndex(:,2))
-    %sortIdx = sort(TrialIndex(:,2))
-    
-    % FIXME:  Hacked in block indices, which are missing from the data
-    % record.
-    %BlockIndex_tr = [1 1 1 2 2 2];    
-   
+
     %% FIXME: Data export hardcoded for expected number of markers
     
     [m, n, p] = size(shutterGlass_XYZ);
@@ -118,18 +105,31 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
         trialStructs_tr(tIdx).startFr = TrialStartFr_tIdx(tIdx);
         trialStructs_tr(tIdx).stopFr = TrialStopFr_tIdx(tIdx);
 
+        
+        %%
+        rFootCollisionFrames = intersect( ...
+            rightFootCollisionFr_cIdx(find(rightFootCollisionFr_cIdx > TrialStartFr_tIdx(tIdx))),...
+            rightFootCollisionFr_cIdx(find(rightFootCollisionFr_cIdx  < TrialStopFr_tIdx(tIdx))));
         % Collisions
-        trialStructs_tr(tIdx).rawData.rightFootCollisions_idx = intersect( ...
-            find(rightFootCollision_cIdx > TrialStartFr_tIdx(tIdx)),...
-            find(rightFootCollision_cIdx  < TrialStopFr_tIdx(tIdx)));
-            
-        trialStructs_tr(tIdx).rawData.leftFootCollisions_idx = intersect( ...
-            find(leftFootCollision_idx > TrialStartFr_tIdx(tIdx)),...
-            find(leftFootCollision_idx  < TrialStopFr_tIdx(tIdx)));
-            
+        
+        
+        trialStructs_tr(tIdx).rightFootCollisions_idx = rFootCollisionFrames ;
+        
+        lFootCollisionFrames = intersect( ...
+            leftFootCollisionFr_idx(find(leftFootCollisionFr_idx > TrialStartFr_tIdx(tIdx))),...
+            leftFootCollisionFr_idx(find(leftFootCollisionFr_idx  < TrialStopFr_tIdx(tIdx))));
+        
+        trialStructs_tr(tIdx).leftFootCollisions_idx = lFootCollisionFrames;
+       
+        
+        if( numel(rFootCollisionFrames) > 0 || numel(lFootCollisionFrames) > 0 )
+           fprintf('Collision on trial %u\n', tIdx) 
+        end
+        
         trialStructs_tr(tIdx).trialType = trialType(TrialStartFr_tIdx(tIdx)); 
         trialStructs_tr(tIdx).blockIdx = blockIndex_tr(tIdx);
         
+        %%
         % Fix ME:
         %trialStructs_tr(tIdx).block = BlockIndex_tr(tIdx);
         frIdxList = TrialStartFr_tIdx(tIdx):TrialStopFr_tIdx(tIdx);
@@ -208,7 +208,6 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
         trialStructs_tr(tIdx).excludeTrial = 0;
         trialStructs_tr(tIdx).excludeTrialExplanation = [];
         trialStructs_tr(tIdx).trialModifications_cModIdx = [];
-        
         
         % This will build an unordered vector of unique values that appear
         % in the list of trials

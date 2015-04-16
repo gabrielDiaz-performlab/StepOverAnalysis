@@ -6,12 +6,7 @@ function [ sessionData ] = stepLengthAndDurASO(sessionData, trIdx)
 
 dmTrialStruct = sessionData.dependentMeasures_tr(trIdx);
 
-if(sum(strcmp(fieldnames(dmTrialStruct),'bothFeet'))==0)
-   error('Must run findSteps.m prior to stepLengthAndDurASO.m \n')
-   return 
-end
-
-if( isnan(dmTrialStruct.lFoot.crossingStepIdx) || isnan(dmTrialStruct.rFoot.crossingStepIdx)  )
+if( sessionData.rawData_tr(trIdx).excludeTrial == 1)
     
     sessionData.dependentMeasures_tr(trIdx).leadStepLengthASO = nan;
     sessionData.dependentMeasures_tr(trIdx).leadStepDurASO = nan;
@@ -19,11 +14,29 @@ if( isnan(dmTrialStruct.lFoot.crossingStepIdx) || isnan(dmTrialStruct.rFoot.cros
     sessionData.dependentMeasures_tr(trIdx).trailStepLengthASO = nan;
     sessionData.dependentMeasures_tr(trIdx).trailStepDurASO = nan;
     
-    sessionData.rawData_tr(trIdx).excludeTrial = 1;
-    sessionData.rawData_tr(trIdx).excludeTrialExplanation{end+1} = 'stepLengthAndDurASO: At least one foot did not pass the barrier.'
-    
     return
 end
+
+
+% 
+% if( isnan(dmTrialStruct.lFoot.crossingStepIdx) || ...
+%         isnan(dmTrialStruct.rFoot.crossingStepIdx))
+%     
+%     %isnan(dmTrialStruct.lFoot.crossingStepIdx) ||...
+%     %isnan(dmTrialStruct.rFoot.crossingStepIdx) )
+%     
+%     sessionData.dependentMeasures_tr(trIdx).leadStepLengthASO = nan;
+%     sessionData.dependentMeasures_tr(trIdx).leadStepDurASO = nan;
+%     
+%     sessionData.dependentMeasures_tr(trIdx).trailStepLengthASO = nan;
+%     sessionData.dependentMeasures_tr(trIdx).trailStepDurASO = nan;
+%     
+%     sessionData.rawData_tr(trIdx).excludeTrial = 1;
+%     sessionData.rawData_tr(trIdx).excludeTrialExplanation{end+1} = 'stepLengthAndDurASO: At least one foot did not pass the barrier.'
+%     
+%     return
+% end
+
 
 %%
 if( strcmp( dmTrialStruct.firstCrossingFoot, 'Left' ) ) 
@@ -37,9 +50,9 @@ elseif( strcmp( dmTrialStruct.firstCrossingFoot, 'Right' ) )
     trailFoot = sessionData.dependentMeasures_tr(trIdx).lFoot;
     
 else
+   %keyboard
    error('invalid entry for sessionData.dependentMeasures_tr(trIdx).firstCrossingFoot') 
 end
-
 
 %% FIND LEAD STEP LENGTH / DURATION
 

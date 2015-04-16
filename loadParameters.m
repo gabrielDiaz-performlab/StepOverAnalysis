@@ -21,14 +21,25 @@ sessionFileDir = 'data/sessionFiles/';
 dataFileList = {...
     'exp_data-2015-4-9-16-18'
     'exp_data-2015-4-10-15-31'
+    'exp_data-2015-4-15-10-34'
+    'exp_data-2015-4-14-16-15'
+    'exp_data-2015-4-15-14-22'
     };
 
 legLengthHardCoded_sIdx = [90 90 100];
 
+
+%%
+% hardExclusions(1).fileID = 'exp_data-2015-4-9-16-18';
+% hardExclusions(1).id = [1 2];
+% 
+% hardExclusions(2).fileID = 'exp_data-2015-4-14-16-15';
+% hardExclusions(2).id = [24 38 83];
+
 %% Parameters used by algorithms
 
 % Step detection findSteps.m
-footHeightThresh = .1;
+footHeightThresh = .13;
 HSTOReorderThreshS = .2;
 
 % Butterworth in findStepsMod.m

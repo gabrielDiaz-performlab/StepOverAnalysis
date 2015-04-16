@@ -1,7 +1,6 @@
 function [sessionData] = checkForExclusions(sessionData)
 
 loadParameters
-
 %
 for trIdx = 1:sessionData.expInfo.numTrials
     
@@ -36,9 +35,17 @@ for trIdx = 1:sessionData.expInfo.numTrials
             %keyboard
             
             % Omit trial
-            sessionData.rawData_tr.excludeTrial = 1;
-            sessionData.rawData_tr.excludeTrialExplanation = 'checkForExclusions: found >2 markers left behind';
-            %sessionData.rawData_tr(trIdx) = rawData;
+            
+            
+            sessionData.rawData_tr(trIdx).excludeTrial = 1;
+            excludeMessage = sprintf('checkForExclusions: found >2 markers left behind');
+            
+            if( isempty( sessionData.rawData_tr(trIdx).excludeTrialExplanation) )
+                sessionData.rawData_tr(trIdx).excludeTrialExplanation{1} = excludeMessage;
+            else
+                sessionData.rawData_tr(trIdx).excludeTrialExplanation{end+1} = excludeMessage;
+            end
+            
             
         elseif( numMarkersLeftBehind > 0 )
             
@@ -80,16 +87,13 @@ for trIdx = 1:sessionData.expInfo.numTrials
                 sessionData.expInfo.changeLog_cChangeIdx{end+1} = modMessage;
             end
             
-            
-            
-            %fprintf('Trial num %u >> %s \n', trIdx,modMessage)
-            
-          
-            %sessionData.rawData_tr(trIdx) = rawData;
-            
         end
 
     end
     
+    
+   
+    
 end
+
 

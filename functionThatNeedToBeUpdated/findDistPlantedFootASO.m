@@ -13,6 +13,7 @@ proTrialStruct = sessionData.processedData_tr(trIdx);
 %Determine if step is with right or left foot, then X location of other foot
 stepFoot = proTrialStruct.firstCrossingFoot;
 if strcmp(stepFoot, 'Right')
+    
     crossFrame = proTrialStruct.rightFootCrossingFr;
     plantedFootLoc = rawTrialStruct.leftFoot_fr_mkr_XYZ(crossFrame,1,1); %Should be location of off foot at cross frame, marker 1, in x direction
     

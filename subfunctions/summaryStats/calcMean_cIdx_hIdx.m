@@ -9,7 +9,7 @@ loadParameters
 %%
 
 dm = sessionData.dependentMeasures_tr;
-data_tr = eval( [ '[' sprintf('dm.%s',varString) ']' ]);
+data_tr = eval( [ '[' sprintf('dm.%s',varString) '];' ]);
 
 %%
 % condition (real vs virtual) vs height (s, m, tall).
@@ -48,11 +48,9 @@ for cIdx = 1:numConditions
             outlierIdx = [];
             
             if( nargin > 2 && removeOutliersBool == 1)
-                fprintf('dataStd_cIdx_hIdx: Removing outliers \n')
                 [yData_tr outlierVals outlierIdx] = removeOutliers(yData_tr,outlierThreshold);
                 outlierIdx = trOfType_tIdx(outlierIdx);
                 
-                outlierVals 
             else
                 outlierVals = [];
                 outlierIdx = [];

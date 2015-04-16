@@ -3,11 +3,23 @@
 
 function [ sessionData ] = stepLengthAndDur(sessionData, trIdx)
 
-
 rawTrialStruct = sessionData.rawData_tr(trIdx);
 proTrialStruct = sessionData.processedData_tr(trIdx);
 dmTrialStruct = sessionData.dependentMeasures_tr(trIdx);
 
+
+if(sessionData.rawData_tr(trIdx).excludeTrial == 1)
+    
+    sessionData.dependentMeasures_tr(trIdx).lFoot.stepDur_sIdx = NaN;
+    sessionData.dependentMeasures_tr(trIdx).rFoot.stepDur_sIdx = NaN;
+    
+    
+    sessionData.dependentMeasures_tr(trIdx).lFoot.stepDist_sIdx = NaN;
+    sessionData.dependentMeasures_tr(trIdx).rFoot.stepDist_sIdx = NaN;
+    
+    return
+end
+
 if(sum(strcmp(fieldnames(sessionData),'dependentMeasures_tr'))==0)
    fprintf('Must run findSteps.m prior to stepLength.m \n')
    return 
@@ -17,6 +29,7 @@ if(sum(strcmp(fieldnames(sessionData),'dependentMeasures_tr'))==0)
    fprintf('Must run findSteps.m prior to stepLength.m \n')
    return 
 end
+
 
 %% 
 
@@ -51,12 +64,7 @@ leftFootY_frIdx_mIdx = squeeze(leftFoot_fr_mkr_XYZ(:,:,2));
 
 startPos_sIdx_Y = rightFootMaxY_frIdx(rTO_sIdx);
 endPos_sIdx_Y = rightFootMinY_frIdx(rHS_sIdx);
-
-try
-    rightFootDist_sIdx = (endPos_sIdx_Y-startPos_sIdx_Y);
-catch
-    keyboard
-end
+rightFootDist_sIdx = (endPos_sIdx_Y-startPos_sIdx_Y);
 
 startPos_sIdx_Y = leftFootMaxY_frIdx(lTO_sIdx);
 endPos_sIdx_Y = leftFootMinY_frIdx(lHS_sIdx);
@@ -66,10 +74,8 @@ leftFootDist_sIdx = (endPos_sIdx_Y-startPos_sIdx_Y );
 
 sessionData.dependentMeasures_tr(trIdx).lFoot.stepDur_sIdx = frameTime_fr(lHS_sIdx)-frameTime_fr(lTO_sIdx);
 sessionData.dependentMeasures_tr(trIdx).rFoot.stepDur_sIdx = frameTime_fr(rHS_sIdx)-frameTime_fr(rTO_sIdx);
-sessionData.dependentMeasures_tr(trIdx).bothFeet.stepDur_sIdx = [frameTime_fr(lHS_sIdx)-frameTime_fr(lTO_sIdx) frameTime_fr(rHS_sIdx)-frameTime_fr(rTO_sIdx)];
 
 
-sessionData.dependentMeasures_tr(trIdx).lFoot.stepDist_sIdx = rightFootDist_sIdx;
-sessionData.dependentMeasures_tr(trIdx).rFoot.stepDist_sIdx = leftFootDist_sIdx;
-sessionData.dependentMeasures_tr(trIdx).bothFeet.stepDist_sIdx = [ rightFootDist_sIdx; leftFootDist_sIdx ];
+sessionData.dependentMeasures_tr(trIdx).lFoot.stepDist_sIdx = leftFootDist_sIdx;
+sessionData.dependentMeasures_tr(trIdx).rFoot.stepDist_sIdx = rightFootDist_sIdx;
 
