@@ -5,7 +5,7 @@ close all
 
 loadParameters
 
-sessionFileList = [1 2 3 4 5 6];
+sessionFileList = [1 2 3 4 5];
 
 %% Build struct sessionData_sIdx that includes summary stats for each session
 for sIdx = 1:numel(sessionFileList )

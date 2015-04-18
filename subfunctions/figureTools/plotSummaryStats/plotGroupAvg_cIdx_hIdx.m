@@ -16,7 +16,7 @@ xData = betweenSubStats.expInfo.obsHeightRatios;
 
 meanYData_cIdx_hIdx = summaryStruct.mean_cIdx_hIdx;
 stdYData_cIdx_hIdx = summaryStruct.stdErr_cIdx_hIdx;
-values_cIdx_hIdx = summaryStruct.values_cIdx_hIdx ;
+values_sIdx_cIdx_hIdx = summaryStruct.values_sIdx_cIdx_hIdx ;
 
 l1 = errorbar( xData, meanYData_cIdx_hIdx(1,:)',stdYData_cIdx_hIdx(1,:)','LineWidth',3,'LineStyle',lineStyle_cond(1),'Color',lineColor_cond(1),'Marker','o','MarkerFaceColor',lineColor_cond(1),'MarkerSize',10,'MarkerEdgeColor','k');
 l2 = errorbar( xData, meanYData_cIdx_hIdx(2,:)',stdYData_cIdx_hIdx(1,:)','LineWidth',3,'LineStyle',lineStyle_cond(2),'Color',lineColor_cond(2),'Marker','o','MarkerFaceColor',lineColor_cond(2),'MarkerSize',10,'MarkerEdgeColor','k');
@@ -31,18 +31,7 @@ if (showIndividualTrials )
     for cIdx = 1:numConditions
         for hIdx = 1:numObsHeights
             
-            keyboard
-            scatH = scatter(repmat(xData(hIdx),1,numel(values_cIdx_hIdx{cIdx,hIdx})),values_cIdx_hIdx{cIdx,hIdx},15,lineColor_cond(cIdx),'filled','MarkerFaceColor',lineColor_cond(cIdx));
-            allScatterData = [allScatterData values_cIdx_hIdx{cIdx,hIdx}];
-            
-            
-            if( cIdx == 1)
-                scatHX = scatH.XData;
-                scatH.XData = scatHX + .03 * figBufferPro * range(betweenSubStats.expInfo.obsHeightRatios);
-            else
-                scatHX = scatH.XData;
-                scatH.XData = scatHX -.03 * figBufferPro * range(betweenSubStats.expInfo.obsHeightRatios);
-            end
+            scatH = plot(xData,squeeze(values_sIdx_cIdx_hIdx(:,cIdx,:)),'Color',lineColor_cond(cIdx),'MarkerFaceColor',lineColor_cond(cIdx),'LineWidth',1);
             
         end
     end
