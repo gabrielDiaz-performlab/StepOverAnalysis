@@ -43,13 +43,13 @@ fieldName = 'leadFootMaxVelAXS';
 figH = plotGroupAvg_cIdx_hIdx(betweenSubStats,fieldName,showIndividualTrials);
 eval(['betweenGroupsFigStruct.' fieldName '=figH;']);
 ylabel({'leading foot','max velocity AXS (m/s)' })
-ylim([0 7])
+ylim([3 6])
 
 fieldName = 'trailFootMaxVelAXS';
 figH = plotGroupAvg_cIdx_hIdx(betweenSubStats,fieldName,showIndividualTrials);
 eval(['betweenGroupsFigStruct.' fieldName '=figH;']);
 ylabel({'trailing foot','max velocity AXS (m/s)' })
-ylim([0 7])
+ylim([3 6])
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Height AXS

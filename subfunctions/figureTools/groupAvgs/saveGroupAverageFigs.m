@@ -10,6 +10,8 @@ try
     rmdir(sessionListFPath)
 end
 
+%%
+
 saveFigStructToDir(sessionListFName,betweenGroupsFigStruct);
 
 fid = fopen([sessionListFPath sessionListFName '.txt'],'w+');

@@ -55,45 +55,4 @@ else
     
 end
     
-    %
-    % %% Check for moreParsedText
-    % if (~exist(moreParsedTextPath  , 'file'))
-    %
-    %     %fprintf('.mat File Not Found Parsing The TextFile %s\n', textFileName);
-    %     fprintf('generatesessionData: Could not find session file struct file %s. Creating session file...\n', sessionFilePath  );
-    %
-    %     % createMatFile also called in here
-    %     % From *.txt to *-struct.mat
-    %     % *-struct.mat to an unstructured sessionFile
-    %     parseTextFileToMat(sessionNumber)
-    %
-    %     % sessionFile is now converted into a structure file
-    %     sessionData = generateRawData(sessionFilePath);
-    %
-    %     sessionData.expInfo.fileID = dataFileList{sessionNumber};
-    %
-    %     sessionData.expInfo.numConditions = numConditions ;
-    %     sessionData.expInfo.numObsHeights = numObsHeights ;
-    %
-    %     sessionData.expInfo
-    %
-    %     save( sessionFilePath,'sessionData')
-    %     fprintf ('Session struct created from .mat file and saved\n' )
-    %
-    % else
-    %
-    %     % Fixme:  this loads the intermediate struct.
-    %     % I need to rename this file to be distinct from the session struct
-    %     load( moreParsedTextPath  )
-    %     % Creates an intermediate mat file
-    %     % Creates an intermediate mat in sessionFileDir
-    %     % This file is written over in generateRawData
-    %     % Must run createMatFile on results (structHandler, textFileDir, textFileName,sessionFileDir)
-    %
-    %     fprintf('Loaded struct version of text data from %s\n',structFilePath  )
-    %     keyboard
-    %
-    % end
-    %fprintf('.mat File Not Found Parsing The TextFile %s\n', textFileName);
-    
     

@@ -1,21 +1,16 @@
 
-%dataFileFolder = '\MatlabDataFiles\';
-addpath(genpath('data'));
-%addpath(genpath('sessionFiles'));
-%addpath(genpath('structFiles'));
 
+addpath(genpath('data'));
 addpath(genpath('subFunctions'));
 addpath(genpath('figureTools'));
-
-% textFileDir = 'rawData/';
-% structFileDir = 'structFiles/';
-% sessionFileDir = 'sessionFiles/';
 
 textFileDir = 'data/raw/';
 parsedTextFileDir = 'data/parsedTXT/';
 sessionFileDir = 'data/sessionFiles/';
+spssFileDir = 'data/spssFiles/';
 
 [junk junk] = mkdir('figures');
+[junk junk] = mkdir(spssFileDir );
 
 
 dataFileList = {...
@@ -24,6 +19,8 @@ dataFileList = {...
     'exp_data-2015-4-15-10-34'
     'exp_data-2015-4-14-16-15'
     'exp_data-2015-4-15-14-22'
+    'exp_data-2015-4-16-14-16'
+    'exp_data-2015-4-17-11-27'
     };
 
 legLengthHardCoded_sIdx = [90 90 100];

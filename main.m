@@ -29,7 +29,7 @@ sessionNumber = 1;
 dataFileString = sprintf('%s.mat',dataFileList{sessionNumber})
 
 %% Generate or open session file struct
-sessionData = loadSession(sessionNumber);
+sessionData =  (sessionNumber);
 
 %% If you want, you can reset the struct for a fresh analysis
 % For example, if you cahnge parameters.  I suggest this is done every
@@ -73,15 +73,53 @@ for trIdx = 1:numel(sessionData.rawData_tr)
     [ sessionData ] = avgCOMVelocity(sessionData,trIdx);
     [ sessionData ] = maxVelAndHeightAXS(sessionData,trIdx);
     [ sessionData ] = findDistPlantedFootASO(sessionData,trIdx);
-    
+    [ sessionData ] = calcBodyScaled(sessionData,trIdx);
 end
 
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %% Plot body scaled
+% 
+% figure(1010)
+% hold on
+% cla
+% set(1010,'Units','Normalized','Position',[0.118055555555556 0.235555555555556 0.829166666666667 0.65]);
+% title({'lead foot position','in units of leg length','for 1 obstacle height'})
+% 
+% for hIdx = 1:3
+%     
+%     trIdxList = find([sessionData.rawData_tr.trialType] == hIdx);
+%     trIdxList = [trIdxList  find([sessionData.rawData_tr.trialType] == hIdx+3)];
+%         
+%     for trIdx = 1:numel(trIdxList)
+%         
+%         trNum = trIdxList(trIdx);
+%         
+%         if( strcmp( sessionData.dependentMeasures_tr(trNum).firstCrossingFoot, 'Left' ) )
+%             
+%             leadFoot_fr_XYZ = sessionData.processedData_tr(trIdxList(trIdx)).lFootBS_fr_XYZ;
+%         else
+%             leadFoot_fr_XYZ = sessionData.processedData_tr(trIdxList(trIdx)).rFootBS_fr_XYZ;
+%         end
+%         
+%         X = repmat(trIdx,1,length(leadFoot_fr_XYZ ));
+%         Y = leadFoot_fr_XYZ(:,2);
+%         Z = leadFoot_fr_XYZ(:,3);
+%         plot3(X,Y,Z)
+%         
+%     end
+% end
+
+
+%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Some methods for plotting a trial
 
 %plotTrialMarkers(sessionData,2);
 %plotTrialRigid(sessionData,3)
+
+%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -92,5 +130,11 @@ sessionFigH = struct;
 
 [sessionData sessionFigH ] = calculateSSandPlot(sessionData,removeOutliers,showIndividualTrials)
 
+
+
 %%
 saveFigStructToDir(dataFileList{sessionNumber},sessionFigH);
+
+%% Save session file
+
+save([ sessionFileDir dataFileList{sessionNumber} '.mat'] , 'sessionData');

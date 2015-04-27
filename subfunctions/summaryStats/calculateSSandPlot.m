@@ -14,9 +14,11 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Make some figures
 
-
+try
 dm = sessionData.dependentMeasures_tr;
-
+catch
+    keyboard
+end
 
 %% Lead Toe Height ASO BY REPETITION
 
@@ -98,6 +100,10 @@ ylim([0 1])
 
 [sessionData sessionFigH.distPlantedFootASO] = cNp_cIdx_hIdx(sessionData,'distPlantedFootASO',removeOutliers,showIndividualTrials);
 ylabel({'planted foot','location ASO (m)' })
+
+%% NOrmalize trajectories by crossing frame
+%[sessionFigH.avgTraj_tr_c_H] = plotAvgTraj_Tr_C_H(sessionData)
+[sessionFigH.avgTraj_c_H] = plotAvgTraj_CxH(sessionData)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

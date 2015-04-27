@@ -20,7 +20,7 @@ loadParameters
 % This function finds steps from kinematic data based on a algorthm
 % presented in Zeni et al 2008 in Gait and Posture.
 %
-% The basic idea is to first situate the data by subtracting the 
+% The basic idea is to first situate the data by subtracting the
 % coordinates of the Root marker from each marker position at each frame,
 % essentially setting the origin to the subject's root.
 %
@@ -279,7 +279,7 @@ for i = 1:numel(rHS)
 end
 
 %%
-for i = 1:numel(lTO)    
+for i = 1:numel(lTO)
     if( numel(lTO) >= i )
         while( lTO(i) > lHS(i) )
             lTO(i) = [];
@@ -333,72 +333,100 @@ if plotOn == 1
     %%
     figure(3);
     
-    subplot(211);
+    %     subplot(211);
+    %     hold on
+    %
+    %     ylim([-.7, 1])
+    %     title('Normalized foot velocity in spine-based FOR')
+    %     xlabel('Frame')
+    %     ylabel('normalized velocity')
+    %
+    %     plot((rAnkVelY*meanFrameRate)./ max(abs(rAnkVelY*meanFrameRate)),'c')
+    %     plot((lAnkVelY*meanFrameRate)./ max(abs(lAnkVelY*meanFrameRate)),':m')
+    %     legend('right','left','location','Best')
+    %
+    %     %hline(0,'k')
+    %
+    %     for idx = 1:numel(rTO)
+    %         vline(rTO(idx),'g',2,'-')
+    %     end
+    %
+    %     for idx = 1:numel(rHS)
+    %         vline(rHS(idx),'r',2,'-')
+    %     end
+    %
+    %     for idx = 1:numel(lTO)
+    %         vline(lTO(idx),'g',2,':')
+    %     end
+    %
+    %     for idx = 1:numel(lHS)
+    %         vline(lHS(idx),'r',2,':')
+    %     end
+    
+    frameTime_fr = sessionData.rawData_tr(trIdx).frameTime_fr - frameTime_fr(1);
+    
+    subplot(211)
     hold on
-    grid on
-    ylim([-.7, 1])
-    title('Normalized foot velocity in spine-based FOR')
-    xlabel('Frame')
-    ylabel('normalized velocity')
     
-    plot((rAnkVelY*meanFrameRate)./ max(abs(rAnkVelY*meanFrameRate)),'c')
-    plot((lAnkVelY*meanFrameRate)./ max(abs(lAnkVelY*meanFrameRate)),':m')
-    legend('right','left','location','Best')
+    xlim([0, frameTime_fr(end)])
+    ylim([0, .7])
+    title('right foot height')
+    xlabel('time (s)')
+    ylabel('foot height (m)')
     
-    hline(0,'k')
+    plot(frameTime_fr,rFootHeight_fr,'k');
+    %plot(frameTime_fr,lFootHeight_fr,'m:');
     
+    %hline(footHeightThresh,'y')
+    %legend('right','left','threshold height','location','Best')
     
     for idx = 1:numel(rTO)
-        vline(rTO(idx),'g',2,'-')
+        vline(frameTime_fr(rTO(idx)),'g',2,':')
     end
     
     for idx = 1:numel(rHS)
-        vline(rHS(idx),'r',2,'-')
+        vline(frameTime_fr(rHS(idx)),'r',2,':')
     end
     
-    for idx = 1:numel(lTO)
-        vline(lTO(idx),'g',2,':')
-    end
     
-    for idx = 1:numel(lHS)
-        vline(lHS(idx),'r',2,':')
-    end
     
     subplot(212)
     hold on
-    grid on
+    
+    xlim([0, frameTime_fr(end)])
     ylim([0, .7])
-    title('Vertial foot position')
-    xlabel('Frame')
-    ylabel('m')
+    title('foot height')
+    xlabel('time (s)')
+    ylabel('foot height (m)')
     
-    plot(rFootHeight_fr,'c');
-    plot(lFootHeight_fr,'m:');
+    %plot(frameTime_fr,rFootHeight_fr,'c');
+    plot(frameTime_fr,lFootHeight_fr,'k');
     
-    hline(footHeightThresh,'y')
-    legend('right','left','threshold height','location','Best')
+    %hline(footHeightThresh,'y')
+    %legend('right','left','threshold height','location','Best')
     
-    for idx = 1:numel(rTO)
-        vline(rTO(idx),'g',2,'-')
-    end
-    
-    for idx = 1:numel(rHS)
-        vline(rHS(idx),'r',2,'-')
-    end
-    
+    %     for idx = 1:numel(rTO)
+    %         vline(frameTime_fr(rTO(idx)),'g',2,'-')
+    %     end
+    %
+    %     for idx = 1:numel(rHS)
+    %         vline(frameTime_fr(rHS(idx)),'r',2,'-')
+    %     end
+    %
     for idx = 1:numel(lTO)
-        vline(lTO(idx),'g',2,':')
+        vline(frameTime_fr(lTO(idx)),'g',2,':')
     end
     
     for idx = 1:numel(lHS)
-        vline(lHS(idx),'r',2,':')
+        vline(frameTime_fr(lHS(idx)),'r',2,':')
     end
     
     figDir = sprintf('outputFigures/StepFigs/%s/',sessionData.expInfo.fileID);
     [junk junk] = mkdir(figDir );
-    set(3,'Units','Normalized','Position',[0.0923611111111111 0.211111111111111 0.838888888888889 0.673333333333333]);
-    %saveas(figH,sprintf('%s%u.png',figDir,trialNum));
-    waitforbuttonpress
+    set(3,'Units','Normalized','Position',[0.0923611111111111 0.21 0.565972222222222 0.674444444444444]);
+    saveas(figH,sprintf('%s%u.pdf',figDir,trIdx));
+    
+    %waitforbuttonpress
     
 end
 

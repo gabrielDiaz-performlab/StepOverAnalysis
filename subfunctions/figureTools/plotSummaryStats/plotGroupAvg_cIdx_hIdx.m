@@ -9,6 +9,8 @@ figH = figure( sum(double( varString )) );
 clf
 hold on
 
+
+
 evalStr1 = ['summaryStruct = betweenSubStats.' lower(varString(1)) varString(2:end) ';' ];
 eval(evalStr1)
 
@@ -18,8 +20,8 @@ meanYData_cIdx_hIdx = summaryStruct.mean_cIdx_hIdx;
 stdYData_cIdx_hIdx = summaryStruct.stdErr_cIdx_hIdx;
 values_sIdx_cIdx_hIdx = summaryStruct.values_sIdx_cIdx_hIdx ;
 
-l1 = errorbar( xData, meanYData_cIdx_hIdx(1,:)',stdYData_cIdx_hIdx(1,:)','LineWidth',3,'LineStyle',lineStyle_cond(1),'Color',lineColor_cond(1),'Marker','o','MarkerFaceColor',lineColor_cond(1),'MarkerSize',10,'MarkerEdgeColor','k');
-l2 = errorbar( xData, meanYData_cIdx_hIdx(2,:)',stdYData_cIdx_hIdx(1,:)','LineWidth',3,'LineStyle',lineStyle_cond(2),'Color',lineColor_cond(2),'Marker','o','MarkerFaceColor',lineColor_cond(2),'MarkerSize',10,'MarkerEdgeColor','k');
+l1 = errorbar( xData, meanYData_cIdx_hIdx(1,:)',stdYData_cIdx_hIdx(1,:)','LineWidth',3,'LineStyle',lineStyle_cond(1),'Color',lineColor_cond(1),'Marker','o','MarkerFaceColor',lineColor_cond(1),'MarkerSize',10,'MarkerEdgeColor',lineColor_cond(1));
+l2 = errorbar( xData, meanYData_cIdx_hIdx(2,:)',stdYData_cIdx_hIdx(1,:)','LineWidth',3,'LineStyle',lineStyle_cond(2),'Color',lineColor_cond(2),'Marker','o','MarkerFaceColor',lineColor_cond(2),'MarkerSize',10,'MarkerEdgeColor',lineColor_cond(2));
 
 %% Plot Scatterplot xdata
 if (showIndividualTrials )
