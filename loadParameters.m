@@ -45,8 +45,8 @@ cutoff = 5;
 
 %% Here where I hardcode variables that should be in the text file.
 
-legLength = .87;
-obsHeightRatio_trialType = [ .15 .25 .35 .15 .25 .35 ];
+%legLength = .87;
+%obsHeightRatio_trialType = [ .15 .25 .35 .15 .25 .35 ];
 
 obsPositionIfWalkingUp = -3.5;
 obsPositionIfWalkingDown = 2.4;
@@ -56,10 +56,13 @@ obsLW = [5,.03];
 numConditions = 2;
 numObsHeights = 3;
 
-obsHeightRatios = [.15 .25 .35];
+%obsHeightRatios = [.15 .25 .35];
 footSize_LWH = [.25 .1 .07];
 
 %standingBoxOffset_Z = - 2;
+
+% Number of frames to search before and after the crossing for other features
+crossingSearchWindowSize = 20; 
 
 %% Figure colors / linestyles
 

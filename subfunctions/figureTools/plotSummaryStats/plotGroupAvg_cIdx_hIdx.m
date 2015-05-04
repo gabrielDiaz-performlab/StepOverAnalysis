@@ -9,8 +9,6 @@ figH = figure( sum(double( varString )) );
 clf
 hold on
 
-
-
 evalStr1 = ['summaryStruct = betweenSubStats.' lower(varString(1)) varString(2:end) ';' ];
 eval(evalStr1)
 

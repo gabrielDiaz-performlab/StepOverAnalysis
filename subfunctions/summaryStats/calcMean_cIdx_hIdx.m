@@ -24,11 +24,9 @@ dataStd_cIdx_hIdx = nan(numConditions ,numObsHeights);
 % if( nargin > 2 && removeOutliersBool == 1 )
 %     fprintf('dataStd_cIdx_hIdx: Removing outliers \n');
 % end
-
-for cIdx = 1:numConditions
-    for hIdx = 1:numObsHeights
-        
-        
+for hIdx = 1:numObsHeights
+    for cIdx = 1:numConditions
+    
         %% Exclude trials marked for exlusion in sessionData.rawData_tr.excludeTrial
         
         % Get indices for the trial type specified by hIdx and cIdx
@@ -62,11 +60,17 @@ for cIdx = 1:numConditions
             outlierValues_cIdx_hIdx(cIdx,hIdx) = {outlierVals};
             numAveraged_cIdx_hIdx(cIdx,hIdx) = numel(yData_tr);
             values_cIdx_hIdx(cIdx,hIdx) = {yData_tr};
-
-
+            
+    
     end
+    
+    meanDiffBtCond_hIdx(hIdx) = dataMean_cIdx_hIdx(1,hIdx) - dataMean_cIdx_hIdx(2,hIdx);
+    
 end
 
+
+
+            
 %%
 evalStr1 = ['sessionData.summaryStats.' lower(varString(1)) varString(2:end) ' = struct;' ];
 
@@ -79,6 +83,10 @@ summaryStruct.std_cIdx_hIdx = dataStd_cIdx_hIdx;
 summaryStruct.outlierIdx_cIdx_hIdx = outlierIdx_cIdx_hIdx;
 summaryStruct.outlierValues_cIdx_hIdx = outlierValues_cIdx_hIdx;
 summaryStruct.numAveraged_cIdx_hIdx = numAveraged_cIdx_hIdx;
+summaryStruct.meanDiffBtCond_hIdx = meanDiffBtCond_hIdx;
+
+% summaryStruct.meanDiffBtCond = meanDiffBtCond;
+% summaryStruct.stdDiffBtCond_hIdx = stdDiffBtCond_hIdx;
 
 evalStr2 = ['sessionData.summaryStats.' lower(varString(1)) varString(2:end) '= summaryStruct;' ];
 eval(evalStr2);

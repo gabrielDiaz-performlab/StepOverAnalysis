@@ -101,9 +101,26 @@ ylim([0 1])
 [sessionData sessionFigH.distPlantedFootASO] = cNp_cIdx_hIdx(sessionData,'distPlantedFootASO',removeOutliers,showIndividualTrials);
 ylabel({'planted foot','location ASO (m)' })
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Min distance of the lead foot AXS
+
+[sessionData sessionFigH.distPlantedFootASO] = cNp_cIdx_hIdx(sessionData,'leadMinClearanceAXS',removeOutliers,showIndividualTrials);
+ylabel({'lead foot','min distance AXS(m)' })
+ylim([0 0.3])
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Min distance of the trailing foot AXS
+
+[sessionData sessionFigH.distPlantedFootASO] = cNp_cIdx_hIdx(sessionData,'trailMinClearanceAXS',removeOutliers,showIndividualTrials);
+ylabel({'trail foot','min distance AXS(m)' })
+ylim([0 0.3])
+
 %% NOrmalize trajectories by crossing frame
 %[sessionFigH.avgTraj_tr_c_H] = plotAvgTraj_Tr_C_H(sessionData)
 [sessionFigH.avgTraj_c_H] = plotAvgTraj_CxH(sessionData)
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

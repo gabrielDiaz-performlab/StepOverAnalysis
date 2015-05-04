@@ -16,24 +16,24 @@ eval(['betweenGroupsFigStruct.' fieldName '=figH;']);
 ylabel({'trailing step','duration (s)' })
 ylim([.5 1 ])
 
-%% Clearance ASO
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% lead clearance ASO (at step-over frame)
-    
-fieldName = 'leadToeZClearanceASO';
-figH = plotGroupAvg_cIdx_hIdx(betweenSubStats,fieldName,showIndividualTrials);
-eval(['betweenGroupsFigStruct.' fieldName '=figH;']);
-ylabel({'leading toe','clearance ASO (m)' })
-ylim([0 1 ])
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% trail clearance ASO (at step-over frame)
-    
-fieldName = 'trailToeZClearanceASO';
-figH = plotGroupAvg_cIdx_hIdx(betweenSubStats,fieldName,showIndividualTrials);
-eval(['betweenGroupsFigStruct.' fieldName '=figH;']);
-ylabel({'trailing toe','clearance ASO (m)' })
-ylim([0 1 ])
+% %% Clearance ASO
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% % lead clearance ASO (at step-over frame)
+%     
+% fieldName = 'leadToeZClearanceASO';
+% figH = plotGroupAvg_cIdx_hIdx(betweenSubStats,fieldName,showIndividualTrials);
+% eval(['betweenGroupsFigStruct.' fieldName '=figH;']);
+% ylabel({'leading toe','clearance ASO (m)' })
+% ylim([0 1 ])
+% 
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% % trail clearance ASO (at step-over frame)
+%     
+% fieldName = 'trailToeZClearanceASO';
+% figH = plotGroupAvg_cIdx_hIdx(betweenSubStats,fieldName,showIndividualTrials);
+% eval(['betweenGroupsFigStruct.' fieldName '=figH;']);
+% ylabel({'trailing toe','clearance ASO (m)' })
+% ylim([0 1 ])
 
 %% Max Velocity AXS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
