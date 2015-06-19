@@ -50,17 +50,17 @@ ylabel({'trail step','duration (s)' })
 ylim([.5 1 ])
 
 %% Clearance ASO
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% lead clearance ASO (at step-over frame)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%lead clearance ASO (at step-over frame)
     
-[sessionData sessionFigH.leadToeZClearanceASO] = cNp_cIdx_hIdx(sessionData,'leadToeZClearanceASO',removeOutliers,showIndividualTrials);
+[sessionData sessionFigH.leadToeZClearanceASO] = cNp_cIdx_hIdx(sessionData,'leadMinClearanceAXS',removeOutliers,showIndividualTrials);
 ylabel({'lead toe','clearance ASO (m)' })
 ylim([0 0.5])
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% trail clearance ASO (at step-over frame)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%trail clearance ASO (at step-over frame)
     
-[sessionData sessionFigH.trailToeZClearanceASO] = cNp_cIdx_hIdx(sessionData,'trailToeZClearanceASO',removeOutliers,showIndividualTrials);
+[sessionData sessionFigH.trailToeZClearanceASO] = cNp_cIdx_hIdx(sessionData,'trailMinClearanceAXS',removeOutliers,showIndividualTrials);
 ylabel({'trail toe','clearance ASO (m)' })
 ylim([0 0.5])
 
@@ -118,7 +118,7 @@ ylim([0 0.3])
 
 %% NOrmalize trajectories by crossing frame
 %[sessionFigH.avgTraj_tr_c_H] = plotAvgTraj_Tr_C_H(sessionData)
-[sessionFigH.avgTraj_c_H] = plotAvgTraj_CxH(sessionData)
+%[sessionFigH.avgTraj_c_H] = plotAvgTraj_CxH(sessionData)
 
 
 

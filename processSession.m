@@ -1,4 +1,13 @@
-function [sessionData sessionFigH]= processSession(sessionNumber)
+% function [sessionData sessionFigH]= processSession(sessionNumber,cleanRunBool)
+% 
+% if(nargin == 1 )
+%    cleanRunBool = 1; 
+% end
+
+clear all
+close all
+sessionNumber = 1;
+cleanRunBool = 1;
 
 %FIXME:  Python variable sugests quat form of WXYZ, but it is in XYZW
 %FIXME:  Python obstacle_XYZ is actually Xpos, Ypos, Height
@@ -32,7 +41,10 @@ sessionData =  loadSession(sessionNumber);
 % For example, if you cahnge parameters.  I suggest this is done every
 % time, just in case.  
 
-sessionData = cleanSessionData(sessionData);
+if( cleanRunBool )
+    sessionData = cleanSessionData(sessionData);
+end
+
 sessionData = checkForExclusions(sessionData);
 
 % FIXME:  Leg length data in .txt file is not correct!
@@ -67,7 +79,8 @@ for trIdx = 1:numel(sessionData.rawData_tr)
     [ sessionData ] = avgCOMVelocity(sessionData,trIdx);
     [ sessionData ] = maxVelAndHeightAXS(sessionData,trIdx);
     [ sessionData ] = findDistPlantedFootASO(sessionData,trIdx);
-    [ sessionData ] = calcBodyScaled(sessionData,trIdx);
+    
+    [ sessionData ] = calcObjCenteredTraj(sessionData,trIdx);
     
     %[ sessionData ] = toeHeightAndClearanceASO(sessionData, trIdx);
     [ sessionData ] = findMinDistanceAXS(sessionData,trIdx);
@@ -117,7 +130,14 @@ end
 %plotTrialMarkers(sessionData,2);
 %plotTrialRigid(sessionData,3)
 
-%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% plotAvgTraj_CxH - a work in progress
+% Analyzing to see if postural adjustments occurred during the approach,
+% or as they left the go-box
+
+%plotAvgTraj_CxH(sessionData)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -129,7 +149,8 @@ sessionFigH = struct;
 
 [sessionData sessionFigH ] = calculateSSandPlot(sessionData,removeOutliers,showIndividualTrials)
 
-%%
+%%  Save figures
+
 saveFigStructToDir(dataFileList{sessionNumber},sessionFigH);
 
 %% Save session file

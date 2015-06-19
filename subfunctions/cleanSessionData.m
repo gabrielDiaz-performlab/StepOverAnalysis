@@ -1,6 +1,8 @@
 
 function sessionData = cleanSessionData(sessionData)
 
+
+
 try
     sessionData = rmfield(sessionData,'processedData_tr');
 end

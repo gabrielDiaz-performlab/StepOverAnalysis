@@ -10,15 +10,16 @@ showIndividualTrialsBool = 0;
     
 if numel(sessionFileList)<2 error 'sessionFileList cannot be a single value'; end
 %% Build struct sessionData_sIdx that includes summary stats for each session
+
 for sIdx = 1:numel(sessionFileList )
     
     sessionNumber = sessionFileList(sIdx);
-    %dataFileString = sprintf('%s.mat',dataFileList{sessionNumber})
-    %sessionData = loadSession(sessionNumber);
-    %sessionData  = calculateSSandPlot(sessionData,removeOutliersBool,showIndividualTrialsBool )
-    %save([ sessionFileDir dataFileList{sessionNumber} '.mat'] , 'sessionData');
     
-    sessionData = processSession(sessionNumber);
+    % If you want to load previously calculated data
+    sessionData = loadSession(sessionNumber);
+    
+    % If you want to calculate the data once again
+    %sessionData = processSession(sessionNumber);
         
     close all
     
@@ -27,7 +28,6 @@ for sIdx = 1:numel(sessionFileList )
     
 end
 
-%%
 %% For each fieldname, measure between subject error
 fieldNames_fIdx = fieldnames(sessionData_sIdx(1).summaryStats);
 
@@ -72,6 +72,7 @@ betweenSubStats.expInfo.numConditions = sessionData.expInfo.numConditions;
 betweenSubStats.expInfo.numObsHeights = sessionData.expInfo.numObsHeights;
 
 %% Plot and save DM avgs
+
 showIndividualSubData = 0;
 betweenGroupsFigStruct = plotGroupAvgs(betweenSubStats,showIndividualSubData);
 saveGroupAverageFigs(betweenGroupsFigStruct ,sessionFileList)
@@ -79,6 +80,7 @@ saveGroupAverageFigs(betweenGroupsFigStruct ,sessionFileList)
 close all
 
 %% Plot and save DM diff bt cond avgs
+
 showIndividualSubData = 0;
 betweenGroupsFigStruct = plotGroupAvgDiffs(betweenSubStats,showIndividualSubData);
 saveGroupAverageFigs(betweenGroupsFigStruct ,sessionFileList)

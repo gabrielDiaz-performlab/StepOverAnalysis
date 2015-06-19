@@ -5,7 +5,7 @@ loadParameters
 trialData = sessionData.rawData_tr(trialNum);
 
 %FIXME:  Obstacle height should be a part of the text file
-
+legLength = sessionData.expInfo.obstacleHeights(1) ./ sessionData.expInfo.obsHeightRatios(1);
 obsHeight = legLength * obsHeightRatio_trialType ( trialData.trialType );
 obstacle_XposYposHeight = trialData.obstacle_XposYposHeight;
 

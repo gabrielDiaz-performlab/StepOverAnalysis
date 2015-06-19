@@ -47,7 +47,7 @@ else
     sessionData.expInfo.fileID = dataFileList{sessionNumber};
     sessionData.expInfo.numConditions = numConditions ;
     sessionData.expInfo.numObsHeights = numObsHeights ;
-    
+    sessionData.expInfo.legLength = sessionData.expInfo.obstacleHeights(1) ./ sessionData.expInfo.obsHeightRatios(1);
     sessionData.expInfo
     
     save( sessionFilePath,'sessionData')
