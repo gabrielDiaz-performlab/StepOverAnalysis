@@ -1,5 +1,7 @@
 function [posSysTime_mFr pos_mFr_xyz quatSysTime_mFr quat_mFr_xyz] = getBufferedRigidData(currentLine, varName)
 
+%FIXME:  FLIPPED DATA L/R to acocunt for export error in python
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Rigid DATA 
 
@@ -9,16 +11,18 @@ startIndex = strfind( currentLine, refString ) + length(refString);
 
 % The next value specifies the number of entries stored in the variable
 try
-[numMFrames moveAheadBy]= textscan( currentLine(startIndex:startIndex+10), '%u' );
-currentIndex = startIndex + moveAheadBy;
+    [numMFrames moveAheadBy]= textscan( currentLine(startIndex:startIndex+10), '%u' );
+    currentIndex = startIndex + moveAheadBy;
 catch
     keyboard
 end
+
 % Now, get all the quat data
 [data_timeXYZ moveAheadBy]= textscan( currentLine(currentIndex:length(currentLine)), '[ %f %f %f %f %f ]' );
 
-quatSysTime_mFr = data_timeXYZ{1};
-quat_mFr_xyz = [ data_timeXYZ{2} data_timeXYZ{3} data_timeXYZ{4} data_timeXYZ{5}];
+
+quatSysTime_mFr = fliplr(data_timeXYZ{1});
+quat_mFr_xyz = fliplr([ data_timeXYZ{2} data_timeXYZ{3} data_timeXYZ{4} data_timeXYZ{5}]);
     
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -35,6 +39,6 @@ currentIndex = startIndex + moveAheadBy;
 % Now, get all the quat data
 [data_timeXYZ moveAheadBy]= textscan( currentLine(currentIndex:length(currentLine)), '[ %f %f %f %f ]' );
 
-posSysTime_mFr = data_timeXYZ{1};
-pos_mFr_xyz = [ data_timeXYZ{2} data_timeXYZ{3} data_timeXYZ{4} ];
+posSysTime_mFr = fliplr(data_timeXYZ{1});
+pos_mFr_xyz = fliplr([ data_timeXYZ{2} data_timeXYZ{3} data_timeXYZ{4} ]);
     

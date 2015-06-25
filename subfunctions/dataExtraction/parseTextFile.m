@@ -128,7 +128,9 @@ while ~feof(fid)
         
         isWalkingDownAxis_tr(trialNum) = extractVarFromLine(currentLine, 'isWalkingDownAxis', 1  );
         obstacleHeight_tr(trialNum) = extractVarFromLine(currentLine, 'obstacleHeight', 1  );
-        obstacle_tr_XYZ(trialNum,:) = extractVarFromLine(currentLine, 'Obstacle_XYZ', 3  );
+        
+        obsXYZ = extractVarFromLine(currentLine, 'Obstacle_XYZ', 3  );
+        obstacle_tr_XYZ(trialNum,:) = obsXYZ([0 3 2]);
         
     end
     
@@ -167,7 +169,6 @@ while ~feof(fid)
     glassesQUAT_fr_WXYZ(i,:) = [ -data_valIdx(4) data_valIdx(1) data_valIdx(3) data_valIdx(2) ];
 
     %% ============= MainView visNode pos + quat
-    
     
     data_valIdx = extractVarFromLine(currentLine, 'viewPos_XYZ', 3);
     mainView_fr_XYZ(i,:) = [ data_valIdx(1) data_valIdx(3) data_valIdx(2) ];
@@ -245,7 +246,8 @@ while ~feof(fid)
         [glassRbSysTime_mFr glassRbPos_mFr_xyz glassRbQuatSysTime_mFr glassRbQuat_mFr_xyz] = getBufferedRigidData(currentLine, 'glassesRb');
         [lFootRbSysTime_mFr lFootRbPos_mFr_xyz lFootRbQuatSysTime_mFr lFootRbQuat_mFr_xyz] = getBufferedRigidData(currentLine, 'lFootRB');
         [rFootRbSysTime_mFr rFootRbPos_mFr_xyz rFootRbQuatSysTime_mFr rFootRbQuat_mFr_xyz] = getBufferedRigidData(currentLine, 'rFootRb');
-         
+
+        
     end
     
     i = i+1;
@@ -265,7 +267,10 @@ save ([ parsedTextFileDir textFileName '-parsed.mat'],'trialType_tr','isWalkingD
     'rFootSysTime_tr_mIdx_CmFr','rFootMData_tr_mIdx_CmFr_xyz',...
     'lFootSysTime_tr_mIdx_CmFr','lFootMData_tr_mIdx_CmFr_xyz',...
     'rFoot_fr_XYZ','lFoot_fr_XYZ','glasses_fr_XYZ','mainView_fr_XYZ',...
-    'rFootQUAT_fr_WXYZ','lFootQUAT_fr_WXYZ','glassesQUAT_fr_WXYZ','mainViewQUAT_fr_WXYZ');
+    'rFootQUAT_fr_WXYZ','lFootQUAT_fr_WXYZ','glassesQUAT_fr_WXYZ','mainViewQUAT_fr_WXYZ',...
+    'glassRbSysTime_mFr','glassRbPos_mFr_xyz','glassRbQuatSysTime_mFr','glassRbQuat_mFr_xyz',...
+    'lFootRbSysTime_mFr','lFootRbPos_mFr_xyz','lFootRbQuatSysTime_mFr','lFootRbQuat_mFr_xyz',...
+    'rFootRbSysTime_mFr','rFootRbPos_mFr_xyz','rFootRbQuatSysTime_mFr','rFootRbQuat_mFr_xyz');
 
 fprintf ('Parsed text save to file %s.mat \n', parsedTextFileDir )
 
