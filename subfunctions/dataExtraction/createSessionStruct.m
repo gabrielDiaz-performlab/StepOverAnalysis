@@ -64,13 +64,15 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
         
         info = struct;
         
-        info .excludeTrial = 0;
-        info .excludeTrialExplanation = [];
-        info .trialModifications_cModIdx = [];
+        info.excludeTrial = 0;
+        info.excludeTrialExplanation = [];
+        info.trialModifications_cModIdx = [];
         
         % Add basic trial start/stop info
         info.startFr = trialStartFr_tIdx(tIdx);
         info.stopFr = trialStopFr_tIdx(tIdx);
+        
+        info.eventFlag_fr = eventFlag(trialStartFr_tIdx:trialStopFr_tIdx);
         
         subIsWalkingUpAxis = -isWalkingDownAxis_tr(tIdx);
         info.subIsWalkingUpAxis = subIsWalkingUpAxis;
@@ -110,11 +112,15 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
         
         
         rFoot.rbQuatSysTime_mFr = rFootRbQuatSysTime_mFr;
-        
+        %%
         % Marker data
         for mIdx = 1:size(rFootMData_tr_mIdx_CmFr_xyz,2)
-            rFoot.mkrPos_mIdx_Cfr_xyz(mIdx,:,:) = rFootMData_tr_mIdx_CmFr_xyz(tIdx,mIdx);
-            rFoot.mkrSysTime_mIdx_Cfr(mIdx,:) = rFootSysTime_tr_mIdx_CmFr(tIdx,1);
+            try
+                rFoot.mkrPos_mIdx_Cfr_xyz(mIdx,:,:) = rFootMData_tr_mIdx_CmFr_xyz(tIdx,mIdx);
+                rFoot.mkrSysTime_mIdx_Cfr(mIdx,:) = rFootSysTime_tr_mIdx_CmFr(tIdx,1);
+            catch
+                keyboard
+            end
         end
         
         % Collisions
@@ -145,7 +151,7 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
         % Marker data
         for mIdx = 1:size(lFootMData_tr_mIdx_CmFr_xyz,2)
             lFoot.mkrPos_mIdx_Cfr_xyz(mIdx,:,:) = lFootMData_tr_mIdx_CmFr_xyz(tIdx,mIdx);
-            lFoot.mkrSysTime_mIdx_Cfr(mIdx,:) = lFootSysTime_tr_mIdx_CmFr(tIdx,1);
+            lFoot.mkrSysTime_mIdx_Cfr(mIdx,:) = lFootSysTime_tr_mIdx_CmFr(tIdx,mIdx);
         end
         
         lFootCollisionFrames = intersect( ...
@@ -178,7 +184,7 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
         % Marker data
         for mIdx = 1:size(glassesMData_tr_mIdx_CmFr_xyz,2)
             glasses.mkrPos_mIdx_Cfr_xyz(mIdx,:) = glassesMData_tr_mIdx_CmFr_xyz(tIdx,mIdx);
-            glasses.mkrSysTime_mIdx_Cfr(mIdx,:) = glassesSysTime_tr_mIdx_CmFr(tIdx,1);
+            glasses.mkrSysTime_mIdx_Cfr(mIdx,:) = glassesSysTime_tr_mIdx_CmFr(tIdx,mIdx);
         end
         
         trialStructs_tr(tIdx).glasses = glasses;
@@ -202,6 +208,8 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
     
     expInfo = struct;
     
+    keyboard
+    
     % This will build an unordered vector of unique values that appear
     % in the list of trials
     %%
@@ -209,17 +217,15 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
     %expInfo.trialTypes = sort(unique( [trialStructs_tr.trialType] ));
         
     expInfo.numTrials = numTrials;
-    expInfo.numBlockTypes = numel(unique(blockIndex_tr));
-    expInfo.numTrialTypes = numel(unique([trialStructs_tr(tIdx).info.type]));
+    expInfo.numBlocks = numel(unique(blockIndex_tr));
     
-    
-    expInfo.eventFlag_fr = eventFlag;
+    info_tr = [trialStructs_tr.info];
+    expInfo.numTrialTypes = numel(unique([info_tr.type]));
+    expInfo.trialTypes = unique([info_tr.type]);
     
     expInfo.changeLog_cChangeIdx = [];
 
-    %expInfo.obsHeightRatios = obsHeightRatios ;%[.15 .25 .35];
-    %display(fprintf('FIXME: generateRawData - IMPORT LEG LENGTH RATIO ***CURRENTLY HARDCODED at %f %f %f **\n',expInfo.obsHeightRatios))
-    
+    expInfo.obsHeightRatios = unique(obstacleHeight_tr ./ legLengthCM);
     
     sessionStruct.expInfo = expInfo;
     

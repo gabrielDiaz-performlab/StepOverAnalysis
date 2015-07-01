@@ -1,13 +1,25 @@
+% This function iterates through trials and marks those that meet certain
+% conditions for exclusion from certain analysis.
+
+% - Conditions for exclusion:
+% If a foot marker does not appear to move with the rest of markers attached to
+% the same rigid body, then it is excluded because this interferes with
+% later analysis.
+
+%%
+
 function [sessionData] = checkForExclusions(sessionData)
 
 loadParameters
 %
 for trIdx = 1:sessionData.expInfo.numTrials
     
-    %trIdx = 101
+    lFoot = sessionData.rawData_tr.lFoot;
+    rFoot = sessionData.rawData_tr.rFoot;
     
     rawData = sessionData.rawData_tr(trIdx);
-    data_cFr_mkr_XYZ = [{rawData.leftFoot_fr_mkr_XYZ},{rawData.rightFoot_fr_mkr_XYZ}];
+    %data_cFr_mkr_XYZ = [{lFoot.leftFoot_fr_mkr_XYZ},{rawData.rightFoot_fr_mkr_XYZ}];
+    %lFoot.mkrPos_mIdx_Cfr_xyz
             
     %% Left foot
     for cIdx = 1:length(data_cFr_mkr_XYZ)
@@ -35,8 +47,6 @@ for trIdx = 1:sessionData.expInfo.numTrials
             %keyboard
             
             % Omit trial
-            
-            
             sessionData.rawData_tr(trIdx).excludeTrial = 1;
             excludeMessage = sprintf('checkForExclusions: found >2 markers left behind');
             
@@ -89,11 +99,7 @@ for trIdx = 1:sessionData.expInfo.numTrials
             
         end
 
-    end
-    
-    
-   
-    
+    end 
 end
 
 

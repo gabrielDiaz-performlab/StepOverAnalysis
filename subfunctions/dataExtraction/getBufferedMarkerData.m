@@ -27,5 +27,8 @@ currentIndex = startIndex + moveAheadBy;
 sysTime_mFr = data_timeXYZ{1};
 data_mFr_xyz = [ data_timeXYZ{2} data_timeXYZ{3} data_timeXYZ{4} ];
     
+if( length(sysTime_mFr) ~= length(data_mFr_xyz) )
+    keyboard
+end
 
 

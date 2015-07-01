@@ -9,22 +9,6 @@ close all
 sessionNumber = 1;
 cleanRunBool = 1;
 
-%FIXME:  Python variable sugests quat form of WXYZ, but it is in XYZW
-%FIXME:  Python obstacle_XYZ is actually Xpos, Ypos, Height
-
-%%%%%%%%%%%%
-%FIXME:  Python output needs:
-%FIXME:  Rigid body position should be passed in from vizard (on each frame)
-%FIXME:  Rigid body sizes should be passed in from vizard (start of trial)
-%FIXME:  Marker conditions
-%FIXME:  Leg length ratios
-
-%FIXME:  Rigid body - marker positions in a LOCAL frame of reference
-% ...or, set interp/post processing to the correct value (better) and save
-% condition
-
-%%%%%%%%%%%
-
 close all
 
 tic
@@ -35,15 +19,31 @@ loadParameters
 dataFileString = sprintf('%s.mat',dataFileList{sessionNumber})
 
 %% Generate or open session file struct
+
+%%% FOR A REALLY CLEAN RUN, CALL removeParsedData(sessionnumber)
+if( cleanRunBool )
+    
+    removeParsedData(sessionNumber);
+    removeSessionData(sessionNumber);
+    
+    % An alternative: 
+    % This just sets the session file back to its raw state,
+    % after importorting text data and creating session struct.
+    % Avoids having to import / parse text again.
+    %sessionData = cleanSessionData(sessionData);
+end
+
 sessionData =  loadSession(sessionNumber);
+
+%% TO DO:
+
+% 
 
 %% If you want, you can reset the struct for a fresh analysis
 % For example, if you cahnge parameters.  I suggest this is done every
 % time, just in case.  
 
-if( cleanRunBool )
-    sessionData = cleanSessionData(sessionData);
-end
+
 
 sessionData = checkForExclusions(sessionData);
 
