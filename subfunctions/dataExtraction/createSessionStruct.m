@@ -64,6 +64,8 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
         
         info = struct;
         
+        
+        
         info.excludeTrial = 0;
         info.excludeTrialExplanation = [];
         info.trialModifications_cModIdx = [];
@@ -72,6 +74,7 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
         info.startFr = trialStartFr_tIdx(tIdx);
         info.stopFr = trialStopFr_tIdx(tIdx);
         
+        info.sysTime_fr = sysTime_fr(trialStartFr_tIdx:trialStopFr_tIdx);
         info.eventFlag_fr = eventFlag(trialStartFr_tIdx:trialStopFr_tIdx);
         
         subIsWalkingUpAxis = -isWalkingDownAxis_tr(tIdx);
@@ -115,12 +118,10 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
         %%
         % Marker data
         for mIdx = 1:size(rFootMData_tr_mIdx_CmFr_xyz,2)
-            try
-                rFoot.mkrPos_mIdx_Cfr_xyz(mIdx,:,:) = rFootMData_tr_mIdx_CmFr_xyz(tIdx,mIdx);
-                rFoot.mkrSysTime_mIdx_Cfr(mIdx,:) = rFootSysTime_tr_mIdx_CmFr(tIdx,1);
-            catch
-                keyboard
-            end
+            
+            rFoot.mkrPos_mIdx_Cfr_xyz(mIdx,:,:) = rFootMData_tr_mIdx_CmFr_xyz(tIdx,mIdx);
+            rFoot.mkrSysTime_mIdx_Cfr(mIdx,:) = rFootSysTime_tr_mIdx_CmFr(tIdx,1);
+            
         end
         
         % Collisions
@@ -207,8 +208,7 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
     %% Set session struct and expStruct info
     
     expInfo = struct;
-    
-    keyboard
+
     
     % This will build an unordered vector of unique values that appear
     % in the list of trials

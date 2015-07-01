@@ -112,7 +112,7 @@ while ~feof(fid)
     %% =======================================================
     
     %frameTime(i) = extractVarFromLine(currentLine, 'frameTime', 1  );
-    sysTime(i) = extractVarFromLine(currentLine, 'sysTime', 1  );
+    sysTime_fr(i) = extractVarFromLine(currentLine, 'sysTime', 1  );
     
     %% ============= Event Flag ==================
     %% ===========================================
@@ -210,7 +210,7 @@ fclose(fid);
 
 outFileDir = [ 'parsed' textFileName(4:end)];
 
-save ([ parsedTextFileDir outFileDir '.mat'],'trialType_tr','isWalkingDownAxis_tr',...
+save ([ parsedTextFileDir outFileDir '.mat'],'sysTime_fr','trialType_tr','isWalkingDownAxis_tr',...
     'legLengthCM','eventFlag', 'obstacleHeight_tr','obstacle_tr_XYZ','collision_XYZ',...
     'rFoot_fr_XYZ','lFoot_fr_XYZ','glasses_fr_XYZ','mainView_fr_XYZ',...
     'rFootQUAT_fr_WXYZ','lFootQUAT_fr_WXYZ','glassesQUAT_fr_WXYZ','mainViewQUAT_fr_WXYZ');

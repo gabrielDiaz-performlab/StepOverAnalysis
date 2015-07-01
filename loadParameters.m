@@ -14,7 +14,7 @@ spssFileDir = 'data/spssFiles/';
 
 
 dataFileList = {...
-    '_data-2015-7-1-9-52'
+    '_data-2015-7-1-9-52'...
     };
 
 % Step detection findSteps.m

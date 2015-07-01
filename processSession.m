@@ -4,8 +4,37 @@
 %    cleanRunBool = 1; 
 % end
 
+% _tr = trial
+% _fr = frame (vizard frame)
+% _mFr frame (phasespace/mocap frame)
+% _xyz = xyz position data
+% _wxyz = quaternion data wxyz
+% rb = phasespace rigid body data
+% mkr = phasespace marker data
+
+%%%  Subjects are always walking from 0,0,0, (center of the start box) towarsda and over an obstacle placed up the Y axis
+
+%%%%% Examples of phasespace data (highfrequ sampling)
+% rbPos_mFr_xyz: [2881x3 double]
+% rbPosSysTime_mFr_xyz: [2881x1 double]
+% rbQuat_mFr_xyz: [2881x4 double]
+% rbQuatSysTime_mFr: [2881x1 double]
+% mkrPos_mIdx_Cfr_xyz: {5x1 cell}
+% mkrSysTime_mIdx_Cfr: {5x1 cell}
+%%%%% 
+
+%%%%% Examples of vizard data (low frequ sampling)
+%rFoot.pos_fr_xyz: [1147x3 double]
+%rFoot.quat_fr_wxyz: [1147x4 double]
+%rFoot.rot_fr_d1_d2: [1147x4x4 double]
+% TIMESTAMPS are stored in sessionData.rawData_tr(trialNum).info.sysTime_fr
+%%%%% 
+
+%%
+
 clear all
 close all
+
 sessionNumber = 1;
 cleanRunBool = 1;
 
@@ -20,7 +49,6 @@ dataFileString = sprintf('%s.mat',dataFileList{sessionNumber})
 
 %% Generate or open session file struct
 
-%%% FOR A REALLY CLEAN RUN, CALL removeParsedData(sessionnumber)
 if( cleanRunBool )
     
     removeParsedData(sessionNumber);
@@ -37,13 +65,12 @@ sessionData =  loadSession(sessionNumber);
 
 %% TO DO:
 
-% 
+% Interpolate!
+% sessionData = sycnhronizeData(sessionData);
 
 %% If you want, you can reset the struct for a fresh analysis
 % For example, if you cahnge parameters.  I suggest this is done every
 % time, just in case.  
-
-
 
 sessionData = checkForExclusions(sessionData);
 
