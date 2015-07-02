@@ -63,25 +63,16 @@ end
 
 sessionData =  loadSession(sessionNumber);
 
-%% TO DO:
+%% Rakshit:  
 
-% Interpolate!
+% I think that, here, you should add a function to interpolate data to a
+% common timestamp
 % sessionData = sycnhronizeData(sessionData);
-
-%% If you want, you can reset the struct for a fresh analysis
-% For example, if you cahnge parameters.  I suggest this is done every
-% time, just in case.  
 
 sessionData = checkForExclusions(sessionData);
 
-% FIXME:  Leg length data in .txt file is not correct!
 
 %% Interpolate and filter
-
-% It seems that data is already interpolated.
-% Evidence?  THe NaNs are in the start of the first trial.
-% I should probably try and turn this off and see what happens,
-% Or import marker condition
 
 sessionData = calculateSamplingRate(sessionData);
 sessionData = interpAndFilterData(sessionData, 0); %Fixme - add trialModification messages

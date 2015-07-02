@@ -64,8 +64,6 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
         
         info = struct;
         
-        
-        
         info.excludeTrial = 0;
         info.excludeTrialExplanation = [];
         info.trialModifications_cModIdx = [];
@@ -74,8 +72,9 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
         info.startFr = trialStartFr_tIdx(tIdx);
         info.stopFr = trialStopFr_tIdx(tIdx);
         
-        info.sysTime_fr = sysTime_fr(trialStartFr_tIdx:trialStopFr_tIdx);
-        info.eventFlag_fr = eventFlag(trialStartFr_tIdx:trialStopFr_tIdx);
+        trialFrames = trialStartFr_tIdx:trialStopFr_tIdx;
+        info.sysTime_fr = sysTime_fr(trialFrames );
+        info.eventFlag_fr = eventFlag(trialFrames );
         
         subIsWalkingUpAxis = -isWalkingDownAxis_tr(tIdx);
         info.subIsWalkingUpAxis = subIsWalkingUpAxis;
@@ -102,19 +101,21 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %% Right foot marker and rb data
         
+        %%
         rFoot = struct;
 
-        rFoot.pos_fr_xyz = rFoot_fr_XYZ;
-        rFoot.quat_fr_wxyz = rFootQUAT_fr_WXYZ;
-        rFoot.rot_fr_d1_d2 = quatVecToRotationMatVec(rFootQUAT_fr_WXYZ,subIsWalkingUpAxis);
-        
-        rFoot.rbPos_mFr_xyz = rFootRbPos_mFr_xyz;
-        rFoot.rbPosSysTime_mFr_xyz = rFootRbSysTime_mFr;
-        
-        rFoot.rbQuat_mFr_xyz = rFootRbQuat_mFr_xyz;
+        rFoot.pos_fr_xyz = rFoot_fr_XYZ(trialFrames ,:);
+        rFoot.quat_fr_wxyz = rFootQUAT_fr_WXYZ(trialFrames ,:);
+        rFoot.rot_fr_d1_d2 = quatVecToRotationMatVec(rFootQUAT_fr_WXYZ(trialFrames ,:),subIsWalkingUpAxis);
         
         
-        rFoot.rbQuatSysTime_mFr = rFootRbQuatSysTime_mFr;
+        rFoot.rbPos_mFr_xyz = rFootRbPos_tr_CmFr(tIdx);
+        rFoot.rbPosSysTime_mFr_xyz = rFootRbSysTime_tr_CmFr(tIdx);
+        
+        rFoot.rbQuat_mFr_xyz = rFootRbQuat_tr_CmFr_xyz(tIdx);
+        
+        rFoot.rbQuatSysTime_mFr = rFootRbQuatSysTime_tr_CmFr(tIdx);
+        
         %%
         % Marker data
         for mIdx = 1:size(rFootMData_tr_mIdx_CmFr_xyz,2)
@@ -139,15 +140,15 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
         
         lFoot = struct;
 
-        lFoot.pos_fr_xyz = lFoot_fr_XYZ;
-        lFoot.quat_fr_wxyz = lFootQUAT_fr_WXYZ;
-        lFoot.rot_fr_d1_d2 = quatVecToRotationMatVec(lFootQUAT_fr_WXYZ,subIsWalkingUpAxis);
+        lFoot.pos_fr_xyz = lFoot_fr_XYZ(trialFrames ,:);
+        lFoot.quat_fr_wxyz = lFootQUAT_fr_WXYZ(trialFrames ,:);
+        lFoot.rot_fr_d1_d2 = quatVecToRotationMatVec(lFootQUAT_fr_WXYZ(trialFrames ,:),subIsWalkingUpAxis);
         
-        lFoot.rbPos_mFr_xyz = lFootRbPos_mFr_xyz;
-        lFoot.rbPosSysTime_mFr_xyz = lFootRbSysTime_mFr;
+        lFoot.rbPos_mFr_xyz = lFootRbPos_tr_CmFr(tIdx);
+        lFoot.rbPosSysTime_mFr_xyz = lFootRbSysTime_tr_CmFr(tIdx);
         
-        lFoot.rbQuat_mFr_xyz = lFootRbQuat_mFr_xyz;
-        lFoot.rbQuatSysTime_mFr = lFootRbQuatSysTime_mFr;
+        lFoot.rbQuat_mFr_xyz = lFootRbQuat_tr_CmFr_xyz(tIdx);
+        lFoot.rbQuatSysTime_mFr = lFootRbQuatSysTime_tr_CmFr(tIdx);
         
         % Marker data
         for mIdx = 1:size(lFootMData_tr_mIdx_CmFr_xyz,2)
@@ -172,15 +173,15 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
         % fixed position relative to the glasses.  however, it may be
         % shifted slightly from the rbPos
         
-        glasses.pos_fr_xyz = mainView_fr_XYZ;
-        glasses.quat_fr_wxyz = mainViewQUAT_fr_WXYZ;
-        glasses.rot_fr_d1_d2 = quatVecToRotationMatVec(mainViewQUAT_fr_WXYZ,subIsWalkingUpAxis);
+        glasses.pos_fr_xyz = mainView_fr_XYZ(trialFrames ,:);
+        glasses.quat_fr_wxyz = mainViewQUAT_fr_WXYZ(trialFrames ,:);
+        glasses.rot_fr_d1_d2 = quatVecToRotationMatVec(mainViewQUAT_fr_WXYZ(trialFrames ,:),subIsWalkingUpAxis);
         
-        glasses.rbPos_mFr_xyz = glassRbPos_mFr_xyz;
-        glasses.rbPosSysTime_mFr_xyz = glassRbSysTime_mFr;
+        glasses.rbPos_mFr_xyz = glassRbPos_tr_CmFr(tIdx);
+        glasses.rbPosSysTime_mFr_xyz = glassRbSysTime_tr_CmFr(tIdx);
         
-        glasses.rbQuat_mFr_xyz = glassRbQuat_mFr_xyz;
-        glasses.rbQuatSysTime_mFr = glassRbQuatSysTime_mFr;
+        glasses.rbQuat_mFr_xyz = glassRbQuat_tr_CmFr_xyz(tIdx);
+        glasses.rbQuatSysTime_mFr = glassRbQuatSysTime_tr_CmFr(tIdx);
         
         % Marker data
         for mIdx = 1:size(glassesMData_tr_mIdx_CmFr_xyz,2)
@@ -189,6 +190,34 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
         end
         
         trialStructs_tr(tIdx).glasses = glasses;
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %% Glasses marker and rb data
+        
+        spine = struct;
+
+        % This is actually the position of the mainview, which is in a
+        % fixed position relative to the glasses.  however, it may be
+        % shifted slightly from the rbPos
+        
+        spine.pos_fr_xyz = mainView_fr_XYZ(trialFrames ,:);
+        spine.quat_fr_wxyz = mainViewQUAT_fr_WXYZ(trialFrames ,:);
+        spine.rot_fr_d1_d2 = quatVecToRotationMatVec(mainViewQUAT_fr_WXYZ(trialFrames ,:),subIsWalkingUpAxis);
+        
+        spine.rbPos_mFr_xyz = glassRbPos_tr_CmFr(tIdx);
+        spine.rbPosSysTime_mFr_xyz = glassRbSysTime_tr_CmFr(tIdx);
+        
+        spine.rbQuat_mFr_xyz = glassRbQuat_tr_CmFr_xyz(tIdx);
+        spine.rbQuatSysTime_mFr = glassRbQuatSysTime_tr_CmFr(tIdx);
+        
+        % Marker data
+        for mIdx = 1:size(spineMData_tr_mIdx_CmFr_xyz,2)
+            spine.mkrPos_mIdx_Cfr_xyz(mIdx,:) = spineMData_tr_mIdx_CmFr_xyz(tIdx,mIdx);
+            spine.mkrSysTime_mIdx_Cfr(mIdx,:) = spineSysTime_tr_mIdx_CmFr(tIdx,mIdx);
+        end
+        
+        trialStructs_tr(tIdx).spine = spine;
+        
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %% Obstacle data
