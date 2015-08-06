@@ -1,5 +1,3 @@
-
-
 addpath(genpath('data'));
 addpath(genpath('subFunctions'));
 addpath(genpath('figureTools'));
@@ -10,11 +8,13 @@ sessionFileDir = 'data/sessionFiles/';
 spssFileDir = 'data/spssFiles/';
 
 [junk junk] = mkdir('figures');
+[junk junk] = mkdir(parsedTextFileDir);
+[junk junk] = mkdir(sessionFileDir );
 [junk junk] = mkdir(spssFileDir );
 
 
 dataFileList = {...
-    '_data-2015-7-1-9-52'...
+    '_data-2015-8-6-15-50'...
     };
 
 % Step detection findSteps.m

@@ -208,6 +208,7 @@ fclose(fid);
  
 %
 
+
 outFileDir = [ 'parsed' textFileName(4:end)];
 
 save ([ parsedTextFileDir outFileDir '.mat'],'sysTime_fr','trialType_tr','isWalkingDownAxis_tr',...
