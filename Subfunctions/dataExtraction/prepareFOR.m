@@ -18,7 +18,8 @@ if( length(size(dataInXZY)) > 2 )
     for mIdx = 1:numMarkers
         
         % In matlab coordinates, Z is up
-        dataOutXYZ(:,mIdx,:) = squeeze(dataInXZY(:,mIdx,[1 3 2]));
+        %dataOutXYZ(:,mIdx,:) = squeeze(dataInXZY(:,mIdx,[1 3 2]));
+        dataOutXYZ(:,mIdx,:) = squeeze(dataInXZY(:,mIdx,:));
         
         if(subIsWalkingUpAxis)
            % Subtract box position
@@ -33,7 +34,8 @@ if( length(size(dataInXZY)) > 2 )
 else
     
     % In matlab coordinates, Z is up
-    dataOutXYZ = dataInXZY(:,[1 3 2]);
+    %dataOutXYZ = dataInXZY(:,[1 3 2]);
+    dataOutXYZ = dataInXZY;
     
     if(subIsWalkingUpAxis)
         % Subtract box position

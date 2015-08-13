@@ -1,5 +1,3 @@
-
-
 addpath(genpath('data'));
 addpath(genpath('subFunctions'));
 addpath(genpath('figureTools'));
@@ -10,22 +8,18 @@ sessionFileDir = 'data/sessionFiles/';
 spssFileDir = 'data/spssFiles/';
 
 [junk junk] = mkdir('figures');
+[junk junk] = mkdir(parsedTextFileDir);
+[junk junk] = mkdir(sessionFileDir );
 [junk junk] = mkdir(spssFileDir );
 
 
 dataFileList = {...
-    'exp_data-2015-4-9-16-18'
-    'exp_data-2015-4-10-15-31'
-    'exp_data-2015-4-15-10-34'
-    'exp_data-2015-4-14-16-15'
-    'exp_data-2015-4-15-14-22'
-    'exp_data-2015-4-16-14-16'
-    'exp_data-2015-4-17-11-27'
+    '_data-2015-8-13-10-22'...
     };
 
-legLengthHardCoded_sIdx = [90 90 100];
-
-
+% Step detection findSteps.m
+footHeightThresh_sIdx = [.13,];
+   
 %%
 % hardExclusions(1).fileID = 'exp_data-2015-4-9-16-18';
 % hardExclusions(1).id = [1 2];
@@ -35,8 +29,7 @@ legLengthHardCoded_sIdx = [90 90 100];
 
 %% Parameters used by algorithms
 
-% Step detection findSteps.m
-footHeightThresh = .13;
+% heel-striek toe-off re-order threshold
 HSTOReorderThreshS = .2;
 
 % Butterworth in findStepsMod.m

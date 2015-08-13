@@ -1,5 +1,9 @@
 function [sessionData figH] = interpAndFilterData(sessionData, plotOn)
 
+% It seems that data is already subject to some filling in.
+% Evidence?  A rigid body marker data may start with NaNs , but once the
+% markers have been seen they are never again NaNs.
+
 loadParameters
 
 %%

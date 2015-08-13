@@ -2,11 +2,15 @@ function sessionData = loadSession(sessionNumber)
 
 loadParameters
 
-textFileName = dataFileList{sessionNumber};
+expTextFileName = ['exp' dataFileList{sessionNumber}];
+mocapTextFileName = ['mocap' dataFileList{sessionNumber}];
+sessionFileName = ['session' dataFileList{sessionNumber}];
 
-textFilePath = ['data/raw/' textFileName '.txt'];
-sessionFilePath = [ sessionFileDir textFileName '.mat'];
-parsedTextPath  = [ parsedTextFileDir textFileName '-parsed.mat'];
+textFilePath = ['data/raw/' expTextFileName '.txt'];
+
+parsedTextPath  = [ parsedTextFileDir 'parsed' dataFileList{sessionNumber} '.mat'];
+
+sessionFilePath = [ sessionFileDir sessionFileName '.mat'];
 
 %moreParsedTextPath  = [ moreParsedTextFileDir textFileName '-parsed.mat'];
 
@@ -35,7 +39,8 @@ else
         fprintf('Could not find moreParsedText file %s. Parsing text file...\n', parsedTextFileDir  );
         
         %textFileStruct = parseTextFiletoStruct(textFilePath);
-        parseTextFile(textFileDir, textFileName)
+        parseExpTextFile(textFileDir, expTextFileName)
+        parseMocapTextFile(textFileDir, mocapTextFileName)
         
     end
     
@@ -47,7 +52,8 @@ else
     sessionData.expInfo.fileID = dataFileList{sessionNumber};
     sessionData.expInfo.numConditions = numConditions ;
     sessionData.expInfo.numObsHeights = numObsHeights ;
-    sessionData.expInfo.legLength = sessionData.expInfo.obstacleHeights(1) ./ sessionData.expInfo.obsHeightRatios(1);
+    %FIXME:  add leg length
+    %sessionData.expInfo.legLength = sessionData.expInfo.obstacleHeights(1) ./ sessionData.expInfo.obsHeightRatios(1);
     sessionData.expInfo
     
     save( sessionFilePath,'sessionData')
