@@ -1,7 +1,5 @@
 function [posSysTime_mFr pos_mFr_xyz quatSysTime_mFr quat_mFr_xyz] = getBufferedRigidData(currentLine, varName)
 
-%FIXME:  FLIPPED DATA L/R to acocunt for export error in python
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Rigid DATA 
 
@@ -20,8 +18,9 @@ end
 
 [data_timeXYZ moveAheadBy]= textscan( currentLine(currentIndex:length(currentLine)), '[ %f %f %f %f %f ]' );
 
+% SWITCH FROM VIZARD XYZW TO WXYZ
 quatSysTime_mFr = data_timeXYZ{1};
-quat_mFr_xyz = [ data_timeXYZ{2} data_timeXYZ{3} data_timeXYZ{4} data_timeXYZ{5}];
+quat_mFr_xyz = [ -data_timeXYZ{5} data_timeXYZ{2} data_timeXYZ{4} data_timeXYZ{3}];
     
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -38,6 +37,11 @@ currentIndex = startIndex + moveAheadBy;
 % Now, get all the quat data
 [data_timeXYZ moveAheadBy]= textscan( currentLine(currentIndex:length(currentLine)), '[ %f %f %f %f ]' );
 
-posSysTime_mFr = fliplr(data_timeXYZ{1});
-pos_mFr_xyz = fliplr([ data_timeXYZ{2} data_timeXYZ{3} data_timeXYZ{4} ]);
+
+posSysTime_mFr = data_timeXYZ{1};
+% SWAPPED Y AND Z AXES
+pos_mFr_xyz = ([ data_timeXYZ{2} data_timeXYZ{4} data_timeXYZ{3} ]);
+    
+%posSysTime_mFr = fliplr(data_timeXYZ{1});
+%pos_mFr_xyz = fliplr([ data_timeXYZ{2} data_timeXYZ{3} data_timeXYZ{4} ]);
     

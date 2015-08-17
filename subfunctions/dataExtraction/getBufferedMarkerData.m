@@ -10,7 +10,10 @@ refString = sprintf('<< %s-M%u_XYZ',varName,mIdx);
 startIndex = strfind( currentLine, refString ) + length(refString);
 
 if( isempty(startIndex) )
-    error('in getBufferedMarkerData: Either rigid body name or marker ID is incorrect')
+    refString
+    keyboard
+    errorString = springf('in getBufferedMarkerData: Marker #%f of %s not present during this trial',mIdx,varName);
+    error(errorString)
 end
 
 %%
@@ -25,7 +28,8 @@ currentIndex = startIndex + moveAheadBy;
 [data_timeXYZ moveAheadBy]= textscan( currentLine(currentIndex:length(currentLine)), '[ %f %f %f %f ]' );
 
 sysTime_mFr = data_timeXYZ{1};
-data_mFr_xyz = [ data_timeXYZ{2} data_timeXYZ{3} data_timeXYZ{4} ];
+% SWAPPED Y AND Z AXES
+data_mFr_xyz = [ data_timeXYZ{2} data_timeXYZ{4} data_timeXYZ{3} ];
     
 if( length(sysTime_mFr) ~= length(data_mFr_xyz) )
     keyboard

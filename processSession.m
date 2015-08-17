@@ -45,7 +45,7 @@ tic
 loadParameters
 
 % You just need to pass the .mat file name and the experiment Data structure will be generated
-dataFileString = sprintf('%s.mat',dataFileList{sessionNumber})
+dataFileString = sprintf('%s.mat',dataFileList{sessionNumber});
 
 %% Generate or open session file struct
 
@@ -63,45 +63,43 @@ end
 
 sessionData =  loadSession(sessionNumber);
 
-%%
-close all
-trNum =1 ;
 
-lFootPos_fr_xyz = sessionData.rawData_tr(trNum).lFoot.pos_fr_xyz;
-time_fr = sessionData.rawData_tr(trNum).info.sysTime_fr;
+%% Gabe:  
 
-lFootRbPos_fr_xyz = cell2mat(sessionData.rawData_tr(trNum).lFoot.rbPos_mFr_xyz);
-time_mfr = cell2mat(sessionData.rawData_tr(trNum).lFoot.rbQuatSysTime_mFr);
-
-
-figure(1)
-hold on
-plot(time_fr,lFootPos_fr_xyz(:,3),'r')
-plot(time_mfr,lFootRbPos_fr_xyz(:,3),'b')
-
-
-%%
-%% Rakshit:  
-
-% I think that, here, you should add a function to interpolate data to a
-% common timestamp
-
-DisplaySessionData(sessionData, 2)
-% sessionData = synchronizeData(sessionData);
-% DisplaySessionData(sessionData, 2)
-
-% sessionData = checkForExclusions(sessionData);
+% i=6;
 % 
+% rbAx = 3;  % This is wrong!  Z should be up
+% vizAx = rbAx ;
 % 
-% %% Interpolate and filter
+% figure(1)
+% hold on
+% cla
+% rbPosMat_mFr_xyz = cell2mat(sessionData.rawData_tr(i).lFoot.rbPos_mFr_xyz);
+% rbPos = rbPosMat_mFr_xyz(:,rbAx);
+% rbTime  = cell2mat(sessionData.rawData_tr(i).lFoot.rbPosSysTime_mFr_xyz)
+% 
+% pos = sessionData.rawData_tr(i).lFoot.pos_fr_xyz(:,vizAx);
+% time = sessionData.rawData_tr(i).info.sysTime_fr;
+% 
+% plot( rbTime, rbPos,':r','LineWidth',2)
+% plot( time, pos,'b')
+
+%%
+
+sessionData = synchronizeData(sessionData);
+DisplaySessionData(sessionData, 3, 4)
+
+sessionData = checkForExclusions(sessionData);
+
+
+%% Interpolate and filter
 % 
 % sessionData = calculateSamplingRate(sessionData);
+% % RK: Whats the purpose of this function?
 % sessionData = interpAndFilterData(sessionData, 0); %Fixme - add trialModification messages
-% 
-% %%
-% 
+%  
 % sessionData = avgTrialDuration(sessionData);
-% sessionData.expInfo.meanTrialDuration;
+% display(['Mean trial duration:' num2str(sessionData.expInfo.meanTrialDuration)]);
 % 
 % 
 % %% Some per-trial functions
@@ -125,73 +123,73 @@ DisplaySessionData(sessionData, 2)
 %     [ sessionData ] = findMinDistanceAXS(sessionData,trIdx);
 %     
 % end
-% 
+% % 
+% % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% % % %% Plot body scaled
+% % % 
+% % % figure(1010)
+% % % hold on
+% % % cla
+% % % set(1010,'Units','Normalized','Position',[0.118055555555556 0.235555555555556 0.829166666666667 0.65]);
+% % % title({'lead foot position','in units of leg length','for 1 obstacle height'})
+% % % 
+% % % for hIdx = 1:3
+% % %     
+% % %     trIdxList = find([sessionData.rawData_tr.trialType] == hIdx);
+% % %     trIdxList = [trIdxList  find([sessionData.rawData_tr.trialType] == hIdx+3)];
+% % %         
+% % %     for trIdx = 1:numel(trIdxList)
+% % %         
+% % %         trNum = trIdxList(trIdx);
+% % %         
+% % %         if( strcmp( sessionData.dependentMeasures_tr(trNum).firstCrossingFoot, 'Left' ) )
+% % %             
+% % %             leadFoot_fr_XYZ = sessionData.processedData_tr(trIdxList(trIdx)).lFootBS_fr_XYZ;
+% % %         else
+% % %             leadFoot_fr_XYZ = sessionData.processedData_tr(trIdxList(trIdx)).rFootBS_fr_XYZ;
+% % %         end
+% % %         
+% % %         X = repmat(trIdx,1,length(leadFoot_fr_XYZ ));
+% % %         Y = leadFoot_fr_XYZ(:,2);
+% % %         Z = leadFoot_fr_XYZ(:,3);
+% % %         plot3(X,Y,Z)
+% % %         
+% % %     end
+% % % end
+% % 
+% % 
+% % %%
 % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % %% Plot body scaled
+% % % Some methods for plotting a trial
 % % 
-% % figure(1010)
-% % hold on
-% % cla
-% % set(1010,'Units','Normalized','Position',[0.118055555555556 0.235555555555556 0.829166666666667 0.65]);
-% % title({'lead foot position','in units of leg length','for 1 obstacle height'})
+% % %plotTrialMarkers(sessionData,2);
+% % %plotTrialRigid(sessionData,3)
 % % 
-% % for hIdx = 1:3
-% %     
-% %     trIdxList = find([sessionData.rawData_tr.trialType] == hIdx);
-% %     trIdxList = [trIdxList  find([sessionData.rawData_tr.trialType] == hIdx+3)];
-% %         
-% %     for trIdx = 1:numel(trIdxList)
-% %         
-% %         trNum = trIdxList(trIdx);
-% %         
-% %         if( strcmp( sessionData.dependentMeasures_tr(trNum).firstCrossingFoot, 'Left' ) )
-% %             
-% %             leadFoot_fr_XYZ = sessionData.processedData_tr(trIdxList(trIdx)).lFootBS_fr_XYZ;
-% %         else
-% %             leadFoot_fr_XYZ = sessionData.processedData_tr(trIdxList(trIdx)).rFootBS_fr_XYZ;
-% %         end
-% %         
-% %         X = repmat(trIdx,1,length(leadFoot_fr_XYZ ));
-% %         Y = leadFoot_fr_XYZ(:,2);
-% %         Z = leadFoot_fr_XYZ(:,3);
-% %         plot3(X,Y,Z)
-% %         
-% %     end
-% % end
-% 
-% 
-% %%
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % Some methods for plotting a trial
-% 
-% %plotTrialMarkers(sessionData,2);
-% %plotTrialRigid(sessionData,3)
-% 
-% 
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% %% plotAvgTraj_CxH - a work in progress
-% % Analyzing to see if postural adjustments occurred during the approach,
-% % or as they left the go-box
-% 
-% %plotAvgTraj_CxH(sessionData)
-% 
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% %% Make some figures
-% 
-% removeOutliers = 1
-% showIndividualTrials= 1;
-% sessionFigH = struct;
-% 
-% [sessionData sessionFigH ] = calculateSSandPlot(sessionData,removeOutliers,showIndividualTrials)
-% 
-% %%  Save figures
-% 
-% saveFigStructToDir(dataFileList{sessionNumber},sessionFigH);
-% 
-% %% Save session file
-% 
-% save([ sessionFileDir dataFileList{sessionNumber} '.mat'] , 'sessionData');
+% % 
+% % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% % %% plotAvgTraj_CxH - a work in progress
+% % % Analyzing to see if postural adjustments occurred during the approach,
+% % % or as they left the go-box
+% % 
+% % %plotAvgTraj_CxH(sessionData)
+% % 
+% % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% % %% Make some figures
+% % 
+% % removeOutliers = 1
+% % showIndividualTrials= 1;
+% % sessionFigH = struct;
+% % 
+% % [sessionData sessionFigH ] = calculateSSandPlot(sessionData,removeOutliers,showIndividualTrials)
+% % 
+% % %%  Save figures
+% % 
+% % saveFigStructToDir(dataFileList{sessionNumber},sessionFigH);
+% % 
+% % %% Save session file
+% % 
+% % save([ sessionFileDir dataFileList{sessionNumber} '.mat'] , 'sessionData');

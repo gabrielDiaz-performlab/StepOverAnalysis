@@ -72,8 +72,9 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
         info.startFr = trialStartFr_tIdx(tIdx);
         info.stopFr = trialStopFr_tIdx(tIdx);
         
-        trialFrames = trialStartFr_tIdx:trialStopFr_tIdx;
-        info.sysTime_fr = sysTime_fr(trialFrames );
+%         trialFrames = trialStartFr_tIdx:trialStopFr_tIdx;
+        trialFrames = trialStartFr_tIdx(tIdx):trialStopFr_tIdx(tIdx);
+        info.sysTime_fr = sysTime_fr(trialFrames); % - sysTime_fr(trialFrames(1))
         info.eventFlag_fr = eventFlag(trialFrames );
         
         subIsWalkingUpAxis = -isWalkingDownAxis_tr(tIdx);
@@ -101,9 +102,11 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %% Right foot marker and rb data
         
-        %%
+        %% Rakshit:  THis is where I would implement cell2mat
+        
         rFoot = struct;
 
+        %rFoot.pos_fr_xyz = prepareFOR(rFoot_fr_XYZ(trialFrames ,:),subIsWalkingUpAxis);
         rFoot.pos_fr_xyz = rFoot_fr_XYZ(trialFrames ,:);
         rFoot.quat_fr_wxyz = rFootQUAT_fr_WXYZ(trialFrames ,:);
         rFoot.rot_fr_d1_d2 = quatVecToRotationMatVec(rFootQUAT_fr_WXYZ(trialFrames ,:),subIsWalkingUpAxis);
@@ -195,20 +198,16 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
         %% Glasses marker and rb data
         
         spine = struct;
-
-        % This is actually the position of the mainview, which is in a
-        % fixed position relative to the glasses.  however, it may be
-        % shifted slightly from the rbPos
         
-        spine.pos_fr_xyz = mainView_fr_XYZ(trialFrames ,:);
-        spine.quat_fr_wxyz = mainViewQUAT_fr_WXYZ(trialFrames ,:);
-        spine.rot_fr_d1_d2 = quatVecToRotationMatVec(mainViewQUAT_fr_WXYZ(trialFrames ,:),subIsWalkingUpAxis);
+        %spine.pos_fr_xyz = spineRbPos_tr_CmFr(trialFrames ,:);
+        %spine.quat_fr_wxyz = spineRbQuat_tr_CmFr_xyz mainViewQUAT_fr_WXYZ(trialFrames ,:);
+        %spine.rot_fr_d1_d2 = quatVecToRotationMatVec(mainViewQUAT_fr_WXYZ(trialFrames ,:),subIsWalkingUpAxis);
         
-        spine.rbPos_mFr_xyz = glassRbPos_tr_CmFr(tIdx);
-        spine.rbPosSysTime_mFr_xyz = glassRbSysTime_tr_CmFr(tIdx);
+        spine.rbPos_mFr_xyz = spineRbPos_tr_CmFr(tIdx);
+        spine.rbPosSysTime_mFr_xyz = spineRbSysTime_tr_CmFr(tIdx);
         
-        spine.rbQuat_mFr_xyz = glassRbQuat_tr_CmFr_xyz(tIdx);
-        spine.rbQuatSysTime_mFr = glassRbQuatSysTime_tr_CmFr(tIdx);
+        spine.rbQuat_mFr_xyz = spineRbQuat_tr_CmFr_xyz(tIdx);
+        spine.rbQuatSysTime_mFr = spineRbQuatSysTime_tr_CmFr(tIdx);
         
         % Marker data
         for mIdx = 1:size(spineMData_tr_mIdx_CmFr_xyz,2)

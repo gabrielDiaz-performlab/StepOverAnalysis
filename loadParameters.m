@@ -12,9 +12,10 @@ spssFileDir = 'data/spssFiles/';
 [junk junk] = mkdir(sessionFileDir );
 [junk junk] = mkdir(spssFileDir );
 
+clear junk
 
 dataFileList = {...
-    '_data-2015-8-6-15-50'...
+    '_data-2015-8-13-10-22'...
     };
 
 % Step detection findSteps.m
@@ -36,6 +37,10 @@ HSTOReorderThreshS = .2;
 order = 7;
 cutoff = 5;
 
+% Number of frames to search before and after the crossing for other features
+crossingSearchWindowSize = 20; 
+
+
 %% Here where I hardcode variables that should be in the text file.
 
 %legLength = .87;
@@ -53,9 +58,6 @@ numObsHeights = 3;
 footSize_LWH = [.25 .1 .07];
 
 %standingBoxOffset_Z = - 2;
-
-% Number of frames to search before and after the crossing for other features
-crossingSearchWindowSize = 20; 
 
 %% Figure colors / linestyles
 

@@ -7,10 +7,8 @@ function [sessionData] = avgTrialDuration(sessionData)
 %%
 for trIdx = 1:sessionData.expInfo.numTrials
     
-    sessionData.rawData_tr(trIdx).timeElapsed_fr = ...
-        sessionData.rawData_tr(trIdx).frameTime_fr - sessionData.rawData_tr(trIdx).frameTime_fr(1);
-    
-    sessionData.rawData_tr(trIdx).trialDuration = sessionData.rawData_tr(trIdx).timeElapsed_fr(end);
+    timeElapsed_fr = sessionData.rawData_tr(trIdx).info.sysTime_fr - sessionData.rawData_tr(trIdx).info.sysTime_fr(1);
+    sessionData.rawData_tr(trIdx).trialDuration = timeElapsed_fr(end);
 
 end
 
