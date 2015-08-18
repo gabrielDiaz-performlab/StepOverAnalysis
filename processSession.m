@@ -86,10 +86,11 @@ sessionData =  loadSession(sessionNumber);
 
 %%
 
+DisplaySessionData(sessionData, 2, 1)
 sessionData = synchronizeData(sessionData);
-DisplaySessionData(sessionData, 3, 4)
 
-sessionData = checkForExclusions(sessionData);
+
+% sessionData = checkForExclusions(sessionData);
 
 
 %% Interpolate and filter

@@ -6,17 +6,17 @@ Glasses = sessionData.rawData_tr(i).glasses;
 Spine = sessionData.rawData_tr(i).spine;
 
 %Plot Rigid body phase space data
-LFoot_rb_xyz = cell2mat(LFoot.rbPos_mFr_xyz);
-LFoot_rb_time = cell2mat(LFoot.rbPosSysTime_mFr_xyz);
+LFoot_rb_xyz = LFoot.rbPos_mFr_xyz;
+LFoot_rb_time = LFoot.rbPosSysTime_mFr_xyz;
 
-RFoot_rb_xyz = cell2mat(RFoot.rbPos_mFr_xyz);
-RFoot_rb_time = cell2mat(RFoot.rbPosSysTime_mFr_xyz);
+RFoot_rb_xyz = RFoot.rbPos_mFr_xyz;
+RFoot_rb_time = RFoot.rbPosSysTime_mFr_xyz;
 
-Glasses_rb_xyz = cell2mat(Glasses.rbPos_mFr_xyz);
-Glasses_rb_time = cell2mat(Glasses.rbPosSysTime_mFr_xyz);
+Glasses_rb_xyz = Glasses.rbPos_mFr_xyz;
+Glasses_rb_time = Glasses.rbPosSysTime_mFr_xyz;
 
-Spine_rb_xyz = cell2mat(Spine.rbPos_mFr_xyz);
-Spine_rb_time = cell2mat(Spine.rbPosSysTime_mFr_xyz);
+Spine_rb_xyz = Spine.rbPos_mFr_xyz;
+Spine_rb_time = Spine.rbPosSysTime_mFr_xyz;
 
 figure;
 plot(LFoot_rb_time, LFoot_rb_xyz(:,ax),'r','LineWidth',1); hold on
@@ -32,13 +32,11 @@ fr_time = sessionData.rawData_tr(i).info.sysTime_fr;
 LFoot_fr_xyz = LFoot.pos_fr_xyz;
 RFoot_fr_xyz = RFoot.pos_fr_xyz;
 Glasses_fr_xyz = Glasses.pos_fr_xyz;
-Spine_fr_xyz = Spine.pos_fr_xyz;
 
 figure;
 plot(fr_time, LFoot_fr_xyz(:,ax), 'r','LineWidth',1); hold on 
 plot(fr_time, RFoot_fr_xyz(:,ax), 'g','LineWidth',1);
 plot(fr_time, Glasses_fr_xyz(:,ax), 'b','LineWidth',1);
-plot(fr_time, Spine_fr_xyz(:,ax), 'k','LineWidth',1); hold off
 xlabel('Time [S]'); ylabel('Distance [M]'); 
 title(['Vizard data ' num2str(ax) ' axis data with time'])
 legend('Left foot','Right foot','Glasses','Spine')
@@ -57,8 +55,8 @@ plot(Glasses_rb_time, Glasses_rb_xyz(:,ax),'b','LineWidth',1); hold on;
 plot(fr_time, Glasses_fr_xyz(:,ax), '--b','LineWidth',1); hold off;
 xlabel('Time [S]'); ylabel('Distance [M]'); title('Glasses')
 subplot(2,2,4)
-plot(Spine_rb_time, Spine_rb_xyz(:,ax),'k','LineWidth',1); hold on;
-plot(fr_time, Spine_fr_xyz(:,ax), '--k','LineWidth',1); hold off;
+plot(Spine_rb_time, Spine_rb_xyz(:,ax),'k','LineWidth',1); %hold on;
+% plot(fr_time, Spine_fr_xyz(:,ax), '--k','LineWidth',1); hold off;
 xlabel('Time [S]'); ylabel('Distance [M]'); title('Spine')
 suptitle('Comparing Vizard and Rigid body data')
 
