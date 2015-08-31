@@ -116,8 +116,8 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
         % Marker data
         for mIdx = 1:size(rFootMData_tr_mIdx_CmFr_xyz,2)
             
-            rFoot.mkrPos_mIdx_Cfr_xyz(mIdx,:,:) = rFootMData_tr_mIdx_CmFr_xyz(tIdx,mIdx);
-            rFoot.mkrSysTime_mIdx_Cfr(mIdx,:) = rFootSysTime_tr_mIdx_CmFr(tIdx,1);
+            rFoot.mkrPos_mIdx_Cfr_xyz(mIdx,:,:) = {prepareFOR(cell2mat(rFootMData_tr_mIdx_CmFr_xyz(tIdx,mIdx)), subIsWalkingUpAxis)};
+            rFoot.mkrSysTime_mIdx_Cfr(mIdx,:) = rFootSysTime_tr_mIdx_CmFr(tIdx,mIdx);
             
         end
         
@@ -138,7 +138,7 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
 
         lFoot.pos_fr_xyz = prepareFOR(lFoot_fr_XYZ(trialFrames ,:),subIsWalkingUpAxis);
         lFoot.quat_fr_wxyz = lFootQUAT_fr_WXYZ(trialFrames ,:);
-        lFoot.rot_fr_d1_d2 = quatVecToRotationMatVec(lFootQUAT_fr_WXYZ(trialFrames ,:),subIsWalkingUpAxis);
+        lFoot.rot_fr_d1_d2 = quatVecToRotationMatVec(lFootQUAT_fr_WXYZ(trialFrames ,:), subIsWalkingUpAxis);
         
         lFoot.rbPos_mFr_xyz = cell2mat(lFootRbPos_tr_CmFr(tIdx));
         lFoot.rbPos_mFr_xyz = prepareFOR(lFoot.rbPos_mFr_xyz,subIsWalkingUpAxis);
@@ -146,10 +146,10 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
         
         lFoot.rbQuat_mFr_xyz = cell2mat(lFootRbQuat_tr_CmFr_xyz(tIdx));
         lFoot.rbQuatSysTime_mFr = cell2mat(lFootRbQuatSysTime_tr_CmFr(tIdx));
-        
+                       
         % Marker data
         for mIdx = 1:size(lFootMData_tr_mIdx_CmFr_xyz,2)
-            lFoot.mkrPos_mIdx_Cfr_xyz(mIdx,:,:) = lFootMData_tr_mIdx_CmFr_xyz(tIdx,mIdx);
+            lFoot.mkrPos_mIdx_Cfr_xyz(mIdx,:,:) = {prepareFOR(cell2mat(lFootMData_tr_mIdx_CmFr_xyz(tIdx,mIdx)), subIsWalkingUpAxis)};
             lFoot.mkrSysTime_mIdx_Cfr(mIdx,:) = lFootSysTime_tr_mIdx_CmFr(tIdx,mIdx);
         end
         
@@ -183,7 +183,7 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
         
         % Marker data
         for mIdx = 1:size(glassesMData_tr_mIdx_CmFr_xyz,2)
-            glasses.mkrPos_mIdx_Cfr_xyz(mIdx,:) = glassesMData_tr_mIdx_CmFr_xyz(tIdx,mIdx);
+            glasses.mkrPos_mIdx_Cfr_xyz(mIdx,:) = {prepareFOR(cell2mat(glassesMData_tr_mIdx_CmFr_xyz(tIdx,mIdx)), subIsWalkingUpAxis)};
             glasses.mkrSysTime_mIdx_Cfr(mIdx,:) = glassesSysTime_tr_mIdx_CmFr(tIdx,mIdx);
         end
         
@@ -201,9 +201,9 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
         spine.rbQuat_mFr_xyz = cell2mat(spineRbQuat_tr_CmFr_xyz(tIdx));
         spine.rbQuatSysTime_mFr = cell2mat(spineRbQuatSysTime_tr_CmFr(tIdx));
         
-        % Marker data
+        % Marker data 
         for mIdx = 1:size(spineMData_tr_mIdx_CmFr_xyz,2)
-            spine.mkrPos_mIdx_Cfr_xyz(mIdx,:) = spineMData_tr_mIdx_CmFr_xyz(tIdx,mIdx);
+            spine.mkrPos_mIdx_Cfr_xyz(mIdx,:) = {prepareFOR(cell2mat(spineMData_tr_mIdx_CmFr_xyz(tIdx,mIdx)), subIsWalkingUpAxis)};
             spine.mkrSysTime_mIdx_Cfr(mIdx,:) = spineSysTime_tr_mIdx_CmFr(tIdx,mIdx);
         end
         

@@ -6,7 +6,7 @@ function [ sessionData ] = stepLengthAndDurASO(sessionData, trIdx)
 
 dmTrialStruct = sessionData.dependentMeasures_tr(trIdx);
 
-if( sessionData.rawData_tr(trIdx).excludeTrial == 1)
+if( sessionData.rawData_tr(trIdx).info.excludeTrial == 1)
     
     sessionData.dependentMeasures_tr(trIdx).leadStepLengthASO = nan;
     sessionData.dependentMeasures_tr(trIdx).leadStepDurASO = nan;

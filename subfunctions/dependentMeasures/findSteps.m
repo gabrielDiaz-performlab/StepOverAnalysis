@@ -7,6 +7,7 @@ if nargin < 3
 end
 
 if( plotOn)
+    close all
     figH = figure(3);
     clf
 else
@@ -46,7 +47,7 @@ loadParameters
 % Simplified syntax.
 % Added a height threshold saved in through to loadParameters
 
-if(sessionData.rawData_tr(trIdx).excludeTrial == 1)
+if(sessionData.processedData_tr(trIdx).info.excludeTrial == 1)
     
     sessionData.dependentMeasures_tr(trIdx).rFoot = struct;
     sessionData.dependentMeasures_tr(trIdx).lFoot = struct;
@@ -60,9 +61,9 @@ if(sessionData.rawData_tr(trIdx).excludeTrial == 1)
     return
 end
 
-rightFoot_fr_XYZ = sessionData.processedData_tr(trIdx).rightFoot_fr_XYZ;
-leftFoot_fr_XYZ = sessionData.processedData_tr(trIdx).leftFoot_fr_XYZ;
-spine_fr_xyz= sessionData.processedData_tr(trIdx).spine_fr_xyz;
+rightFoot_fr_XYZ = sessionData.processedData_tr(trIdx).rFoot.rbPos_mFr_xyz;
+leftFoot_fr_XYZ = sessionData.processedData_tr(trIdx).lFoot.rbPos_mFr_xyz;
+spine_fr_xyz = sessionData.processedData_tr(trIdx).spine.rbPos_mFr_xyz;
 
 try
     % Before subtracting spine position, get height
@@ -77,16 +78,16 @@ rightFoot_fr_XYZ = rightFoot_fr_XYZ - spine_fr_xyz;
 leftFoot_fr_XYZ = leftFoot_fr_XYZ - spine_fr_xyz;
 
 % Calculate velocities along the Y axis
-spineVelY = diff(spine_fr_xyz(:,2)) ./ diff( spine_fr_xyz(:,1));
+% spineVelY = diff(spine_fr_xyz(:,2)) ./ diff( spine_fr_xyz(:,1));
 
 %%
 %find frame wherein feet are moving
-%timeElapsed_fr = [1/60 diff(trialData.frameTime_fr)];
+% timeElapsed_fr = [1/60 diff(trialData.frameTime_fr)];
 
 meanFrameDur = sessionData.expInfo.meanFrameDur;
 meanFrameRate = sessionData.expInfo.meanFrameRate;
 
-%frameRate = mean(diff(sessionData.rawData_tr(1).frameTime_fr));
+%frameRate = mean(diff(sessionData.processedData_tr(1).frameTime_fr));
 %meanFrameRate = 1/frameRate ;
 
 rAnkVelY = [0 diff(rightFoot_fr_XYZ(:,2))'] ./ meanFrameRate;
@@ -96,10 +97,10 @@ lAnkVelY = [0 diff(leftFoot_fr_XYZ(:,2))'] ./ meanFrameRate;
 %% Find frames when foot is under a height threshold
 
 lFootUnderHeightThresh_idx = find( lFootHeight_fr < footHeightThresh );
-lFootAboveHeightThresh_idx = find( lFootHeight_fr >= footHeightThresh);
+% lFootAboveHeightThresh_idx = find( lFootHeight_fr >= footHeightThresh);
 
 rFootUnderHeightThresh_idx = find( rFootHeight_fr < footHeightThresh);
-rFootAboveHeightThresh_idx = find( rFootHeight_fr >= footHeightThresh);
+% rFootAboveHeightThresh_idx = find( rFootHeight_fr >= footHeightThresh);
 
 %% Find zero crossings of foot velocity, with direction (e.g. neg to pos)
 
@@ -115,8 +116,6 @@ lAnkVelY_downIdx= find(x <0) +1;
 
 lUpIter = 1;
 lDownIter = 1;
-
-
 
 % Vectors for toe-offs and heel-strikes
 rTO = [];
@@ -163,7 +162,8 @@ for i = 1:maxIndex
     if leftlookingfor == 2 && lUpIter <= numel(lAnkVelY_upIdx)
         
         nextLTO = lFootUnderHeightThresh_idx( find( lFootUnderHeightThresh_idx <= lAnkVelY_upIdx(lUpIter),1,'last')) -1;
-        if( nextLTO == 0 ) nextLTO  = 1; end
+        if( nextLTO == 0 ) 
+            nextLTO  = 1; end
         
         if( ~isempty(nextLTO))
             % Do NOT count as a TO if...
@@ -292,7 +292,7 @@ end
 %% Find toe-offs that occur shortly before heelstrikes
 
 
-frameTime_fr = sessionData.rawData_tr(trIdx).frameTime_fr;
+frameTime_fr = sessionData.processedData_tr(trIdx).info.sysTime_fr;
 % Check for rTO that occur just before lHS
 for toIdx = 1:numel(rTO)
     for hsIdx = 1:numel(lHS)
@@ -363,7 +363,7 @@ if plotOn == 1
     %         vline(lHS(idx),'r',2,':')
     %     end
     
-    frameTime_fr = sessionData.rawData_tr(trIdx).frameTime_fr - frameTime_fr(1);
+    frameTime_fr = frameTime_fr - frameTime_fr(1);
     
     subplot(211)
     hold on

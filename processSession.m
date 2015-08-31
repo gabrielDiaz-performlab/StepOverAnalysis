@@ -63,67 +63,41 @@ end
 
 sessionData =  loadSession(sessionNumber);
 
-
-%% Gabe:  
-
-% i=6;
-% 
-% rbAx = 3;  % This is wrong!  Z should be up
-% vizAx = rbAx ;
-% 
-% figure(1)
-% hold on
-% cla
-% rbPosMat_mFr_xyz = cell2mat(sessionData.rawData_tr(i).lFoot.rbPos_mFr_xyz);
-% rbPos = rbPosMat_mFr_xyz(:,rbAx);
-% rbTime  = cell2mat(sessionData.rawData_tr(i).lFoot.rbPosSysTime_mFr_xyz)
-% 
-% pos = sessionData.rawData_tr(i).lFoot.pos_fr_xyz(:,vizAx);
-% time = sessionData.rawData_tr(i).info.sysTime_fr;
-% 
-% plot( rbTime, rbPos,':r','LineWidth',2)
-% plot( time, pos,'b')
-
 %%
 
-DisplaySessionData(sessionData, 2, 1)
+sessionData = checkForExclusions(sessionData);
+
 sessionData = synchronizeData(sessionData);
 
+DisplaySessionData(sessionData, 2, 1, 'rawData_tr', 1) % rawData_tr -> view raw data; processedData_tr -> view processed data
 
-% sessionData = checkForExclusions(sessionData);
+%% filter
 
+sessionData = calculateSamplingRate(sessionData);
 
-%% Interpolate and filter
-% 
-% sessionData = calculateSamplingRate(sessionData);
-% % RK: Whats the purpose of this function?
-% sessionData = interpAndFilterData(sessionData, 0); %Fixme - add trialModification messages
-%  
-% sessionData = avgTrialDuration(sessionData);
-% display(['Mean trial duration:' num2str(sessionData.expInfo.meanTrialDuration)]);
-% 
-% 
-% %% Some per-trial functions
-% 
-% for trIdx = 1:numel(sessionData.rawData_tr)
-%     
+% sessionData = filterMocapData(sessionData, 0);
+
+sessionData = avgTrialDuration(sessionData);
+display(['Mean trial duration:' num2str(sessionData.expInfo.meanTrialDuration)]);
+
+% Some per-trial functions
+
+for trIdx = 1:numel(sessionData.rawData_tr)
+    
 %     [ sessionData ] = calcMeanRigidBodyPos(sessionData, trIdx);
-%     
-%     [ sessionData ] = findSteps(sessionData, trIdx, 0);
-%     [ sessionData ] = findFootCrossing(sessionData, trIdx,0);
-%     [ sessionData ] = stepLengthAndDur(sessionData,trIdx);
-%     [ sessionData ] = stepLengthAndDurASO(sessionData,trIdx);
-%     [ sessionData ] = findCOM(sessionData,trIdx);
-%     [ sessionData ] = avgCOMVelocity(sessionData,trIdx);
-%     [ sessionData ] = maxVelAndHeightAXS(sessionData,trIdx);
-%     [ sessionData ] = findDistPlantedFootASO(sessionData,trIdx);
-%     
-%     [ sessionData ] = calcObjCenteredTraj(sessionData,trIdx);
-%     
-%     %[ sessionData ] = toeHeightAndClearanceASO(sessionData, trIdx);
-%     [ sessionData ] = findMinDistanceAXS(sessionData,trIdx);
-%     
-% end
+    [ sessionData ] = findSteps(sessionData, trIdx, 0);
+    [ sessionData ] = findFootCrossing(sessionData, trIdx);
+    [ sessionData ] = stepLengthAndDur(sessionData,trIdx);
+    [ sessionData ] = stepLengthAndDurASO(sessionData,trIdx);
+    [ sessionData ] = findCOM(sessionData,trIdx);
+    [ sessionData ] = avgCOMVelocity(sessionData,trIdx);
+    [ sessionData ] = maxVelAndHeightAXS(sessionData,trIdx);
+    [ sessionData ] = findDistPlantedFootASO(sessionData,trIdx);
+    [ sessionData ] = calcObjCenteredTraj(sessionData,trIdx);
+    [ sessionData ] = toeHeightAndClearanceASO(sessionData, trIdx);
+    [ sessionData ] = findMinDistanceAXS(sessionData,trIdx);
+    
+end
 % % 
 % % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

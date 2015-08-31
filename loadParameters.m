@@ -19,8 +19,11 @@ dataFileList = {...
     };
 
 % Step detection findSteps.m
-footHeightThresh_sIdx = [.13,];
-   
+% footHeightThresh_sIdx = [.13,]; We will likely need a diff. threshold for
+% different subjects. 
+
+  footHeightThresh = 0.13;
+  
 %%
 % hardExclusions(1).fileID = 'exp_data-2015-4-9-16-18';
 % hardExclusions(1).id = [1 2];

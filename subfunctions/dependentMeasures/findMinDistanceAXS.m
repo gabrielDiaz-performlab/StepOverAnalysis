@@ -5,7 +5,7 @@ function [sessionData] = findMinDistanceAXS(sessionData, trIdx)
 % This function gets two Frame indexes as input (startFrameIndex, endFrameIndex)
 % and finds the minimum distance to the obstacle among all the markers
 %
-% It draws a line on the obstacle between to Points B and C
+% It draws a line on the obstacle between Points B and C
 % Then from each marker point (A) the distance is calculated using the
 % Area of the triangle shaped by A, B and C.
 % (Area = ( Dsitance * BC )/ 2 ==>  Distance = ( 2 * Area )/ BC
@@ -27,7 +27,7 @@ if(sum(strcmp(fieldnames(dmTrialStruct),'lFoot'))==0 || sum(strcmp(fieldnames(dm
 end
 
 
-if(sessionData.rawData_tr(trIdx).excludeTrial == 1)
+if(sessionData.rawData_tr(trIdx).info.excludeTrial == 1)
     
     sessionData.dependentMeasures_tr(trIdx).leadMinClearanceAXS = NaN;
     sessionData.dependentMeasures_tr(trIdx).leadMinClearanceMidx = NaN;
@@ -41,47 +41,26 @@ if(sessionData.rawData_tr(trIdx).excludeTrial == 1)
 end
 %%
 
-numberOfFootMarkers = size(sessionData.rawData_tr(trIdx).rightFoot_fr_mkr_XYZ,2);
+numberOfFootMarkers = length(sessionData.rawData_tr(trIdx).rFoot.mkrPos_mIdx_Cfr_xyz);
 
-if( numberOfFootMarkers ~= size(sessionData.rawData_tr(trIdx).leftFoot_fr_mkr_XYZ,2))
+if( numberOfFootMarkers ~= length(sessionData.rawData_tr(trIdx).lFoot.mkrPos_mIdx_Cfr_xyz) )
     error('findMinDistanceAXS: Assumption that num markeres for both feet is equal has been violated.  Adjust the code to fix.')
     return
 end
 
-rFDistances_mkr = 100 * ones(1,numberOfFootMarkers);
-lFDistances_mkr = 100 * ones(1,numberOfFootMarkers);
-
-rawData = sessionData.rawData_tr(trIdx);
-
-
-if( strcmp( dmTrialStruct.firstCrossingFoot, 'Left' ) )
-    
-    leadFootDM = sessionData.dependentMeasures_tr(trIdx).lFoot;
-    trailFootDM = sessionData.dependentMeasures_tr(trIdx).rFoot;
-    
-    
-elseif( strcmp( dmTrialStruct.firstCrossingFoot, 'Right' ) )
-    
-    leadFootDM = sessionData.dependentMeasures_tr(trIdx).rFoot;
-    trailFootDM = sessionData.dependentMeasures_tr(trIdx).lFoot;
-    
-else
-    error('invalid entry for sessionData.dependentMeasures_tr(trIdx).firstCrossingFoot')
-end
-
 %%
 
-footString_fIdx = {'left','right'};
-%%
+footString_fIdx = {'lFoot','rFoot'};
+
+minClearance_fIdx_mkr = zeros(2,numberOfFootMarkers);
+minClearanceFrame_fIdx_mkr = zeros(2,numberOfFootMarkers);
+
 for fIdx  = 1:2
     for mIdx = 1:numberOfFootMarkers
         
-        
-        
-        %%
         footString = footString_fIdx{fIdx};
         
-        if( strcmp(footString,'left'))
+        if( strcmp(footString,'lFoot'))
             
             crossingFrame = sessionData.dependentMeasures_tr(trIdx).lFoot.crossingFr;
         
@@ -91,17 +70,17 @@ for fIdx  = 1:2
         
         end
         
-        searchFrames = (crossingFrame-crossingSearchWindowSize):(crossingFrame+crossingSearchWindowSize);
-       
+        searchFrames = (crossingFrame - crossingSearchWindowSize):(crossingFrame + crossingSearchWindowSize);
+               
+        mData_fr_XYZ = sessionData.processedData_tr(trIdx).(footString).mkrPos_mIdx_Cfr_xyz{mIdx}(searchFrames,:);
         
-        mData_fr_XYZ = eval([ 'squeeze(sessionData.processedData_tr(trIdx).' footString 'Foot_fr_mkr_XYZ(searchFrames,mIdx,:));' ]);
-        
-        obstacleXLocation = sessionData.rawData_tr(trIdx).obstacle_XposYposHeight(1);
-        obstacleYLocation = sessionData.rawData_tr(trIdx).obstacle_XposYposHeight(2);
-        obstacleZLocation = sessionData.rawData_tr(trIdx).obstacle_XposYposHeight(3);
+        obstacleXLocation = sessionData.rawData_tr(trIdx).obs.pos_xyz(1);
+        obstacleYLocation = sessionData.rawData_tr(trIdx).obs.pos_xyz(2);
+        obstacleZLocation = sessionData.rawData_tr(trIdx).obs.pos_xyz(3);
         
         %%
         % Selecting two points one meter away on the obstacle line (Triangle Base)
+        
         pointC_fr = repmat([0.5, obstacleYLocation, obstacleZLocation],size(mData_fr_XYZ,1),1);
         pointB_fr = repmat([-0.5, obstacleYLocation, obstacleZLocation],size(mData_fr_XYZ,1),1);
         
@@ -114,7 +93,7 @@ for fIdx  = 1:2
         
         distance_fr = (2 .* Area)./bc_fr;
         
-        [minVal minFrameIdx] = min(distance_fr);
+        [minVal, minFrameIdx] = min(distance_fr);
         
         minClearance_fIdx_mkr(fIdx,mIdx) = minVal;
         minClearanceFrame_fIdx_mkr(fIdx,mIdx) = minFrameIdx + searchFrames(1) - 1;
@@ -122,7 +101,7 @@ for fIdx  = 1:2
     end
 end
 
-[minClearance_LRFoot closestMarkerMidx_LRFoot] = min(minClearance_fIdx_mkr,[],2);
+[minClearance_LRFoot, closestMarkerMidx_LRFoot] = min(minClearance_fIdx_mkr,[],2);
 minClearanceFrame_fIdx = [minClearanceFrame_fIdx_mkr(1,closestMarkerMidx_LRFoot(1)) minClearanceFrame_fIdx_mkr(2,closestMarkerMidx_LRFoot(2))];
 
 
@@ -145,8 +124,4 @@ sessionData.dependentMeasures_tr(trIdx).leadMinClearanceFrame = minClearanceFram
 sessionData.dependentMeasures_tr(trIdx).trailMinClearanceAXS = minClearance_LRFoot(trailIdx);
 sessionData.dependentMeasures_tr(trIdx).trailMinClearanceMidx = closestMarkerMidx_LRFoot(trailIdx);
 sessionData.dependentMeasures_tr(trIdx).trailMinClearanceFrame = minClearanceFrame_fIdx(trailIdx);
-    
-
-
-
-
+end

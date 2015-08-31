@@ -1,4 +1,4 @@
-function sessionData = findFootCrossing( sessionData, trIdx , plotData )
+function sessionData = findFootCrossing( sessionData, trIdx )
 
 % Kamran Binaee
 % Find when each foot breaks the plane of the obstacle first
@@ -15,24 +15,26 @@ end
 
 loadParameters
 
-%trialStruct = sessionData.rawData_tr(trIdx);
 procData = sessionData.processedData_tr(trIdx);
 rawData = sessionData.rawData_tr(trIdx);
 
 %FIXME: Obstacle has no width
 
-obstacleFront_Y = rawData.obstacle_XposYposHeight(2) - obsLW(2)/2;
+obstacleFront_Y = rawData.obs.pos_xyz(2) - obsLW(2)/2;
 
 % Get marker data for all markers on the feet
-rightFoot_fr_mkr_XYZ = procData.rightFoot_fr_mkr_XYZ;
-leftFoot_fr_mkr_XYZ = procData.leftFoot_fr_mkr_XYZ;
+rightFoot_fr_mkr_XYZ = procData.rFoot.mkrPos_mIdx_Cfr_xyz;
+leftFoot_fr_mkr_XYZ = procData.lFoot.mkrPos_mIdx_Cfr_xyz;
+
+rightFoot_fr_mkr_XYZ = cell2mat(permute(rightFoot_fr_mkr_XYZ, [3 2 1]));
+leftFoot_fr_mkr_XYZ = cell2mat(permute(leftFoot_fr_mkr_XYZ, [3 2 1]));
 
 % Grab the position on Y axis
-rightFootY_frIdx_mIdx = squeeze(rightFoot_fr_mkr_XYZ(:,:,2));
-leftFootY_frIdx_mIdx = squeeze(leftFoot_fr_mkr_XYZ(:,:,2));
+rightFootY_frIdx_mIdx = squeeze(rightFoot_fr_mkr_XYZ(:,2,:));
+leftFootY_frIdx_mIdx = squeeze(leftFoot_fr_mkr_XYZ(:,2,:));
 
 % Find the Y data of the foot marker that is furthest up the Y axis
-[ rightFootMaxY_frIdx,maxRightMkrIdx_fr] = max(rightFootY_frIdx_mIdx,[],2);
+[ rightFootMaxY_frIdx, maxRightMkrIdx_fr] = max(rightFootY_frIdx_mIdx,[],2);
 [ leftFootMaxY_frIdx, maxLeftMkrIdx_fr] = max(leftFootY_frIdx_mIdx,[],2);
 
 %%  Find frames and markerIDX of first crossing

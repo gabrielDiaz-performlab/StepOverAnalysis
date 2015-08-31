@@ -13,9 +13,9 @@ function [sessionData] = checkForExclusions(sessionData)
 loadParameters
 %
 for trIdx = 1:sessionData.expInfo.numTrials
-    
-    rawData = sessionData.rawData_tr(trIdx);
-    data_cFr_mkr_XYZ = [{rawData(trIdx).lFoot.mkrPos_mIdx_Cfr_xyz},{rawData(trIdx).rFoot.mkrPos_mIdx_Cfr_xyz}];
+
+    data_cFr_mkr_XYZ = [{sessionData.rawData_tr(trIdx).lFoot.mkrPos_mIdx_Cfr_xyz},...
+        {sessionData.rawData_tr(trIdx).rFoot.mkrPos_mIdx_Cfr_xyz}];
               
     for cIdx = 1:length(data_cFr_mkr_XYZ)
                
@@ -37,7 +37,7 @@ for trIdx = 1:sessionData.expInfo.numTrials
         % Find markers 'left behind"
         % That is:  although other markers moved > .5*obstacle distance,
         % the markers 'left behind' did not
-        distToObs = rawData.obstacle_XposYposHeight(2);
+        distToObs = sessionData.rawData_tr(trIdx).obs.pos_xyz(2);
         leftBehind_cIdx= find( totalYDisp_cIdx < distToObs/2 ) ;
         
         numMarkersLeftBehind = sum(leftBehind_cIdx);
@@ -54,7 +54,7 @@ for trIdx = 1:sessionData.expInfo.numTrials
             if( isempty( sessionData.rawData_tr(trIdx).info.excludeTrialExplanation) )
                 sessionData.rawData_tr(trIdx).info.excludeTrialExplanation{1} = excludeMessage;
             else
-                sessionData.rawData_tr(trIdx).excludeTrialExplanation{end+1} = excludeMessage;
+                sessionData.rawData_tr(trIdx).info.excludeTrialExplanation{end+1} = excludeMessage;
             end
                
         elseif( numMarkersLeftBehind == 1 )
@@ -77,10 +77,10 @@ for trIdx = 1:sessionData.expInfo.numTrials
             %%% Append changes to trial log
             modMessage = sprintf('checkForExclusions: Marker data missing for a single marker in a rigid body.  To correct, values were set to NAN.');
             
-            if( isempty( sessionData.rawData_tr(trIdx).trialModifications_cModIdx) )
-                sessionData.rawData_tr(trIdx).trialModifications_cModIdx{1} = modMessage;
+            if( isempty( sessionData.rawData_tr(trIdx).info.trialModifications_cModIdx) )
+                sessionData.rawData_tr(trIdx).info.trialModifications_cModIdx{1} = modMessage;
             else
-                sessionData.rawData_tr(trIdx).trialModifications_cModIdx{end+1} = modMessage;
+                sessionData.rawData_tr(trIdx).info.trialModifications_cModIdx{end+1} = modMessage;
             end
              
             %%% Append changes to experiment log

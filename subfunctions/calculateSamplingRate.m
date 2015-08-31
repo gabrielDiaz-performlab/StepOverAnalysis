@@ -5,11 +5,8 @@ globalSumOfMeanFrameTimes = 0;
 
 for trIdx = 1:sessionData.expInfo.numTrials
     
-    
-    
     globalSumOfMeanFrameTimes  = globalSumOfMeanFrameTimes ...
         + mean(diff(sessionData.rawData_tr(trIdx).info.sysTime_fr));
-    
 end
 
 %%

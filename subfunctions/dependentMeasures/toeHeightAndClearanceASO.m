@@ -8,16 +8,15 @@ function [ sessionData ] = toeHeightAndClearanceASO(sessionData, trIdx)
 %SessionData is a struct containing raw and processed data from Main.m
 %trialNumber is the current trial number.
 
-rawTrialStruct = sessionData.rawData_tr(trIdx);
+% rawTrialStruct = sessionData.rawData_tr(trIdx);
 proTrialStruct = sessionData.processedData_tr(trIdx);
 dmTrialStruct = sessionData.dependentMeasures_tr(trIdx);
 
 %% Determine if step is with right or left foot, then X location of other foot
 
-
 stepFoot = dmTrialStruct.firstCrossingFoot;
-obsYLoc = rawTrialStruct.obstacle_XposYposHeight(2);
-obsHeight = rawTrialStruct.obstacle_XposYposHeight(3);
+obsYLoc = proTrialStruct.obs.pos_xyz(2);
+obsHeight = proTrialStruct.obs.height;
 
 rightCrossFrame = dmTrialStruct.rFoot.crossingFr;
 leftCrossFrame = dmTrialStruct.lFoot.crossingFr;
@@ -26,24 +25,21 @@ rightCrossMkrIdx = dmTrialStruct.rFoot.firstCrossingMkrIdx;
 leftCrossMkrIdx = dmTrialStruct.lFoot.firstCrossingMkrIdx;
 
 %% 
-
 if strcmp(stepFoot, 'Right')
     
-    %%
+    leadToeZClearanceASO = proTrialStruct.rFoot.mkrPos_mIdx_Cfr_xyz{rightCrossMkrIdx}(rightCrossFrame,3) - obsHeight; 
+    trailToeZClearanceASO = proTrialStruct.lFoot.mkrPos_mIdx_Cfr_xyz{leftCrossMkrIdx}(leftCrossFrame,3) - obsHeight; 
     
-    leadToeZClearanceASO = rawTrialStruct.rightFoot_fr_mkr_XYZ(rightCrossFrame,rightCrossMkrIdx,3) - obsHeight; 
-    trailToeZClearanceASO = rawTrialStruct.leftFoot_fr_mkr_XYZ(leftCrossFrame,leftCrossMkrIdx ,3) - obsHeight; 
-    
-    leadToeZASO = rawTrialStruct.rightFoot_fr_mkr_XYZ(rightCrossFrame,rightCrossMkrIdx,3); 
-    trailToeZASO= rawTrialStruct.leftFoot_fr_mkr_XYZ(leftCrossFrame,leftCrossMkrIdx,3); 
+    leadToeZASO = proTrialStruct.rFoot.mkrPos_mIdx_Cfr_xyz{rightCrossMkrIdx}(rightCrossFrame,3); 
+    trailToeZASO= proTrialStruct.lFoot.mkrPos_mIdx_Cfr_xyz{leftCrossMkrIdx}(leftCrossFrame,3); 
     
 elseif strcmp(stepFoot, 'Left')
     
-    leadToeZClearanceASO = rawTrialStruct.leftFoot_fr_mkr_XYZ(leftCrossFrame,leftCrossMkrIdx,3) - obsHeight; 
-    trailToeZClearanceASO = rawTrialStruct.rightFoot_fr_mkr_XYZ(rightCrossFrame,rightCrossMkrIdx,3) - obsHeight; 
+    leadToeZClearanceASO = proTrialStruct.lFoot.mkrPos_mIdx_Cfr_xyz{leftCrossMkrIdx}(leftCrossFrame,3) - obsHeight;  
+    trailToeZClearanceASO = proTrialStruct.rFoot.mkrPos_mIdx_Cfr_xyz{rightCrossMkrIdx}(rightCrossFrame,3) - obsHeight;  
     
-    leadToeZASO = rawTrialStruct.leftFoot_fr_mkr_XYZ(leftCrossFrame,leftCrossMkrIdx,3);
-    trailToeZASO= rawTrialStruct.rightFoot_fr_mkr_XYZ(rightCrossFrame,rightCrossMkrIdx,3);
+    leadToeZASO = proTrialStruct.lFoot.mkrPos_mIdx_Cfr_xyz{leftCrossMkrIdx}(leftCrossFrame,3);
+    trailToeZASO= proTrialStruct.rFoot.mkrPos_mIdx_Cfr_xyz{rightCrossMkrIdx}(rightCrossFrame,3); 
     
 else
     fprintf('toeClearanceASO: Subject did not pass the obstacle. \n');

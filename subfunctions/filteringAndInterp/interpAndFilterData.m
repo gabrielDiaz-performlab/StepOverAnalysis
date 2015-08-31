@@ -94,6 +94,6 @@ for trIdx = 1:numTrials
 end
 
 
-sessionData = filterMocapData(sessionData, 0);
+
 
 
