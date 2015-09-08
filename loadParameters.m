@@ -7,22 +7,22 @@ parsedTextFileDir = 'data/parsedTXT/';
 sessionFileDir = 'data/sessionFiles/';
 spssFileDir = 'data/spssFiles/';
 
-[junk junk] = mkdir('figures');
-[junk junk] = mkdir(parsedTextFileDir);
-[junk junk] = mkdir(sessionFileDir );
-[junk junk] = mkdir(spssFileDir );
+[junk, junk] = mkdir('figures');
+[junk, junk] = mkdir(parsedTextFileDir);
+[junk, junk] = mkdir(sessionFileDir );
+[junk, junk] = mkdir(spssFileDir );
 
 clear junk
 
 dataFileList = {...
-    '_data-2015-8-13-10-22'...
+    '_data-2015-9-8-12-30'...
     };
 
 % Step detection findSteps.m
 % footHeightThresh_sIdx = [.13,]; We will likely need a diff. threshold for
 % different subjects. 
 
-  footHeightThresh = 0.13;
+footHeightThresh = 0.13;
   
 %%
 % hardExclusions(1).fileID = 'exp_data-2015-4-9-16-18';
@@ -49,10 +49,10 @@ crossingSearchWindowSize = 20;
 %legLength = .87;
 %obsHeightRatio_trialType = [ .15 .25 .35 .15 .25 .35 ];
 
-obsPositionIfWalkingUp = -3.5;
-obsPositionIfWalkingDown = 2.4;
+% obsPositionIfWalkingUp = -3.5;
+% obsPositionIfWalkingDown = 2.4;
 
-obsLW = [5,.03];
+obsLW = [1.24,.087];
 
 numConditions = 2;
 numObsHeights = 3;

@@ -146,6 +146,11 @@ while ~feof(fid)
         obsXYZ = extractVarFromLine(currentLine, 'obstacle_XYZ', 3  );
         obstacle_tr_XYZ(trialNum,:) = obsXYZ([1 3 2]);
         
+        standingBoxOffset_negZ(trialNum,:) = extractVarFromLine(currentLine, 'standingBoxOffset_negZ', 1);
+        standingBoxOffset_posZ(trialNum,:) = extractVarFromLine(currentLine, 'standingBoxOffset_posZ', 1);
+        
+        leftFoot_LWH(trialNum,:) = extractVarFromLine(currentLine, 'leftFoot_LWH', 3);
+        rightFoot_LWH(trialNum,:) = extractVarFromLine(currentLine, 'rightFoot_LWH', 3);
         
     end
     
@@ -214,7 +219,8 @@ outFileDir = [ 'parsed' textFileName(4:end)];
 save ([ parsedTextFileDir outFileDir '.mat'],'sysTime_fr','trialType_tr','isWalkingDownAxis_tr',...
     'legLengthCM','eventFlag', 'obstacleHeight_tr','obstacle_tr_XYZ','collision_XYZ',...
     'rFoot_fr_XYZ','lFoot_fr_XYZ','glasses_fr_XYZ','mainView_fr_XYZ',...
-    'rFootQUAT_fr_WXYZ','lFootQUAT_fr_WXYZ','glassesQUAT_fr_WXYZ','mainViewQUAT_fr_WXYZ');
+    'rFootQUAT_fr_WXYZ','lFootQUAT_fr_WXYZ','glassesQUAT_fr_WXYZ','mainViewQUAT_fr_WXYZ','standingBoxOffset_negZ',...
+    'standingBoxOffset_posZ','leftFoot_LWH','rightFoot_LWH');
 
 fprintf ('Parsed exp data saved to text file %s.mat \n', parsedTextFileDir )
 

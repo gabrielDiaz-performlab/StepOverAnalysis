@@ -1,9 +1,7 @@
-function [sessionData figH] = findSteps(sessionData, trIdx, plotOn)
+function [sessionData, figH] = findSteps(sessionData, trIdx, plotOn)
 
-if nargin < 3
-    
-    plotOn = 0;
-    
+if nargin < 3  
+    plotOn = 0;    
 end
 
 if( plotOn)
@@ -22,7 +20,7 @@ loadParameters
 % presented in Zeni et al 2008 in Gait and Posture.
 %
 % The basic idea is to first situate the data by subtracting the
-% coordinates of the Root marker from each marker position at each frame,
+% coordinates of the Foot marker from each marker position at each frame,
 % essentially setting the origin to the subject's root.
 %
 % The velocity of each foot in the Y direction is then calculated. Zero
@@ -136,7 +134,7 @@ for i = 1:maxIndex
         
         nextRTO = rFootUnderHeightThresh_idx( find( rFootUnderHeightThresh_idx <= rAnkVelY_upIdx(rUpIter),1,'last')) -1;
         
-        if( nextRTO == 0 ) nextRTO  = 1; end
+        if( nextRTO == 0 ), nextRTO  = 1; end
         
         if( ~isempty(nextRTO))
             % Do NOT count as a TO if...
@@ -267,7 +265,7 @@ end
 
 %
 
-%% Make sure there is a 1:1 toe-off to heel-strike relationship
+%% Make sure there is a 1:1  toe-off to heel-strike relationship
 
 for i = 1:numel(rHS)
     if( numel(rTO) >= i )

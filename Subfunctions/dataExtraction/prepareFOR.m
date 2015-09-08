@@ -1,15 +1,12 @@
-function dataOutXYZ = prepareFOR(dataInXYZ,subIsWalkingUpAxis)
+function dataOutXYZ = prepareFOR(dataInXYZ,subIsWalkingUpAxis,standingBoxOffset_posZ,standingBoxOffset_negZ)
 
 loadParameters
 
 if( subIsWalkingUpAxis )
-    standingBoxPosOnAxis = obsPositionIfWalkingUp;
+    standingBoxPosOnAxis = standingBoxOffset_negZ;
 else
-    standingBoxPosOnAxis = obsPositionIfWalkingDown;
+    standingBoxPosOnAxis = standingBoxOffset_posZ;
 end
-
-% keyboard
-
 
 % UP: dataOutXYZ(:,mIdx,:) = [dataOutXYZ(:,mIdx,1), (dataOutXYZ(:,mIdx,2) - standingBoxPosOnAxis),dataOutXYZ(:,mIdx,3)];
 % DOWN: dataOutXYZ(:,mIdx,:) = [-dataOutXYZ(:,mIdx,1), -(dataOutXYZ(:,mIdx,2) - standingBoxPosOnAxis),dataOutXYZ(:,mIdx,3)];

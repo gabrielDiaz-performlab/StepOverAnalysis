@@ -2,7 +2,7 @@ function [figH] = plotAvgTraj_CxH(sessionData)
 
 xLimVals = [-3.5 1];
 
-figH1 = figure(1010)
+figH1 = figure(1010);
 hold on
 cla
 xlabel('foot distance (m)')
@@ -11,7 +11,7 @@ set(1010,'Units','Normalized','Position',[0.118055555555556 0.235555555555556 0.
 title({'lead foot position','for 1 obstacle height'})
 xlim(xLimVals)
 
-figH2 = figure(1011)
+figH2 = figure(1011);
 hold on
 cla
 xlabel('foot distance (m)')
@@ -21,7 +21,7 @@ title({'variation in lead foot position','for 1 obstacle height'})
 xlim(xLimVals)
 ylim([0 0.2])
 
-figH2 = figure(1012)
+figH2 = figure(1012);
 hold on
 cla
 xlabel('foot distance (m)')
@@ -135,7 +135,3 @@ for hIdx = 1:3;
         
     end
 end
-%vline(0,'k',2,':')
-
-
-

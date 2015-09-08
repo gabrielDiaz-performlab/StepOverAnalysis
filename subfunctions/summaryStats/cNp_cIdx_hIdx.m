@@ -2,13 +2,13 @@
 % cNp = Calculate and plot
 % This function automates the averaging and plotting of a variable by 
 % condition and obstacle height.
-% Averaging is computed in subfunction:  calcMean_cIdx_hIdx
+% Averaging is computed in subfunction: calcMean_cIdx_hIdx
 % Plotting is performed in subfunction: plot_cIdx_hIdx
 
-function [sessionData figH] = cNp_cIdx_hIdx(sessionData,varString,removeOutliersBool,showIndividualTrials)
+function [sessionData, figH] = cNp_cIdx_hIdx(sessionData,varString,removeOutliersBool,showIndividualTrials)
 
 %% Group trials by condition and obs height and take the average
-%%
+
 % The third variable is a bool that enables the removal of outliers
 if( removeOutliersBool == 1)
     sessionData = calcMean_cIdx_hIdx(sessionData,varString,removeOutliersBool);

@@ -18,7 +18,7 @@
 % rbPos_mFr_xyz: [2881x3 double]
 % rbPosSysTime_mFr_xyz: [2881x1 double]
 % rbQuat_mFr_xyz: [2881x4 double]
-% rbQuatSysTime_mFr: [2881x1 double]
+% rbQuatSysTime_mFr: [2881x1 double]  
 % mkrPos_mIdx_Cfr_xyz: {5x1 cell}
 % mkrSysTime_mIdx_Cfr: {5x1 cell}
 %%%%% 
@@ -69,7 +69,7 @@ sessionData = checkForExclusions(sessionData);
 
 sessionData = synchronizeData(sessionData);
 
-DisplaySessionData(sessionData, 2, 1, 'rawData_tr', 1) % rawData_tr -> view raw data; processedData_tr -> view processed data
+DisplaySessionData(sessionData, 2, 1, 'processedData_tr', 1) % rawData_tr -> view raw data; processedData_tr -> view processed data
 
 %% filter
 
@@ -98,73 +98,73 @@ for trIdx = 1:numel(sessionData.rawData_tr)
     [ sessionData ] = findMinDistanceAXS(sessionData,trIdx);
     
 end
-% % 
-% % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % % %% Plot body scaled
-% % % 
-% % % figure(1010)
-% % % hold on
-% % % cla
-% % % set(1010,'Units','Normalized','Position',[0.118055555555556 0.235555555555556 0.829166666666667 0.65]);
-% % % title({'lead foot position','in units of leg length','for 1 obstacle height'})
-% % % 
-% % % for hIdx = 1:3
-% % %     
-% % %     trIdxList = find([sessionData.rawData_tr.trialType] == hIdx);
-% % %     trIdxList = [trIdxList  find([sessionData.rawData_tr.trialType] == hIdx+3)];
-% % %         
-% % %     for trIdx = 1:numel(trIdxList)
-% % %         
-% % %         trNum = trIdxList(trIdx);
-% % %         
-% % %         if( strcmp( sessionData.dependentMeasures_tr(trNum).firstCrossingFoot, 'Left' ) )
-% % %             
-% % %             leadFoot_fr_XYZ = sessionData.processedData_tr(trIdxList(trIdx)).lFootBS_fr_XYZ;
-% % %         else
-% % %             leadFoot_fr_XYZ = sessionData.processedData_tr(trIdxList(trIdx)).rFootBS_fr_XYZ;
-% % %         end
-% % %         
-% % %         X = repmat(trIdx,1,length(leadFoot_fr_XYZ ));
-% % %         Y = leadFoot_fr_XYZ(:,2);
-% % %         Z = leadFoot_fr_XYZ(:,3);
-% % %         plot3(X,Y,Z)
-% % %         
-% % %     end
-% % % end
-% % 
-% % 
-% % %%
-% % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % % Some methods for plotting a trial
-% % 
-% % %plotTrialMarkers(sessionData,2);
-% % %plotTrialRigid(sessionData,3)
-% % 
-% % 
-% % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % %% plotAvgTraj_CxH - a work in progress
-% % % Analyzing to see if postural adjustments occurred during the approach,
-% % % or as they left the go-box
-% % 
-% % %plotAvgTraj_CxH(sessionData)
-% % 
-% % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % %% Make some figures
-% % 
-% % removeOutliers = 1
-% % showIndividualTrials= 1;
-% % sessionFigH = struct;
-% % 
-% % [sessionData sessionFigH ] = calculateSSandPlot(sessionData,removeOutliers,showIndividualTrials)
-% % 
-% % %%  Save figures
-% % 
-% % saveFigStructToDir(dataFileList{sessionNumber},sessionFigH);
-% % 
-% % %% Save session file
-% % 
-% % save([ sessionFileDir dataFileList{sessionNumber} '.mat'] , 'sessionData');
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Plot body scaled
+
+% figure(1010)
+% hold on
+% cla
+% set(1010,'Units','Normalized','Position',[0.118055555555556 0.235555555555556 0.829166666666667 0.65]);
+% title({'lead foot position','in units of leg length','for 1 obstacle height'})
+% 
+% for hIdx = 1:3
+%     
+%     trIdxList = find([sessionData.rawData_tr.trialType] == hIdx);
+%     trIdxList = [trIdxList  find([sessionData.rawData_tr.trialType] == hIdx+3)];
+%         
+%     for trIdx = 1:numel(trIdxList)
+%         
+%         trNum = trIdxList(trIdx);
+%         
+%         if( strcmp( sessionData.dependentMeasures_tr(trNum).firstCrossingFoot, 'Left' ) )
+%             
+%             leadFoot_fr_XYZ = sessionData.processedData_tr(trIdxList(trIdx)).lFootBS_fr_XYZ;
+%         else
+%             leadFoot_fr_XYZ = sessionData.processedData_tr(trIdxList(trIdx)).rFootBS_fr_XYZ;
+%         end
+%         
+%         X = repmat(trIdx,1,length(leadFoot_fr_XYZ ));
+%         Y = leadFoot_fr_XYZ(:,2);
+%         Z = leadFoot_fr_XYZ(:,3);
+%         plot3(X,Y,Z)
+%         
+%     end
+% end
+
+
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Some methods for plotting a trial
+
+plotTrialMarkers(sessionData,5);
+% plotTrialRigid(sessionData,3) % I don't see the point of this function.
+% Commented it out.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% plotAvgTraj_CxH - a work in progress
+% Analyzing to see if postural adjustments occurred during the approach,
+% or as they left the go-box
+
+% plotAvgTraj_CxH(sessionData)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Make some figures
+
+% removeOutliers = 1
+% showIndividualTrials= 1;
+% sessionFigH = struct;
+% 
+% [sessionData sessionFigH ] = calculateSSandPlot(sessionData,removeOutliers,showIndividualTrials)
+% 
+% %%  Save figures
+% 
+% saveFigStructToDir(dataFileList{sessionNumber},sessionFigH);
+% 
+% %% Save session file
+% 
+% save([ sessionFileDir dataFileList{sessionNumber} '.mat'] , 'sessionData');

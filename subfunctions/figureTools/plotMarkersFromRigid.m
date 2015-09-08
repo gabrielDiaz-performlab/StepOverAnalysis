@@ -1,14 +1,14 @@
-function hand = plotMarkersFromRigid(figureHandle,markerData_fr_mkr_XYZ,color)
+function [] = plotMarkersFromRigid(markerData_fr_mkr_XYZ, color)
 
+markerData_fr_mkr_XYZ = cell2mat(permute(markerData_fr_mkr_XYZ,[2 3 1]));
 
-
-
-for mIdx = 1:size(markerData_fr_mkr_XYZ,2)
+for mIdx = 1:size(markerData_fr_mkr_XYZ,3)
     
-   X = squeeze(markerData_fr_mkr_XYZ(:,mIdx,1));
-   Y = squeeze(markerData_fr_mkr_XYZ(:,mIdx,2));
-   Z = squeeze(markerData_fr_mkr_XYZ(:,mIdx,3));
+   X = squeeze(markerData_fr_mkr_XYZ(:,1,mIdx));
+   Y = squeeze(markerData_fr_mkr_XYZ(:,2,mIdx));
+   Z = squeeze(markerData_fr_mkr_XYZ(:,3,mIdx));
    
-   hand = scatter3( X,Y,Z,10,color)
+   scatter3(X,Y,Z,10,color);hold on;
    
+end
 end

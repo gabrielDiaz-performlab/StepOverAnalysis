@@ -1,4 +1,4 @@
-function [sessionData sessionFigH]= calculateSSandPlot(sessionData,removeOutliers,showIndividualTrials )
+function [sessionData, sessionFigH]= calculateSSandPlot(sessionData,removeOutliers,showIndividualTrials )
 
 if( removeOutliers == 1)
     fprintf('*** calculateSSandPlot: Removing outliers from data! *** \n') 
@@ -13,12 +13,12 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Make some figures
-
-try
-dm = sessionData.dependentMeasures_tr;
-catch
-    keyboard
-end
+% 
+% try
+%     dm = sessionData.dependentMeasures_tr;
+% catch
+%     keyboard
+% end
 
 %% Lead Toe Height ASO BY REPETITION
 
@@ -40,12 +40,12 @@ sessionFigH = struct;
 
 % duration of lead crossing step
 
-[sessionData sessionFigH.leadStepDurASO] = cNp_cIdx_hIdx(sessionData,'leadStepDurASO',removeOutliers,showIndividualTrials);
+[sessionData, sessionFigH.leadStepDurASO] = cNp_cIdx_hIdx(sessionData,'leadStepDurASO',removeOutliers,showIndividualTrials);
 ylabel({'lead step','duration (s)' })
 ylim([.5 1 ])
 
 % duration of trail crossing step
-[sessionData sessionFigH.trailStepDurASO] = cNp_cIdx_hIdx(sessionData,'trailStepDurASO',removeOutliers,showIndividualTrials);
+[sessionData, sessionFigH.trailStepDurASO] = cNp_cIdx_hIdx(sessionData,'trailStepDurASO',removeOutliers,showIndividualTrials);
 ylabel({'trail step','duration (s)' })
 ylim([.5 1 ])
 
@@ -53,14 +53,14 @@ ylim([.5 1 ])
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %lead clearance ASO (at step-over frame)
     
-[sessionData sessionFigH.leadToeZClearanceASO] = cNp_cIdx_hIdx(sessionData,'leadMinClearanceAXS',removeOutliers,showIndividualTrials);
+[sessionData, sessionFigH.leadToeZClearanceASO] = cNp_cIdx_hIdx(sessionData,'leadMinClearanceAXS',removeOutliers,showIndividualTrials);
 ylabel({'lead toe','clearance ASO (m)' })
 ylim([0 0.5])
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %trail clearance ASO (at step-over frame)
     
-[sessionData sessionFigH.trailToeZClearanceASO] = cNp_cIdx_hIdx(sessionData,'trailMinClearanceAXS',removeOutliers,showIndividualTrials);
+[sessionData, sessionFigH.trailToeZClearanceASO] = cNp_cIdx_hIdx(sessionData,'trailMinClearanceAXS',removeOutliers,showIndividualTrials);
 ylabel({'trail toe','clearance ASO (m)' })
 ylim([0 0.5])
 
@@ -68,13 +68,13 @@ ylim([0 0.5])
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % lead max velocity AXS (at crossing step)
 
-[sessionData sessionFigH.leadFootVelAXS] = cNp_cIdx_hIdx(sessionData,'leadFootMaxVelAXS',removeOutliers,showIndividualTrials);
+[sessionData, sessionFigH.leadFootVelAXS] = cNp_cIdx_hIdx(sessionData,'leadFootMaxVelAXS',removeOutliers,showIndividualTrials);
 ylabel({'lead foot','max velocity ASX (m/s)' })
 ylim([0 7])
 
 % trail max velocity AXS (at crossing step)
 
-[sessionData sessionFigH.trailFootVelAXS] = cNp_cIdx_hIdx(sessionData,'trailFootMaxVelAXS',removeOutliers,showIndividualTrials);
+[sessionData, sessionFigH.trailFootVelAXS] = cNp_cIdx_hIdx(sessionData,'trailFootMaxVelAXS',removeOutliers,showIndividualTrials);
 ylabel({'trail foot','max velocity ASX (m/s)' })
 ylim([0 7])
 
@@ -83,12 +83,12 @@ ylim([0 7])
 %% Height AXS
 %lead max  height AXS (at crossing step)
      
-[sessionData sessionFigH.leadFootMaxZAXS] = cNp_cIdx_hIdx(sessionData,'leadFootMaxZAXS',removeOutliers,showIndividualTrials);
+[sessionData, sessionFigH.leadFootMaxZAXS] = cNp_cIdx_hIdx(sessionData,'leadFootMaxZAXS',removeOutliers,showIndividualTrials);
 ylabel({'lead foot','max height ASX (m)' })
 ylim([0 1])
 % trail max height AXS (at crossing step)
     
-[sessionData sessionFigH.trailFootMaxZAXS] = cNp_cIdx_hIdx(sessionData,'trailFootMaxZAXS',removeOutliers,showIndividualTrials);
+[sessionData, sessionFigH.trailFootMaxZAXS] = cNp_cIdx_hIdx(sessionData,'trailFootMaxZAXS',removeOutliers,showIndividualTrials);
 ylabel({'trail foot','max height ASX (m)' })
 ylim([0 1])
 
@@ -98,21 +98,21 @@ ylim([0 1])
 
 % duration of lead crossing step
 
-[sessionData sessionFigH.distPlantedFootASO] = cNp_cIdx_hIdx(sessionData,'distPlantedFootASO',removeOutliers,showIndividualTrials);
+[sessionData, sessionFigH.distPlantedFootASO] = cNp_cIdx_hIdx(sessionData,'distPlantedFootASO',removeOutliers,showIndividualTrials);
 ylabel({'planted foot','location ASO (m)' })
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Min distance of the lead foot AXS
 
-[sessionData sessionFigH.distPlantedFootASO] = cNp_cIdx_hIdx(sessionData,'leadMinClearanceAXS',removeOutliers,showIndividualTrials);
+[sessionData, sessionFigH.distPlantedFootASO] = cNp_cIdx_hIdx(sessionData,'leadMinClearanceAXS',removeOutliers,showIndividualTrials);
 ylabel({'lead foot','min distance AXS(m)' })
 ylim([0 0.3])
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Min distance of the trailing foot AXS
 
-[sessionData sessionFigH.distPlantedFootASO] = cNp_cIdx_hIdx(sessionData,'trailMinClearanceAXS',removeOutliers,showIndividualTrials);
+[sessionData, sessionFigH.distPlantedFootASO] = cNp_cIdx_hIdx(sessionData,'trailMinClearanceAXS',removeOutliers,showIndividualTrials);
 ylabel({'trail foot','min distance AXS(m)' })
 ylim([0 0.3])
 

@@ -1,31 +1,24 @@
 function figH = plotTrialMarkers(sessionData,trialNum)
 
-trialData = sessionData.rawData_tr(trialNum);
+trialData = sessionData.processedData_tr(trialNum);
 
 
 % Create figure
-figH = figure(trialNum);
+figH = figure;
+grid on; axis equal;
 hold on 
 
 
-%%
-headFirst_XYZ = squeeze(trialData.head_fr_mkr_XYZ(1,2,:));
-scatter3(headFirst_XYZ(1),headFirst_XYZ(2),headFirst_XYZ(3),400,'r','Filled')
+%% Plot Marker data
+plotMarkersFromRigid(trialData.rFoot.mkrPos_mIdx_Cfr_xyz,'r')
+plotMarkersFromRigid(trialData.lFoot.mkrPos_mIdx_Cfr_xyz,'b')
+plotMarkersFromRigid(trialData.glasses.mkrPos_mIdx_Cfr_xyz,'k')
 
-plotMarkersFromRigid(figH,trialData.rightFoot_fr_mkr_XYZ,'r')
-plotMarkersFromRigid(figH,trialData.leftFoot_fr_mkr_XYZ,'b')
-plotMarkersFromRigid(figH,trialData.head_fr_mkr_XYZ,'k')
-plotMarkersFromRigid(figH,trialData.spine_fr_mkr_XYZ,'g')
-
+%% Plot obstacle
 plotObs(sessionData,trialNum,'c')
-
-grid on 
-
 
 view([46 8]);
 
-%grid(axes1,'on');
-%axis([-2, 3, -2.5, -0.5, 0,2])
 axis([-2, 2, -0.5, 7.5, 0,2.25])
 axis equal
 
@@ -33,16 +26,10 @@ axis equal
 %%
 TitleText = sprintf('Trial number %1.0f ', trialNum);
 
-% Create title
+% Create titles
 title(TitleText,'FontWeight','bold','FontSize',14,'FontName','Arial');
-
-% Create xlabel
 xlabel('X (m)','FontWeight','bold','FontSize',12,'FontName','Arial');
-
-% Create ylabel
 ylabel('Y (m)','FontWeight','bold','FontSize',12,'FontName','Arial');
-
-% Create zlabel
 zlabel('Z (m)','FontWeight','bold','FontSize',12,'FontName','Arial');
 
 %%
