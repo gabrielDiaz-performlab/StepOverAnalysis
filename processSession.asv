@@ -87,11 +87,15 @@ figure;
 subplot(2,3,1);plot(signal1(:,1))
 subplot(2,3,2);plot(signal1(:,2))
 subplot(2,3,3);plot(signal1(:,3))
-subplot(2,3,4);plot(log(abs(fft_signal1(:,1))))
-subplot(2,3,5);plot(log(abs(fft_signal1(:,2))))
-subplot(2,3,6);plot(log(abs(fft_signal1(:,3))))
+subplot(2,3,4);plot(abs(fft_signal1(:,1)))
+subplot(2,3,5);plot(abs(fft_signal1(:,2)))
+subplot(2,3,6);plot(abs(fft_signal1(:,3)))
+% 
+% rect_window = zeros(length(signal1),1) + 1i;
+% rect_window(end/2 - 2000:end/2 + 2000) = 0.5 + .5i;
+% fft_signal1_proc = fft_signal1.*repmat(rect_window,[1 3]); 
  
-gauss_win = gausswin(100); gauss_win = gauss_win / sum(gauss_win);
+gauss_win = gausswin(100);
 signal2(:,1) = conv(signal1(:,1),gauss_win,'same');
 signal2(:,2) = conv(signal1(:,2),gauss_win,'same');
 signal2(:,3) = conv(signal1(:,3),gauss_win,'same');
@@ -100,13 +104,17 @@ fft_signal1_proc(:,1) = fftshift(fft(signal2(:,1)));
 fft_signal1_proc(:,2) = fftshift(fft(signal2(:,2)));
 fft_signal1_proc(:,3) = fftshift(fft(signal2(:,3)));
 
+% signal2(:,1) = ifft(fft_signal1_proc(:,1));
+% signal2(:,2) = abs(ifft(fft_signal1_proc(:,2)));
+% signal2(:,3) = abs(ifft(fft_signal1_proc(:,3)));
+% 
 figure;
 subplot(2,3,1);plot(signal2(:,1))
 subplot(2,3,2);plot(signal2(:,2))
 subplot(2,3,3);plot(signal2(:,3))
-subplot(2,3,4);plot(log(abs(fft_signal1_proc(:,1))))
-subplot(2,3,5);plot(log(abs(fft_signal1_proc(:,2))))
-subplot(2,3,6);plot(log(abs(fft_signal1_proc(:,3))))
+subplot(2,3,4);plot(abs(fft_signal1_proc(:,1)))
+subplot(2,3,5);plot(abs(fft_signal1_proc(:,2)))
+subplot(2,3,6);plot(abs(fft_signal1_proc(:,3)))
 
 %%
 sessionData = avgTrialDuration(sessionData);

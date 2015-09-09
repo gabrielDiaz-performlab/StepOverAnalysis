@@ -6,7 +6,7 @@ end
 
 if( plotOn)
     close all
-    figH = figure(3);
+    figH = figure;
     clf
 else
     figH = [];
@@ -62,6 +62,7 @@ end
 rightFoot_fr_XYZ = sessionData.processedData_tr(trIdx).rFoot.rbPos_mFr_xyz;
 leftFoot_fr_XYZ = sessionData.processedData_tr(trIdx).lFoot.rbPos_mFr_xyz;
 spine_fr_xyz = sessionData.processedData_tr(trIdx).spine.rbPos_mFr_xyz;
+CTS = sessionData.processedData_tr(trIdx).rFoot.rbPosSysTime_mFr_xyz;
 
 try
     % Before subtracting spine position, get height
@@ -83,14 +84,9 @@ leftFoot_fr_XYZ = leftFoot_fr_XYZ - spine_fr_xyz;
 % timeElapsed_fr = [1/60 diff(trialData.frameTime_fr)];
 
 meanFrameDur = sessionData.expInfo.meanFrameDur;
-meanFrameRate = sessionData.expInfo.meanFrameRate;
 
-%frameRate = mean(diff(sessionData.processedData_tr(1).frameTime_fr));
-%meanFrameRate = 1/frameRate ;
-
-rAnkVelY = [0 diff(rightFoot_fr_XYZ(:,2))'] ./ meanFrameRate;
-lAnkVelY = [0 diff(leftFoot_fr_XYZ(:,2))'] ./ meanFrameRate;
-
+rAnkVelY = [0 diff(rightFoot_fr_XYZ(:,2))'] ./ [0 diff(CTS)'];
+lAnkVelY = [0 diff(leftFoot_fr_XYZ(:,2))'] ./ [0 diff(CTS)'];
 
 %% Find frames when foot is under a height threshold
 
@@ -102,9 +98,12 @@ rFootUnderHeightThresh_idx = find( rFootHeight_fr < footHeightThresh);
 
 %% Find zero crossings of foot velocity, with direction (e.g. neg to pos)
 
+keyboard
+
 x = diff(sign(rAnkVelY));
 rAnkVelY_upIdx = find(x >0) +1;
 rAnkVelY_downIdx= find(x <0) +1;
+
 rUpIter = 1;
 rDownIter = 1;
 
@@ -432,9 +431,7 @@ sessionData.dependentMeasures_tr(trIdx).rFoot = struct;
 sessionData.dependentMeasures_tr(trIdx).lFoot = struct;
 
 sessionData.dependentMeasures_tr(trIdx).rFoot.toeOff_idx = rTO;
-sessionData.dependentMeasures_tr(trIdx).rFoot.heelStrike_idx = rHS;
+sessionData.dependentMeasures_tr(trIdx).rFoot.heelStrike_idx = rHS; 
 
 sessionData.dependentMeasures_tr(trIdx).lFoot.toeOff_idx = lTO;
 sessionData.dependentMeasures_tr(trIdx).lFoot.heelStrike_idx = lHS;
-
-

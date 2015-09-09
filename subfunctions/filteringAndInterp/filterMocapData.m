@@ -1,7 +1,6 @@
-function [sessionData figH] = filterMocapData(sessionData, plotOn)
+function [sessionData, figH] = filterMocapData(sessionData, plotOn)
 
 loadParameters
-
 
 if(sum(strcmp(fieldnames(sessionData),'processedData_tr'))==0)
    fprintf('Must run interpolateMocapData.m prior to filterMocapData.m \n')
