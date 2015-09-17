@@ -5,12 +5,14 @@ loadParameters
 expTextFileName = ['exp' dataFileList{sessionNumber}];
 mocapTextFileName = ['mocap' dataFileList{sessionNumber}];
 sessionFileName = ['session' dataFileList{sessionNumber}];
-
 textFilePath = ['data/raw/' expTextFileName '.txt'];
-
 parsedTextPath  = [ parsedTextFileDir 'parsed' dataFileList{sessionNumber} '.mat'];
-
 sessionFilePath = [ sessionFileDir sessionFileName '.mat'];
+
+%ETG data
+etgFilePath = [pwd '\data\ETG data\' ETG_dataFileList{sessionNumber}];
+
+[ETG_T,audioData,Fs] = loadEyeTracker(etgFilePath);
 
 %moreParsedTextPath  = [ moreParsedTextFileDir textFileName '-parsed.mat'];
 
@@ -49,12 +51,14 @@ else
     
     sessionData = createSessionStruct(parsedTextPath);
     
+    sessionData = findTemporalSpikes(sessionData, audioData, fAudio, Fs, 1);
+    sessionData = processEyeTracker(sessionData, ETG_T);
     sessionData.expInfo.fileID = dataFileList{sessionNumber};
-    sessionData.expInfo.numConditions = numConditions ;
-    sessionData.expInfo.numObsHeights = numObsHeights ;
+    sessionData.expInfo.numConditions = numConditions;
+    sessionData.expInfo.numObsHeights = numObsHeights;
+    
     %FIXME:  add leg length
-    %sessionData.expInfo.legLength = sessionData.expInfo.obstacleHeights(1) ./ sessionData.expInfo.obsHeightRatios(1);
-    sessionData.expInfo
+    %sessionData.expInfo.legLength = sessionData.expInfo.obstacleHeights(1) ./ sessionData.expInfo.obsHeightRatios(1)
     
     save( sessionFilePath,'sessionData')
     fprintf ('Session struct created from .mat file and saved\n' )

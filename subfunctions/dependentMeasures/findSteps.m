@@ -98,8 +98,6 @@ rFootUnderHeightThresh_idx = find( rFootHeight_fr < footHeightThresh);
 
 %% Find zero crossings of foot velocity, with direction (e.g. neg to pos)
 
-keyboard
-
 x = diff(sign(rAnkVelY));
 rAnkVelY_upIdx = find(x >0) +1;
 rAnkVelY_downIdx= find(x <0) +1;
@@ -328,7 +326,7 @@ end
 if plotOn == 1
     
     %%
-    figure(3);
+%     figure;
     
     %     subplot(211);
     %     hold on
@@ -419,8 +417,8 @@ if plotOn == 1
     end
     
     figDir = sprintf('outputFigures/StepFigs/%s/',sessionData.expInfo.fileID);
-    [junk junk] = mkdir(figDir );
-    set(3,'Units','Normalized','Position',[0.0923611111111111 0.21 0.565972222222222 0.674444444444444]);
+    [junk, junk] = mkdir(figDir );
+%     set(gca,'Units','Normalized','Position',[0.0923611111111111 0.21 0.565972222222222 0.674444444444444]);
     saveas(figH,sprintf('%s%u.pdf',figDir,trIdx));
     
     %waitforbuttonpress

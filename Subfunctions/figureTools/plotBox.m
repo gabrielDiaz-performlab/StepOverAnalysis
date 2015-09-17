@@ -20,8 +20,8 @@ rotVert_vIdx_XYZ = zeros(size(unRotVert_vIdx_XYZ));
 for vIdx = 1:size(unRotVert_vIdx_XYZ,1)
     
     vert = unRotVert_vIdx_XYZ(vIdx,:);
-    virtDir = boxRot_d1_d2(1:3,1:3) * vert';
-    rotVert_vIdx_XYZ(vIdx,:) = boxPos_XYZ + virtDir;
+    virtDir = boxRot_d1_d2(1:3,1:3) * vert'; 
+    rotVert_vIdx_XYZ(vIdx,:) = boxPos_XYZ + virtDir';
     
 end
 

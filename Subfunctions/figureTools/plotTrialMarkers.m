@@ -13,6 +13,7 @@ hold on
 plotMarkersFromRigid(trialData.rFoot.mkrPos_mIdx_Cfr_xyz,'r')
 plotMarkersFromRigid(trialData.lFoot.mkrPos_mIdx_Cfr_xyz,'b')
 plotMarkersFromRigid(trialData.glasses.mkrPos_mIdx_Cfr_xyz,'k')
+plotMarkersFromRigid(trialData.spine.mkrPos_mIdx_Cfr_xyz,'g');
 
 %% Plot obstacle
 plotObs(sessionData,trialNum,'c')
@@ -33,6 +34,5 @@ ylabel('Y (m)','FontWeight','bold','FontSize',12,'FontName','Arial');
 zlabel('Z (m)','FontWeight','bold','FontSize',12,'FontName','Arial');
 
 %%
-
 
 set(gcf,'position',[0,350,950,450])

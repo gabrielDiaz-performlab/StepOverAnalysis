@@ -15,6 +15,10 @@ for i = 1:sessionData.expInfo.numTrials
     LFoot_fr_xyz = LFoot.pos_fr_xyz; LFoot_fr_xyz = LFoot_fr_xyz(loc,:);
     RFoot_fr_xyz = RFoot.pos_fr_xyz; RFoot_fr_xyz = RFoot_fr_xyz(loc,:);
     Glasses_fr_xyz = Glasses.pos_fr_xyz; Glasses_fr_xyz = Glasses_fr_xyz(loc,:);
+    
+    LFoot_rot_xyz = LFoot.rot_fr_d1_d2; LFoot_rot_xyz = LFoot_rot_xyz(loc,:,:);
+    RFoot_rot_xyz = RFoot.rot_fr_d1_d2; RFoot_rot_xyz = RFoot_rot_xyz(loc,:,:);
+    Glasses_rot_xyz = Glasses.rot_fr_d1_d2; Glasses_rot_xyz = Glasses_rot_xyz(loc,:,:);
            
     LFoot_rb_time = LFoot.rbPosSysTime_mFr_xyz; [LFoot_rb_time, loc1, ~] = unique(LFoot_rb_time);
     RFoot_rb_time = RFoot.rbPosSysTime_mFr_xyz; [RFoot_rb_time, loc2, ~] = unique(RFoot_rb_time);
@@ -52,42 +56,60 @@ for i = 1:sessionData.expInfo.numTrials
     % Interpolate Rigid body and Vizard values and assign values before start and end to 0
     LFoot_rb_xyz = interp1(LFoot_rb_time, LFoot_rb_xyz, CTS,'spline','extrap');
     loc = CTS > LFoot_rb_time(end) | CTS < LFoot_rb_time(1);
-    LFoot_rb_xyz(loc,:) = 0;
+    LFoot_rb_xyz(loc,:) = NaN;
 
     RFoot_rb_xyz = interp1(RFoot_rb_time, RFoot_rb_xyz, CTS,'spline','extrap');
     loc = CTS > RFoot_rb_time(end) | CTS < RFoot_rb_time(1);
-    RFoot_rb_xyz(loc,:) = 0;
+    RFoot_rb_xyz(loc,:) = NaN;
 
     Glasses_rb_xyz = interp1(Glasses_rb_time, Glasses_rb_xyz, CTS,'spline','extrap');
     loc = CTS > Glasses_rb_time(end) | CTS < Glasses_rb_time(1);
-    Glasses_rb_xyz(loc,:) = 0;
+    Glasses_rb_xyz(loc,:) = NaN;
 
     Spine_rb_xyz = interp1(Spine_rb_time, Spine_rb_xyz, CTS,'spline','extrap');
     loc = CTS > Spine_rb_time(end) | CTS < Spine_rb_time(1);
-    Spine_rb_xyz(loc,:) = 0;
+    Spine_rb_xyz(loc,:) = NaN;
     
     LFoot_fr_xyz = interp1(fr_time, LFoot_fr_xyz, CTS,'spline','extrap');
     loc = CTS > fr_time(end) | CTS < fr_time(1);
-    LFoot_fr_xyz(loc,:) = 0;
+    LFoot_fr_xyz(loc,:) = NaN;
     
     RFoot_fr_xyz = interp1(fr_time, RFoot_fr_xyz, CTS,'spline','extrap');
     loc = CTS > fr_time(end) | CTS < fr_time(1);
-    RFoot_fr_xyz(loc,:) = 0;
+    RFoot_fr_xyz(loc,:) = NaN;
     
     Glasses_fr_xyz = interp1(fr_time, Glasses_fr_xyz, CTS,'spline','extrap');
     loc = CTS > fr_time(end) | CTS < fr_time(1);
-    Glasses_fr_xyz(loc,:) = 0;
+    Glasses_fr_xyz(loc,:) = NaN;
     
+    LFoot_rot_xyz = reshape(LFoot_rot_xyz, [length(LFoot_rot_xyz) 16]);
+    LFoot_rot_xyz = interp1(fr_time, LFoot_rot_xyz, CTS,'spline','extrap');
+    LFoot_rot_xyz = reshape(LFoot_rot_xyz, [length(LFoot_rot_xyz) 4 4]);
+    loc = CTS > fr_time(end) | CTS < fr_time(1);
+    LFoot_rot_xyz(loc,:,:) = NaN;
+    
+    RFoot_rot_xyz = reshape(RFoot_rot_xyz, [length(RFoot_rot_xyz) 16]);
+    RFoot_rot_xyz = interp1(fr_time, RFoot_rot_xyz, CTS,'spline','extrap');
+    RFoot_rot_xyz = reshape(RFoot_rot_xyz, [length(RFoot_rot_xyz) 4 4]);
+    loc = CTS > fr_time(end) | CTS < fr_time(1);
+    RFoot_rot_xyz(loc,:,:) = NaN;
+    
+    Glasses_rot_xyz = reshape(Glasses_rot_xyz, [length(Glasses_rot_xyz) 16]);
+    Glasses_rot_xyz = interp1(fr_time, Glasses_rot_xyz, CTS,'spline','extrap');
+    Glasses_rot_xyz = reshape(Glasses_rot_xyz, [length(Glasses_rot_xyz) 4 4]);
+    loc = CTS > fr_time(end) | CTS < fr_time(1);
+    Glasses_rot_xyz(loc,:,:) = NaN;
+       
 %     Spine_fr_xyz = interp1(fr_time, Spine_fr_xyz, CTS,'spline','extrap');
 %     loc = CTS > fr_time(end) | CTS < fr_time(1);
-%     Spine_fr_xyz(loc,:) = 0;
+%     Spine_fr_xyz(loc,:) = NaN;
 
     % Interpolate LFoot Marker data & Assign time stamp
     for j = 1:length(LFoot_mkr_xyz)
        [mkr_TS,loc,~] = unique(LFoot.mkrSysTime_mIdx_Cfr{j}); mkr_TS = mkr_TS - fTS;
        temp = interp1(mkr_TS, LFoot_mkr_xyz{j}(loc,:), CTS,'spline','extrap'); 
        loc = CTS > mkr_TS(end) | CTS < mkr_TS(1);
-       temp(loc,:) = 0;
+       temp(loc,:) = NaN;
        LFoot_mkr_xyz{j} = temp; 
        LFoot.mkrSysTime_mIdx_Cfr{j} = CTS;
     end
@@ -97,7 +119,7 @@ for i = 1:sessionData.expInfo.numTrials
        [mkr_TS,loc,~] = unique(RFoot.mkrSysTime_mIdx_Cfr{j}); mkr_TS = mkr_TS - fTS;
        temp = interp1(mkr_TS, RFoot_mkr_xyz{j}(loc,:), CTS,'spline','extrap'); 
        loc = CTS > mkr_TS(end) | CTS < mkr_TS(1);
-       temp(loc,:) = 0;
+       temp(loc,:) = NaN;
        RFoot_mkr_xyz{j} = temp; 
        RFoot.mkrSysTime_mIdx_Cfr{j} = CTS;
     end
@@ -107,7 +129,7 @@ for i = 1:sessionData.expInfo.numTrials
        [mkr_TS,loc,~] = unique(Glasses.mkrSysTime_mIdx_Cfr{j}); mkr_TS = mkr_TS - fTS;
        temp = interp1(mkr_TS, Glasses_mkr_xyz{j}(loc,:), CTS,'spline','extrap'); 
        loc = CTS > mkr_TS(end) | CTS < mkr_TS(1);
-       temp(loc,:) = 0;
+       temp(loc,:) = NaN;
        Glasses_mkr_xyz{j} = temp;
        Glasses.mkrSysTime_mIdx_Cfr{j} = CTS;
     end
@@ -117,7 +139,7 @@ for i = 1:sessionData.expInfo.numTrials
        [mkr_TS,loc,~] = unique(Spine.mkrSysTime_mIdx_Cfr{j}); mkr_TS = mkr_TS - fTS;
        temp = interp1(mkr_TS, Spine_mkr_xyz{j}(loc,:), CTS,'spline','extrap'); 
        loc = CTS > mkr_TS(end) | CTS < mkr_TS(1);
-       temp(loc,:) = 0;
+       temp(loc,:) = NaN;
        Spine_mkr_xyz{j} = temp;
        Spine.mkrSysTime_mIdx_Cfr{j} = CTS;
     end
@@ -147,6 +169,10 @@ for i = 1:sessionData.expInfo.numTrials
     Glasses.pos_fr_xyz = Glasses_fr_xyz;
 %     Spine.pos_fr_xyz = Spine_fr_xyz;
     
+    LFoot.rot_fr_d1_d2 = LFoot_rot_xyz;
+    RFoot.rot_fr_d1_d2 = RFoot_rot_xyz;
+    Glasses.rot_fr_d1_d2 = Glasses_rot_xyz;
+
     % Commit changes into sessionData
     sessionData.rawData_tr(i).lFoot = LFoot;
     sessionData.rawData_tr(i).rFoot = RFoot;

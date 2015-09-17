@@ -31,7 +31,7 @@
 %%%%% 
 
 %%
-
+clc
 clear all
 close all
 
@@ -69,44 +69,17 @@ sessionData = checkForExclusions(sessionData);
 
 sessionData = synchronizeData(sessionData);
 
-DisplaySessionData(sessionData, 2, 1, 'processedData_tr', 1) % rawData_tr -> view raw data; processedData_tr -> view processed data
+% DisplaySessionData(sessionData, 2, 1, 'processedData_tr', 1) % rawData_tr -> view raw data; processedData_tr -> view processed data
+
+%% Add Eye tracker information
+% sessionData = loadEyeTracker(sessionData, '');
 
 %% filter
 
 sessionData = calculateSamplingRate(sessionData);
+sessionData = filterData(sessionData);
 
-% sessionData = filterMocapData(sessionData, 0);
-%% My filter trial
-
-signal1 = sessionData.processedData_tr(1).rFoot.rbPos_mFr_xyz;  
-fft_signal1(:,1) = fftshift(fft(signal1(:,1)));
-fft_signal1(:,2) = fftshift(fft(signal1(:,2)));
-fft_signal1(:,3) = fftshift(fft(signal1(:,3)));
-
-figure;
-subplot(2,3,1);plot(signal1(:,1))
-subplot(2,3,2);plot(signal1(:,2))
-subplot(2,3,3);plot(signal1(:,3))
-subplot(2,3,4);plot(log(abs(fft_signal1(:,1))))
-subplot(2,3,5);plot(log(abs(fft_signal1(:,2))))
-subplot(2,3,6);plot(log(abs(fft_signal1(:,3))))
- 
-gauss_win = gausswin(100); gauss_win = gauss_win / sum(gauss_win);
-signal2(:,1) = conv(signal1(:,1),gauss_win,'same');
-signal2(:,2) = conv(signal1(:,2),gauss_win,'same');
-signal2(:,3) = conv(signal1(:,3),gauss_win,'same');
-
-fft_signal1_proc(:,1) = fftshift(fft(signal2(:,1)));
-fft_signal1_proc(:,2) = fftshift(fft(signal2(:,2)));
-fft_signal1_proc(:,3) = fftshift(fft(signal2(:,3)));
-
-figure;
-subplot(2,3,1);plot(signal2(:,1))
-subplot(2,3,2);plot(signal2(:,2))
-subplot(2,3,3);plot(signal2(:,3))
-subplot(2,3,4);plot(log(abs(fft_signal1_proc(:,1))))
-subplot(2,3,5);plot(log(abs(fft_signal1_proc(:,2))))
-subplot(2,3,6);plot(log(abs(fft_signal1_proc(:,3))))
+% DisplaySessionData(sessionData, 2, 1, 'processedData_tr', 1) % rawData_tr -> view raw data; processedData_tr -> view processed data
 
 %%
 sessionData = avgTrialDuration(sessionData);
@@ -117,7 +90,7 @@ display(['Mean trial duration:' num2str(sessionData.expInfo.meanTrialDuration)])
 for trIdx = 1:numel(sessionData.rawData_tr)
     
 %     [ sessionData ] = calcMeanRigidBodyPos(sessionData, trIdx);
-    [ sessionData ] = findSteps(sessionData, trIdx, 0);
+    [ sessionData ] = findSteps(sessionData, trIdx, 1);
     [ sessionData ] = findFootCrossing(sessionData, trIdx);
     [ sessionData ] = stepLengthAndDur(sessionData,trIdx);
     [ sessionData ] = stepLengthAndDurASO(sessionData,trIdx);
@@ -131,49 +104,10 @@ for trIdx = 1:numel(sessionData.rawData_tr)
     
 end
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Plot body scaled
+%% Plot functions for a Trial
 
-% figure(1010)
-% hold on
-% cla
-% set(1010,'Units','Normalized','Position',[0.118055555555556 0.235555555555556 0.829166666666667 0.65]);
-% title({'lead foot position','in units of leg length','for 1 obstacle height'})
-% 
-% for hIdx = 1:3
-%     
-%     trIdxList = find([sessionData.rawData_tr.trialType] == hIdx);
-%     trIdxList = [trIdxList  find([sessionData.rawData_tr.trialType] == hIdx+3)];
-%         
-%     for trIdx = 1:numel(trIdxList)
-%         
-%         trNum = trIdxList(trIdx);
-%         
-%         if( strcmp( sessionData.dependentMeasures_tr(trNum).firstCrossingFoot, 'Left' ) )
-%             
-%             leadFoot_fr_XYZ = sessionData.processedData_tr(trIdxList(trIdx)).lFootBS_fr_XYZ;
-%         else
-%             leadFoot_fr_XYZ = sessionData.processedData_tr(trIdxList(trIdx)).rFootBS_fr_XYZ;
-%         end
-%         
-%         X = repmat(trIdx,1,length(leadFoot_fr_XYZ ));
-%         Y = leadFoot_fr_XYZ(:,2);
-%         Z = leadFoot_fr_XYZ(:,3);
-%         plot3(X,Y,Z)
-%         
-%     end
-% end
-
-
-%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Some methods for plotting a trial
-
-plotTrialMarkers(sessionData,5);
-% plotTrialRigid(sessionData,3) % I don't see the point of this function.
-% Commented it out.
+plotTrialMarkers(sessionData,2);
+plotTrialRigid(sessionData,3)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -191,7 +125,7 @@ plotTrialMarkers(sessionData,5);
 % showIndividualTrials= 1;
 % sessionFigH = struct;
 % 
-% [sessionData sessionFigH ] = calculateSSandPlot(sessionData,removeOutliers,showIndividualTrials)
+% [sessionData, sessionFigH ] = calculateSSandPlot(sessionData,removeOutliers,showIndividualTrials);
 % 
 % %%  Save figures
 % 
