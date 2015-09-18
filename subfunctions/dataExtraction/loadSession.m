@@ -51,7 +51,7 @@ else
     
     sessionData = createSessionStruct(parsedTextPath);
     
-    sessionData = findTemporalSpikes(sessionData, audioData, fAudio, Fs, 1);
+    sessionData = findTemporalSpikes(sessionData, audioData, fAudio, Fs, 1, 0.5);
     sessionData = processEyeTracker(sessionData, ETG_T);
     sessionData.expInfo.fileID = dataFileList{sessionNumber};
     sessionData.expInfo.numConditions = numConditions;
