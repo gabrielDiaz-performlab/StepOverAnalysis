@@ -14,6 +14,8 @@ etgFilePath = [pwd '\data\ETG data\' ETG_dataFileList{sessionNumber}];
 
 [ETG_T,audioData,Fs] = loadEyeTracker(etgFilePath);
 
+len_audioData_s = length(audioData)/Fs;
+
 %moreParsedTextPath  = [ moreParsedTextFileDir textFileName '-parsed.mat'];
 
 %% Attempt to load sessionData file
@@ -51,8 +53,9 @@ else
     
     sessionData = createSessionStruct(parsedTextPath);
     
-    sessionData = findTemporalSpikes(sessionData, audioData, fAudio, Fs, 1, 0.5);
-    sessionData = processEyeTracker(sessionData, ETG_T);
+    sessionData = findTemporalSpikes(sessionData, audioData, fAudio, Fs, beep_Dur, 1);
+    
+    sessionData = processEyeTracker(sessionData, ETG_T, len_audioData_s);
     sessionData.expInfo.fileID = dataFileList{sessionNumber};
     sessionData.expInfo.numConditions = numConditions;
     sessionData.expInfo.numObsHeights = numObsHeights;

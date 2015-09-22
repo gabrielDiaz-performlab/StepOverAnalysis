@@ -13,7 +13,7 @@ for i = 1:length(D)
            ETG_T = readtable([ETG_FilePath '\ExportData\' D_1(end).name]);
        end    
        
-   elseif isempty(strfind(D(i).name, 'ExportedData')) && ~strcmp(D(i).name,'.') && ~strcmp(D(i).name,'..') && isdir(D(i).name)
+   elseif isempty(strfind(D(i).name, 'ExportData')) && ~strcmp(D(i).name,'.') && ~strcmp(D(i).name,'..') && isdir(D(i).name)
        
         D_1 = dir([ETG_FilePath '\' D(i).name]);
         
