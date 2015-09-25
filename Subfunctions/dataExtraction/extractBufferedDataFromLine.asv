@@ -23,12 +23,11 @@ sysTime_fr = []
 % B/C Mocap Framerate is higher than vizard refresh
 % THere are more mocap frames than standard vizard frames
 sysTime_mFr_xyz = NaN;
-data_mFr_xyz = NaN(1,3);
+data_mFr_xyz = NaN(numMFrames,3);
 
 %for mFrIdx = 1:numMFrames
     
 [timeXYZ currentIndex]= textscan( currentLine(currentIndex:length(currentLine)), '[ %f %f %f %f ]' );
-keyboard
 sysTime_mFr(mFrIdx) = timeXYZ(1);
 data_mFr_xyz(mFrIdx,:) = timeXYZ(2:4);
     

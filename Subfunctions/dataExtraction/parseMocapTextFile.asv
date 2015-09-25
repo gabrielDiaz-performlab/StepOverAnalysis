@@ -115,7 +115,6 @@ while ~feof(fid)
         gFr = 1;
         rfFr = 1;
         lfFr = 1;
-        sFr = 1;
         continue
     end
     
@@ -142,7 +141,7 @@ while ~feof(fid)
         glassesMData_fr_mkr(gFr,4,:) = glassesM3_xyz;
         glassesMData_fr_mkr(gFr,5,:) = glassesM4_xyz;
         
-        [glassRbSysTime, glassRbPos_xyz, glassRbQuatSysTime, glassRbQuat_xyzw] = ...
+        [glassRbSysTime glassRbPos_xyz glassRbQuatSysTime glassRbQuat_xyzw] = ...
             getBufferedRigidData(currentLine, 'shutterGlass.rb');
         
         glassRbSysTime_fr(gFr) = glassRbSysTime;
@@ -172,7 +171,7 @@ while ~feof(fid)
         rFootMData_fr_mkr(rfFr,3,:) = rFootM2_xyz;
         rFootMData_fr_mkr(rfFr,4,:) = rFootM3_xyz;
         
-        [rFootRbSysTime, rFootRbPos_xyz, rFootRbQuatSysTime, rFootRbQuat_xyzw] = ...
+        [rFootRbSysTime rFootRbPos_xyz rFootRbQuatSysTime rFootRbQuat_xyzw] = ...
             getBufferedRigidData(currentLine, 'rightFoot.rb');
         
         rFootRbSysTime_fr(rfFr) = rFootRbSysTime;
@@ -183,62 +182,32 @@ while ~feof(fid)
         rfFr = rfFr +1; % a unique frame counte fo the glasses rigid body    
      end
      
-     %% Left Foot
      if( strfind( currentLine, 'left' ) )
        
-        [lFootM0time, lFootM0_xyz] = getBufferedMarkerData(currentLine, 'leftFoot.rb', 9);
-        [lFootM1time, lFootM1_xyz] = getBufferedMarkerData(currentLine, 'leftFoot.rb', 10);
-        [lFootM2time, lFootM2_xyz] = getBufferedMarkerData(currentLine, 'leftFoot.rb', 11);
-        [lFootM3time, lFootM3_xyz] = getBufferedMarkerData(currentLine, 'leftFoot.rb', 12);
+        [lFootM0time, lFootM0_xyz] = getBufferedMarkerData(currentLine, 'leftFoot.rb', 5);
+        [lFootM1time, lFootM1_xyz] = getBufferedMarkerData(currentLine, 'leftFoot.rb', 6);
+        [lFootM2time, lFootM2_xyz] = getBufferedMarkerData(currentLine, 'leftFoot.rb', 7);
+        [lFootM3time, lFootM3_xyz] = getBufferedMarkerData(currentLine, 'leftFoot.rb', 8);
         
-        lFootSysTime_fr_mkr(lfFr,1) = lFootM0time;
-        lFootSysTime_fr_mkr(lfFr,2) = lFootM1time;
-        lFootSysTime_fr_mkr(lfFr,3) = lFootM2time;
-        lFootSysTime_fr_mkr(lfFr,4) = lFootM3time;
+        lFootSysTime_fr_mkr(rfFr,1) = lFootM0time;
+        lFootSysTime_fr_mkr(rfFr,2) = lFootM1time;
+        lFootSysTime_fr_mkr(rfFr,3) = lFootM2time;
+        lFootSysTime_fr_mkr(rfFr,4) = lFootM3time;
 
-        lFootMData_fr_mkr(lfFr,1,:) = lFootM0_xyz;
-        lFootMData_fr_mkr(lfFr,2,:) = lFootM1_xyz;
-        lFootMData_fr_mkr(lfFr,3,:) = lFootM2_xyz;
-        lFootMData_fr_mkr(lfFr,4,:) = lFootM3_xyz;
+        lFootMData_fr_mkr(rfFr,1,:) = lFootM0_xyz;
+        lFootMData_fr_mkr(rfFr,2,:) = lFootM1_xyz;
+        lFootMData_fr_mkr(rfFr,3,:) = lFootM2_xyz;
+        lFootMData_fr_mkr(rfFr,4,:) = lFootM3_xyz;
         
-        [lFootRbSysTime, lFootRbPos_xyz, lFootRbQuatSysTime, lFootRbQuat_xyzw] = ...
-            getBufferedRigidData(currentLine, 'leftFoot.rb');
+        [lFootRbSysTime lFootRbPos_xyz lFootRbQuatSysTime lFootRbQuat_xyzw] = ...
+            getBufferedRigidData(currentLine, 'rightFoot.rb');
         
-        lFootRbSysTime_fr(lfFr) = lFootRbSysTime;
-        lFootRbPos_fr_xyz(lfFr,:) = lFootRbPos_xyz;
-        lFootRbQuatSysTime_fr(lfFr) = lFootRbQuatSysTime;
-        lFootRbQuat_fr_xyzw(lfFr,:) = lFootRbQuat_xyzw;
+        lFootRbSysTime_fr(rfFr) = lFootRbSysTime;
+        lFootRbPos_fr_xyz(rfFr,:) = lFootRbPos_xyz;
+        lFootRbQuatSysTime_fr(rfFr) = lFootRbQuatSysTime;
+        lFootRbQuat_fr_xyzw(rfFr,:) = lFootRbQuat_xyzw;
         
-        lfFr = lfFr +1; % a unique frame counte fo the glasses rigid body    
-     end
-     
-     %% Spine
-      if( strfind( currentLine, 'spine' ) )
-       
-        [spineM0time, spineM0_xyz] = getBufferedMarkerData(currentLine, 'spine.rb', 13);
-        [spineM1time, spineM1_xyz] = getBufferedMarkerData(currentLine, 'spine.rb', 14);
-        [spineM2time, spineM2_xyz] = getBufferedMarkerData(currentLine, 'spine.rb', 15);
-        [spineM3time, spineM3_xyz] = getBufferedMarkerData(currentLine, 'spine.rb', 16);
-        
-        spineSysTime_fr_mkr(sFr,1) = spineM0time;
-        spineSysTime_fr_mkr(sFr,2) = spineM1time;
-        spineSysTime_fr_mkr(sFr,3) = spineM2time;
-        spineSysTime_fr_mkr(sFr,4) = spineM3time;
-
-        spineMData_fr_mkr(sFr,1,:) = spineM0_xyz;
-        spineMData_fr_mkr(sFr,2,:) = spineM1_xyz;
-        spineMData_fr_mkr(sFr,3,:) = spineM2_xyz;
-        spineMData_fr_mkr(sFr,4,:) = spineM3_xyz;
-        
-        [spineRbSysTime, spineRbPos_xyz, spineRbQuatSysTime, spineRbQuat_xyzw] = ...
-            getBufferedRigidData(currentLine, 'spine.rb');
-        
-        spineRbSysTime_fr(sFr) = spineRbSysTime;
-        spineRbPos_fr_xyz(sFr,:) = spineRbPos_xyz;
-        spineRbQuatSysTime_fr(sFr) = spineRbQuatSysTime;
-        spineRbQuat_fr_xyzw(sFr,:) = spineRbQuat_xyzw;
-        
-        sFr = sFr +1; % a unique frame counte fo the glasses rigid body    
+        rfFr = rfFr +1; % a unique frame counte fo the glasses rigid body    
      end
      
     
