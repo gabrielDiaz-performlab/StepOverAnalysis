@@ -36,7 +36,6 @@ else
         load(parsedTextPath)
         fprintf('Loaded struct version of text data from %s\n',parsedTextFileDir  )
     else
-        
         %% Load parsed text file
         
         %fprintf('.mat File Not Found Parsing The TextFile %s\n', textFileName);

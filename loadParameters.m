@@ -17,11 +17,11 @@ clear junk
 %Ensure that the walking data and ETG data are added appropriately
 
 dataFileList = {...
-    '_data-2015-9-22-16-37'...
+    '_data-2015-10-1-17-26'...
     };
 
 ETG_dataFileList = {...
-    'Trial 22-09-2015 16 34 07'...
+    'AudioCheck 01-10-2015 17 20 32'...
     };
 
 % Step detection findSteps.m
@@ -67,8 +67,8 @@ footSize_LWH = [.25 .1 .07];
 
 %% Audio information
 
-fAudio = 523.25; %C in the middle of treble clef
-beep_Dur = 0.5;
+fAudio = 2093; 
+beep_Dur = 0.25;
 
 %% Figure colors / linestyles
 

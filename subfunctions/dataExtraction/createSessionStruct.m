@@ -79,6 +79,7 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
         subIsWalkingUpAxis = ~isWalkingDownAxis_tr(trIdx); 
         info.subIsWalkingUpAxis = subIsWalkingUpAxis;
         
+        
         info.type = trialType_tr(trIdx); 
         info.block = blockIndex_tr(trIdx);
 

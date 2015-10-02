@@ -67,9 +67,11 @@ sessionData =  loadSession(sessionNumber);
 
 sessionData = checkForExclusions(sessionData);
 
+keyboard
+
 sessionData = synchronizeData(sessionData);
 
-% DisplaySessionData(sessionData, 2, 1, 'processedData_tr', 1) % rawData_tr -> view raw data; processedData_tr -> view processed data
+DisplaySessionData(sessionData, 2, 1, 'rawData_tr', 1) % rawData_tr -> view raw data; processedData_tr -> view processed data
 
 %% Add Eye tracker information
 % sessionData = loadEyeTracker(sessionData, '');

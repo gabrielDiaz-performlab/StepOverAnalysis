@@ -38,7 +38,7 @@ for trIdx = 1:sessionData.expInfo.numTrials
         % That is:  although other markers moved > .5*obstacle distance,
         % the markers 'left behind' did not
         distToObs = sessionData.rawData_tr(trIdx).obs.pos_xyz(2);
-        leftBehind_cIdx= find( totalYDisp_cIdx < distToObs/2 ) ;
+        leftBehind_cIdx = find( totalYDisp_cIdx < distToObs/2 ) ;
         
         numMarkersLeftBehind = sum(leftBehind_cIdx);
         
@@ -47,6 +47,7 @@ for trIdx = 1:sessionData.expInfo.numTrials
         
         if( numMarkersLeftBehind > 2 )
             
+                       
             % Omit trial
             sessionData.rawData_tr(trIdx).info.excludeTrial = 1;
             excludeMessage = sprintf('checkForExclusions: found >2 markers left behind');
@@ -61,7 +62,7 @@ for trIdx = 1:sessionData.expInfo.numTrials
             
             % Replace session data with edited data
             
-            mYData_fr_mIdx{find(leftBehind_cIdx)} = NaN;
+            mYData_fr_mIdx{leftBehind_cIdx} = NaN;
             
             data_cFr_mkr_XYZ{cIdx} = mYData_fr_mIdx;
             

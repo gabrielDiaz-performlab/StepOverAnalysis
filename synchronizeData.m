@@ -3,7 +3,7 @@ function sessionData = synchronizeData(sessionData)
 sessionData.rawData = sessionData.rawData_tr;
 
 for i = 1:sessionData.expInfo.numTrials
-    
+
     fr_time = sessionData.rawData_tr(i).info.sysTime_fr; 
     [fr_time,loc,~] = unique(fr_time);
           
@@ -50,7 +50,7 @@ for i = 1:sessionData.expInfo.numTrials
     Glasses_rb_time = Glasses_rb_time - fTS; Glasses_mkr_time = Glasses_mkr_time - fTS;
     Spine_rb_time = Spine_rb_time - fTS; Spine_mkr_time = Spine_mkr_time - fTS;
     
-    CTS = unique([LFoot_rb_time; RFoot_rb_time; Glasses_rb_time; Spine_rb_time; fr_time;...
+    CTS = unique([LFoot_rb_time'; RFoot_rb_time'; Glasses_rb_time'; Spine_rb_time'; fr_time;...
         LFoot_mkr_time; RFoot_mkr_time; Glasses_mkr_time; Spine_mkr_time]);    
                
     % Interpolate Rigid body and Vizard values and assign values before start and end to 0
@@ -103,6 +103,8 @@ for i = 1:sessionData.expInfo.numTrials
 %     Spine_fr_xyz = interp1(fr_time, Spine_fr_xyz, CTS,'spline','extrap');
 %     loc = CTS > fr_time(end) | CTS < fr_time(1);
 %     Spine_fr_xyz(loc,:) = NaN;
+
+keyboard
 
     % Interpolate LFoot Marker data & Assign time stamp
     for j = 1:length(LFoot_mkr_xyz)

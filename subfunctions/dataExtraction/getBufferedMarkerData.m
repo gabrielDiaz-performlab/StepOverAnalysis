@@ -1,4 +1,4 @@
-function [sysTime_mFr data_mFr_xyz] = getBufferedMarkerData(currentLine, varName, mIdx)
+function [sysTime_mFr, data_mFr_xyz] = getBufferedMarkerData(currentLine, varName, mIdx)
 
 
 
@@ -25,9 +25,10 @@ end
 
 %%
     
-[data_timeXYZ moveAheadBy]= textscan( currentLine(startIndex:length(currentLine)), '[ %f %f %f %f ]' );
+[data_timeXYZ, ~]= textscan( currentLine(startIndex:length(currentLine)), '[ %f %f %f %f ]' );
 
 sysTime_mFr = data_timeXYZ{1};
+
 % SWAPPED Y AND Z AXES
 data_mFr_xyz = [ data_timeXYZ{2} data_timeXYZ{4} data_timeXYZ{3} ];
     
