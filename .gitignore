@@ -1,3 +1,5 @@
 *.mat
 *.pdf
 *.png
+*.avi
+*.pyc
