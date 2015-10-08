@@ -44,6 +44,8 @@ tic
 
 loadParameters
 
+addpath(genpath('helperFiles'))
+
 % You just need to pass the .mat file name and the experiment Data structure will be generated
 dataFileString = sprintf('%s.mat',dataFileList{sessionNumber});
 
@@ -64,24 +66,18 @@ end
 sessionData =  loadSession(sessionNumber);
 
 %%
+% DisplaySessionData(sessionData, 2, 1, 'rawData_tr', 1) % rawData_tr -> view raw data; processedData_tr -> view processed data
 
 sessionData = checkForExclusions(sessionData);
 
-keyboard
-
 sessionData = synchronizeData(sessionData);
-
-DisplaySessionData(sessionData, 2, 1, 'rawData_tr', 1) % rawData_tr -> view raw data; processedData_tr -> view processed data
-
-%% Add Eye tracker information
-% sessionData = loadEyeTracker(sessionData, '');
 
 %% filter
 
 sessionData = calculateSamplingRate(sessionData);
 sessionData = filterData(sessionData);
 
-% DisplaySessionData(sessionData, 2, 1, 'processedData_tr', 1) % rawData_tr -> view raw data; processedData_tr -> view processed data
+DisplaySessionData(sessionData, 3, 1, 'processedData_tr', 1) % rawData_tr -> view raw data; processedData_tr -> view processed data
 
 %%
 sessionData = avgTrialDuration(sessionData);
@@ -94,22 +90,33 @@ for trIdx = 1:numel(sessionData.rawData_tr)
 %     [ sessionData ] = calcMeanRigidBodyPos(sessionData, trIdx);
     [ sessionData ] = findSteps(sessionData, trIdx, 1);
     [ sessionData ] = findFootCrossing(sessionData, trIdx);
-    [ sessionData ] = stepLengthAndDur(sessionData,trIdx);
-    [ sessionData ] = stepLengthAndDurASO(sessionData,trIdx);
-    [ sessionData ] = findCOM(sessionData,trIdx);
-    [ sessionData ] = avgCOMVelocity(sessionData,trIdx);
-    [ sessionData ] = maxVelAndHeightAXS(sessionData,trIdx);
-    [ sessionData ] = findDistPlantedFootASO(sessionData,trIdx);
-    [ sessionData ] = calcObjCenteredTraj(sessionData,trIdx);
+    [ sessionData ] = stepLengthAndDur(sessionData, trIdx);
+    [ sessionData ] = stepLengthAndDurASO(sessionData, trIdx);
+    [ sessionData ] = findCOM(sessionData, trIdx);
+    [ sessionData ] = avgCOMVelocity(sessionData, trIdx);
+    [ sessionData ] = maxVelAndHeightAXS(sessionData, trIdx);
+    [ sessionData ] = findDistPlantedFootASO(sessionData, trIdx);
+    [ sessionData ] = calcObjCenteredTraj(sessionData, trIdx);
     [ sessionData ] = toeHeightAndClearanceASO(sessionData, trIdx);
-    [ sessionData ] = findMinDistanceAXS(sessionData,trIdx);
-    
+    [ sessionData ] = findMinDistanceAXS(sessionData, trIdx);  
+%     [ sessionData ] = processEyeTrackerInfo(sessionData, trIdx);
+%     [ sessionData ] = calcGVPosOnObj(sessionData, trIdx);
 end
 
+keyboard
 %% Plot functions for a Trial
 
-plotTrialMarkers(sessionData,2);
-plotTrialRigid(sessionData,3)
+close all
+trIdx = 2
+[ sessionData ] = processEyeTrackerInfo(sessionData, trIdx);
+[ sessionData ] = calcGVPosOnObj(sessionData, trIdx);
+%plotTrialMarkers(sessionData,trIdx);
+F = plotTrialRigid(sessionData,trIdx);
+
+%%
+movFig = figure;
+movie(movFig,F,1)
+movie2avi(F,'Animation.avi','compression','None');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

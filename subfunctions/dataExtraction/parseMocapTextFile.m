@@ -36,65 +36,79 @@ while ~feof(fid)
     
     currentLine = fgetl(fid);
     %fprintf('%s\n',currentLine)
-    trialNum = cell2mat(textscan( currentLine, 'Trial: %f' ));
-
-    if( strfind( currentLine, 'Trial:' ) )
+    
+    if( strfind( currentLine, 'Start:' ) )
+        
+        trialNum = cell2mat(textscan( currentLine, 'Start: %f' ));
+        gFr = 1;
+        rfFr = 1;
+        lfFr = 1;
+        sFr = 1;
+        
+        clear glassesSysTime_fr_mkr glassesMData_fr_mkr glassRbSysTime_fr glassRbPos_fr_xyz glassRbQuatSysTime_fr glassRbQuat_fr_xyzw
+        clear rFootSysTime_fr_mkr rFootMData_fr_mkr rFootRbSysTime_fr rFootRbPos_fr_xyz rFootRbQuatSysTime_fr rFootRbQuat_fr_xyzw
+        clear lFootSysTime_fr_mkr lFootMData_fr_mkr lFootRbSysTime_fr lFootRbPos_fr_xyz lFootRbQuatSysTime_fr lFootRbQuat_fr_xyzw
+        clear spineSysTime_fr_mkr spineMData_fr_mkr spineRbSysTime_fr spineRbPos_fr_xyz spineRbQuatSysTime_fr spineRbQuat_fr_xyzw
+        
+    end
+    
+    if( strfind( currentLine, 'End:' ) )
     % Starting a new trial!  Store buffered trial data in cell array of
     % trials
         % Store trial data into cell arrays
-        if trialNum > 1
+        if trialNum > 0
             
-            prevTrIdx = trialNum - 1;
+            trIdx = trialNum ;
             % Store marker time data
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %%% GLASSES
             for mIdx = 1:5
-                glassesSysTime_tr_mIdx_CmFr(prevTrIdx ,mIdx) = {glassesSysTime_fr_mkr(:,mIdx)};%(~isnan(glassesSysTime_fr_mkr(:,mIdx)))};
-                glassesMData_tr_mIdx_CmFr_xyz(prevTrIdx ,mIdx) = {squeeze(glassesMData_fr_mkr(:,mIdx,:))};%(~isnan(glassesMData_fr_mkr))};
+                glassesSysTime_tr_mIdx_CmFr(trIdx ,mIdx) = {glassesSysTime_fr_mkr(:,mIdx)};%(~isnan(glassesSysTime_fr_mkr(:,mIdx)))};
+                glassesMData_tr_mIdx_CmFr_xyz(trIdx ,mIdx) = {squeeze(glassesMData_fr_mkr(:,mIdx,:))};%(~isnan(glassesMData_fr_mkr))};
             end
             
-            glassRbSysTime_tr_CmFr(prevTrIdx) =  {glassRbSysTime_fr};%(~isnan(glassRbSysTime_fr))};
-            glassRbPos_tr_CmFr(prevTrIdx) = {glassRbPos_fr_xyz};%(~isnan(glassRbPos_fr_xyz))};
-            glassRbQuatSysTime_tr_CmFr(prevTrIdx) = {glassRbQuatSysTime_fr};%(~isnan(glassRbQuatSysTime_fr))};
-            glassRbQuat_tr_CmFr_xyz(prevTrIdx) = {glassRbQuat_fr_xyzw};%(~isnan(glassRbQuat_fr_xyzw))};
+            glassRbSysTime_tr_CmFr(trIdx) =  {glassRbSysTime_fr};%(~isnan(glassRbSysTime_fr))};
+            glassRbPos_tr_CmFr(trIdx) = {glassRbPos_fr_xyz};%(~isnan(glassRbPos_fr_xyz))};
+            glassRbQuatSysTime_tr_CmFr(trIdx) = {glassRbQuatSysTime_fr};%(~isnan(glassRbQuatSysTime_fr))};
+            glassRbQuat_tr_CmFr_xyz(trIdx) = {glassRbQuat_fr_xyzw};%(~isnan(glassRbQuat_fr_xyzw))};
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % RFOOT
             for mIdx = 1:4
-                rFootSysTime_tr_mIdx_CmFr(prevTrIdx ,mIdx) = {rFootSysTime_fr_mkr(:,mIdx)};%(~isnan(rFootSysTime_fr_mkr(:,mIdx)))};
-                rFootMData_tr_mIdx_CmFr_xyz(prevTrIdx ,mIdx) = {squeeze(rFootMData_fr_mkr(:,mIdx,:))};%(~isnan(rFootMData_fr_mkr))};
+                rFootSysTime_tr_mIdx_CmFr(trIdx ,mIdx) = {rFootSysTime_fr_mkr(:,mIdx)};%(~isnan(rFootSysTime_fr_mkr(:,mIdx)))};
+                rFootMData_tr_mIdx_CmFr_xyz(trIdx ,mIdx) = {squeeze(rFootMData_fr_mkr(:,mIdx,:))};%(~isnan(rFootMData_fr_mkr))};
             end
             
-            rFootRbSysTime_tr_CmFr(prevTrIdx) =  {rFootRbSysTime_fr};%(~isnan(rFootRbSysTime_fr))};
-            rFootRbPos_tr_CmFr(prevTrIdx) = {rFootRbPos_fr_xyz};%(~isnan(rFootRbPos_fr_xyz),:)};
-            rFootRbQuatSysTime_tr_CmFr(prevTrIdx) = {rFootRbQuatSysTime_fr}; %(~isnan(rFootRbQuatSysTime_fr))};
-            rFootRbQuat_tr_CmFr_xyz(prevTrIdx) = {rFootRbQuat_fr_xyzw}; %(~isnan(rFootRbQuat_fr_xyzw))};
+            rFootRbSysTime_tr_CmFr(trIdx) =  {rFootRbSysTime_fr};%(~isnan(rFootRbSysTime_fr))};
+            rFootRbPos_tr_CmFr(trIdx) = {rFootRbPos_fr_xyz};%(~isnan(rFootRbPos_fr_xyz),:)};
+            rFootRbQuatSysTime_tr_CmFr(trIdx) = {rFootRbQuatSysTime_fr}; %(~isnan(rFootRbQuatSysTime_fr))};
+            rFootRbQuat_tr_CmFr_xyz(trIdx) = {rFootRbQuat_fr_xyzw}; %(~isnan(rFootRbQuat_fr_xyzw))};
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % LFOOT
             for mIdx = 1:4
                 
-                lFootSysTime_tr_mIdx_CmFr(prevTrIdx ,mIdx) = {lFootSysTime_fr_mkr(:,mIdx)};%(~isnan(lFootSysTime_fr_mkr(:,mIdx)))};
-                lFootMData_tr_mIdx_CmFr_xyz(prevTrIdx ,mIdx) = {squeeze(lFootMData_fr_mkr(:,mIdx,:))};%(~isnan(lFootMData_fr_mkr))};
+                lFootSysTime_tr_mIdx_CmFr(trIdx ,mIdx) = {lFootSysTime_fr_mkr(:,mIdx)};%(~isnan(lFootSysTime_fr_mkr(:,mIdx)))};
+                lFootMData_tr_mIdx_CmFr_xyz(trIdx ,mIdx) = {squeeze(lFootMData_fr_mkr(:,mIdx,:))};%(~isnan(lFootMData_fr_mkr))};
             end
             
-            lFootRbSysTime_tr_CmFr(prevTrIdx) =  {lFootRbSysTime_fr};%(~isnan(lFootRbSysTime_fr))};
-            lFootRbPos_tr_CmFr(prevTrIdx) = {lFootRbPos_fr_xyz};%(~isnan(lFootRbPos_fr_xyz))};
-            lFootRbQuatSysTime_tr_CmFr(prevTrIdx) = {lFootRbQuatSysTime_fr};%(~isnan(lFootRbQuatSysTime_fr))};
-            lFootRbQuat_tr_CmFr_xyz(prevTrIdx) = {lFootRbQuat_fr_xyzw};%(~isnan(lFootRbQuat_fr_xyzw))};
+            lFootRbSysTime_tr_CmFr(trIdx) =  {lFootRbSysTime_fr};%(~isnan(lFootRbSysTime_fr))};
+            lFootRbPos_tr_CmFr(trIdx) = {lFootRbPos_fr_xyz};%(~isnan(lFootRbPos_fr_xyz))};
+            lFootRbQuatSysTime_tr_CmFr(trIdx) = {lFootRbQuatSysTime_fr};%(~isnan(lFootRbQuatSysTime_fr))};
+            lFootRbQuat_tr_CmFr_xyz(trIdx) = {lFootRbQuat_fr_xyzw};%(~isnan(lFootRbQuat_fr_xyzw))};
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % Spine
             for mIdx = 1:4
-                spineSysTime_tr_mIdx_CmFr(prevTrIdx ,mIdx) = {spineSysTime_fr_mkr};%(~isnan(spineSysTime_fr_mkr(:,mIdx)))};
-                spineMData_tr_mIdx_CmFr_xyz(prevTrIdx ,mIdx) = {squeeze(spineMData_fr_mkr(:,mIdx,:))};%(~isnan(spineMData_fr_mkr))};
+                spineSysTime_tr_mIdx_CmFr(trIdx ,mIdx) = {spineSysTime_fr_mkr(:,mIdx)};%(~isnan(spineSysTime_fr_mkr(:,mIdx)))};
+                spineMData_tr_mIdx_CmFr_xyz(trIdx ,mIdx) = {squeeze(spineMData_fr_mkr(:,mIdx,:))};%(~isnan(spineMData_fr_mkr))};
             end
             
-            spineRbSysTime_tr_CmFr(prevTrIdx) =  {spineRbSysTime_fr};%(~isnan(spineRbSysTime_fr))};
-            spineRbPos_tr_CmFr(prevTrIdx) = {spineRbPos_fr_xyz};%(~isnan(spineRbPos_fr_xyz))};
-            spineRbQuatSysTime_tr_CmFr(prevTrIdx) = {spineRbQuatSysTime_fr};%(~isnan(spineRbQuatSysTime_fr))};
-            spineRbQuat_tr_CmFr_xyz(prevTrIdx) = {spineRbQuat_fr_xyzw};%(~isnan(spineRbQuat_fr_xyzw))};
+            spineRbSysTime_tr_CmFr(trIdx) =  {spineRbSysTime_fr};%(~isnan(spineRbSysTime_fr))};
+            spineRbPos_tr_CmFr(trIdx) = {spineRbPos_fr_xyz};%(~isnan(spineRbPos_fr_xyz))};
+            spineRbQuatSysTime_tr_CmFr(trIdx) = {spineRbQuatSysTime_fr};%(~isnan(spineRbQuatSysTime_fr))};
+            spineRbQuat_tr_CmFr_xyz(trIdx) = {spineRbQuat_fr_xyzw};%(~isnan(spineRbQuat_fr_xyzw))};
             
         end
            
@@ -108,12 +122,10 @@ while ~feof(fid)
 %         glassRbQuatSysTime_fr = NaN(trialDur,1);
 %         glassRbQuat_fr_xyzw = NaN(trialDur,4);
         
-        gFr = 1;
-        rfFr = 1;
-        lfFr = 1;
-        sFr = 1;
+
         continue
     end
+        
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% Get FRAME data.  Save it to a trial buffer.
@@ -147,6 +159,7 @@ while ~feof(fid)
         glassRbQuat_fr_xyzw(gFr,:) = glassRbQuat_xyzw;
         
         gFr = gFr+1; % a unique frame counte fo the glasses rigid body
+        
         continue
     end
     
@@ -177,6 +190,8 @@ while ~feof(fid)
         rFootRbQuat_fr_xyzw(rfFr,:) = rFootRbQuat_xyzw;
         
         rfFr = rfFr +1; % a unique frame counte fo the glasses rigid body    
+        
+
      end
      
      %% Left Foot
@@ -205,7 +220,9 @@ while ~feof(fid)
         lFootRbQuatSysTime_fr(lfFr) = lFootRbQuatSysTime;
         lFootRbQuat_fr_xyzw(lfFr,:) = lFootRbQuat_xyzw;
         
-        lfFr = lfFr +1; % a unique frame counte fo the glasses rigid body    
+        lfFr = lfFr +1; % a unique frame counte fo the glasses rigid body   
+        
+
      end
      
      %% Spine
@@ -235,6 +252,8 @@ while ~feof(fid)
         spineRbQuat_fr_xyzw(sFr,:) = spineRbQuat_xyzw;
         
         sFr = sFr +1; % a unique frame counter for the glasses rigid body    
+        
+        
      end
      
     

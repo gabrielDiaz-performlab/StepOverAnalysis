@@ -106,9 +106,14 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
         rFoot.quat_fr_wxyz = rFootQUAT_fr_WXYZ(trialFrames ,:);
         rFoot.rot_fr_d1_d2 = quatVecToRotationMatVec(rFootQUAT_fr_WXYZ(trialFrames ,:),subIsWalkingUpAxis);
         
-        rFoot.rbPos_mFr_xyz = cell2mat(rFootRbPos_tr_CmFr(trIdx));
-        rFoot.rbPos_mFr_xyz = prepareFOR(rFoot.rbPos_mFr_xyz,subIsWalkingUpAxis,standingBoxOffset_posZ(trIdx),standingBoxOffset_negZ(trIdx));
-        rFoot.rbPosSysTime_mFr_xyz = cell2mat(rFootRbSysTime_tr_CmFr(trIdx));
+        
+        try
+            rFoot.rbPos_mFr_xyz = cell2mat(rFootRbPos_tr_CmFr(trIdx));
+            rFoot.rbPos_mFr_xyz = prepareFOR(rFoot.rbPos_mFr_xyz,subIsWalkingUpAxis,standingBoxOffset_posZ(trIdx),standingBoxOffset_negZ(trIdx));
+            rFoot.rbPosSysTime_mFr_xyz = cell2mat(rFootRbSysTime_tr_CmFr(trIdx));
+        catch
+           keyboard 
+        end
         
         rFoot.rbQuat_mFr_xyz = cell2mat(rFootRbQuat_tr_CmFr_xyz(trIdx));
         rFoot.rbQuatSysTime_mFr = cell2mat(rFootRbQuatSysTime_tr_CmFr(trIdx));
@@ -171,9 +176,9 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
         % fixed position relative to the glasses.  however, it may be
         % shifted slightly from the rbPos
         
-        glasses.pos_fr_xyz = prepareFOR(mainView_fr_XYZ(trialFrames ,:),subIsWalkingUpAxis,standingBoxOffset_posZ(trIdx),standingBoxOffset_negZ(trIdx));
-        glasses.quat_fr_wxyz = mainViewQUAT_fr_WXYZ(trialFrames ,:);
-        glasses.rot_fr_d1_d2 = quatVecToRotationMatVec(mainViewQUAT_fr_WXYZ(trialFrames ,:),subIsWalkingUpAxis);
+        glasses.pos_fr_xyz = prepareFOR(glasses_fr_XYZ(trialFrames ,:),subIsWalkingUpAxis,standingBoxOffset_posZ(trIdx),standingBoxOffset_negZ(trIdx));
+        glasses.quat_fr_wxyz = glassesQUAT_fr_WXYZ(trialFrames ,:);
+        glasses.rot_fr_d1_d2 = quatVecToRotationMatVec(glassesQUAT_fr_WXYZ(trialFrames ,:),subIsWalkingUpAxis);
         
         glasses.rbPos_mFr_xyz = cell2mat(glassRbPos_tr_CmFr(trIdx));
         glasses.rbPos_mFr_xyz = prepareFOR(glasses.rbPos_mFr_xyz,subIsWalkingUpAxis,standingBoxOffset_posZ(trIdx),standingBoxOffset_negZ(trIdx));

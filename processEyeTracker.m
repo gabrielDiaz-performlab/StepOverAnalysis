@@ -23,13 +23,15 @@ for i = 1:sessionData.expInfo.numTrials
         sessionData.rawData_tr(i).ETG.L_POR = L_POR(loc,:); 
         sessionData.rawData_tr(i).ETG.R_POR = R_POR(loc,:); 
         sessionData.rawData_tr(i).ETG.L_GVEC = L_GVEC(loc,:); 
-        sessionData.rawData_tr(i).ETG.R_GVEC = R_GVEC(loc,:);         
+        sessionData.rawData_tr(i).ETG.R_GVEC = R_GVEC(loc,:);
+        sessionData.rawData_tr(i).ETG.ETG_ts = TS(loc);
     else
         sessionData.rawData_tr(i).ETG.B_POR = NaN; 
         sessionData.rawData_tr(i).ETG.L_POR = NaN; 
         sessionData.rawData_tr(i).ETG.R_POR = NaN; 
         sessionData.rawData_tr(i).ETG.L_GVEC = NaN; 
         sessionData.rawData_tr(i).ETG.R_GVEC = NaN;     
+        sessionData.rawData_tr(i).ETG.ETG_ts = NaN;
     end
 end
 end

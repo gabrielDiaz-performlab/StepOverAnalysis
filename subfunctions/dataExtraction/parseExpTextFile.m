@@ -194,7 +194,7 @@ while ~feof(fid)
     glasses_fr_XYZ(i,:) = [ data_valIdx(1) data_valIdx(3) data_valIdx(2) ];
     
     data_valIdx = extractVarFromLine(currentLine, 'glassesQUAT_XYZW', 4);
-    glassesQUAT_fr_WXYZ(i,:) = [ -data_valIdx(4) data_valIdx(1) data_valIdx(3) data_valIdx(2) ];
+    glassesQUAT_fr_WXYZ(i,:) = [ data_valIdx(4) data_valIdx(1) data_valIdx(3) data_valIdx(2) ];
 
     %% ============= MainView visNode pos + quat
     
@@ -202,7 +202,7 @@ while ~feof(fid)
     mainView_fr_XYZ(i,:) = [ data_valIdx(1) data_valIdx(3) data_valIdx(2) ];
     
     data_valIdx = extractVarFromLine(currentLine, 'viewQUAT_XYZW', 4);
-    mainViewQUAT_fr_WXYZ(i,:) = [ -data_valIdx(4) data_valIdx(1) data_valIdx(3) data_valIdx(2) ];
+    mainViewQUAT_fr_WXYZ(i,:) = [ data_valIdx(4) data_valIdx(1) data_valIdx(3) data_valIdx(2) ];
     
     i = i+1;
 end

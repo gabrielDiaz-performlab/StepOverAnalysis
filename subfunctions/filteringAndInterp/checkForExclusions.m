@@ -103,7 +103,18 @@ for trIdx = 1:sessionData.expInfo.numTrials
         else
             display('No markers left behind')
         end
+        if sum(sessionData.rawData_tr(trIdx).info.eventFlag_fr == 8) > 0
 
+            excludeMessage = sprintf('Error found in Trial. Collision or failed number task');
+            sessionData.rawData_tr(trIdx).info.excludeTrial = 1;
+            
+            if( isempty( sessionData.rawData_tr(trIdx).info.excludeTrialExplanation) )
+                sessionData.rawData_tr(trIdx).info.excludeTrialExplanation{1} = excludeMessage;
+            else
+                sessionData.rawData_tr(trIdx).info.excludeTrialExplanation{end+1} = excludeMessage;
+            end         
+            
+        end
     end
     
     sessionData.rawData_tr(trIdx).lFoot.mkrPos_mIdx_Cfr_xyz = data_cFr_mkr_XYZ{1};

@@ -1,6 +1,7 @@
 addpath(genpath('data'));
 addpath(genpath('subFunctions'));
 addpath(genpath('figureTools'));
+addpath(genpath('AudioFunctions'))
 
 textFileDir = 'data/raw/';
 parsedTextFileDir = 'data/parsedTXT/';
@@ -17,11 +18,11 @@ clear junk
 %Ensure that the walking data and ETG data are added appropriately
 
 dataFileList = {...
-    '_data-2015-10-1-17-26'...
+    '_data-2015-10-7-18-16'...
     };
 
 ETG_dataFileList = {...
-    'AudioCheck 01-10-2015 17 20 32'...
+    'GD 07-10-2015 18 15 01'...
     };
 
 % Step detection findSteps.m
@@ -67,7 +68,7 @@ footSize_LWH = [.25 .1 .07];
 
 %% Audio information
 
-fAudio = 2093; 
+fAudio = 5000; 
 beep_Dur = 0.25;
 
 %% Figure colors / linestyles

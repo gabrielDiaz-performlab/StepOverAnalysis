@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ParticipantData>
+  <ExperimentDefinition>
+    <Version>1.1</Version>
+    <ClientVersion>2.0.0.11810</ClientVersion>
+    <ExperimentName>GabeData1 05-10-2015 16 54 16</ExperimentName>
+    <ExperimentId>d681d280-fbdd-4f24-b170-69233233b277</ExperimentId>
+    <Date>10/05/2015 16:54:34</Date>
+    <EyeCameraFirmwareVersion>10</EyeCameraFirmwareVersion>
+    <SceneCameraSoftwareVersion>20140215</SceneCameraSoftwareVersion>
+    <IsDirectGazeExperiment>False</IsDirectGazeExperiment>
+    <ExperimentSettings>
+      <DefaultCalibrationMode>Calibration1Point</DefaultCalibrationMode>
+      <IsCalibrationRequired>False</IsCalibrationRequired>
+      <IsCalibrationMandatory>True</IsCalibrationMandatory>
+      <IsCustomCalibrationModeAllowed>True</IsCustomCalibrationModeAllowed>
+      <PasswordDigestForUnlockingExperiment />
+      <FilterGazeCursorForLiveView>True</FilterGazeCursorForLiveView>
+      <DataAcquisitionWithRecodingUnit>False</DataAcquisitionWithRecodingUnit>
+      <ShowEventLog>False</ShowEventLog>
+      <CalibrationArea>960x720</CalibrationArea>
+    </ExperimentSettings>
+    <HardwareConfiguration>
+      <EyeVideoResolution>QVGA320x240</EyeVideoResolution>
+      <IsMicrophoneOn>True</IsMicrophoneOn>
+      <IsEegOn>False</IsEegOn>
+      <EyeCameraMode>Binocular</EyeCameraMode>
+      <SampleRate>60</SampleRate>
+      <SceneCameraMode>SceneMode_960x720_30FPS</SceneCameraMode>
+      <DefaultSceneCameraWhiteBalance>AutoWhiteBalance</DefaultSceneCameraWhiteBalance>
+    </HardwareConfiguration>
+    <ParticipantPropertyDefinitions />
+    <VideoOverlaySettings />
+    <AnnotationDefinition Version="1.0" />
+  </ExperimentDefinition>
+  <Version>1.1</Version>
+  <ClientVersion>2.2.190.11810</ClientVersion>
+  <ServerVersion>2.2.1.125</ServerVersion>
+  <ParticipantId>965b4636-de8b-49fa-a7ee-db59e79dfbdf</ParticipantId>
+  <SceneCameraSoftwareVersion>20140215</SceneCameraSoftwareVersion>
+  <EyeCameraFirmwareVersion>10</EyeCameraFirmwareVersion>
+  <ParticipantProperties>
+    <ParticipantProperty>
+      <Name>Name</Name>
+      <Value>1</Value>
+    </ParticipantProperty>
+    <RecordingDevice>
+      <RecordingDeviceName>ThinkPad X230</RecordingDeviceName>
+      <RecordingDeviceManucaturer>LENOVO</RecordingDeviceManucaturer>
+      <RecordingDeviceModel>2325V6K</RecordingDeviceModel>
+      <HostName>EX0874301-1346</HostName>
+      <CPU>Intel(R) Core(TM) i7-3520M CPU . 2.90GHz</CPU>
+      <CpuFamily>198</CpuFamily>
+      <CpuFrequencyMax>2901</CpuFrequencyMax>
+      <SMIOpt>True</SMIOpt>
+      <SMICert>False</SMICert>
+      <OperatingSystem>Microsoft Windows 7 Professional </OperatingSystem>
+      <OperatingSystemVersion>6.1.7601</OperatingSystemVersion>
+      <OperatingSystemArch>64-bit</OperatingSystemArch>
+      <OperatingSystemUser>EX0874301-1346.iView X</OperatingSystemUser>
+      <OperatingSystemDescription>EX0874301-1346SU</OperatingSystemDescription>
+      <OperatingSystemOrganisation>Rochester Institute of Technology</OperatingSystemOrganisation>
+      <OperatingSystemLanguage>1033</OperatingSystemLanguage>
+      <OperatingSystemSerial>55041-034-1707794-86293</OperatingSystemSerial>
+      <OperatingSystemServicePack>1.0</OperatingSystemServicePack>
+    </RecordingDevice>
+  </ParticipantProperties>
+</ParticipantData>

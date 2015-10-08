@@ -199,8 +199,7 @@ for i = 1:maxIndex
                 
                 rDownIter = rDownIter + 1;
             else
-                
-                
+                               
                 rHS = [ rHS nextRHS];
                 rDownIter = rDownIter + 1;
                 rightlookingfor = 2;

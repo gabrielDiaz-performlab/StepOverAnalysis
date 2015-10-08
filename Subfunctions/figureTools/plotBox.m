@@ -1,7 +1,9 @@
 % If handleIn is a Figure, plot a box on that figure
 % If handleIn is a Patch, update the patch
 
-function [handleOut] = plotBox(handleIn,boxPos_XYZ,boxLWH,boxRot_d1_d2,color)
+function [handleOut] = plotBox(handleIn,boxPos_XYZ,boxLWH,boxRot_d1_d2,~)
+
+color = [0 0 0;1 1 1;1 0 0;0 1 0;0 0 1;1 1 0;0 1 1;1 0 1];
 
 loadParameters
 
@@ -27,10 +29,9 @@ end
 
 my_faces = [1 2 3 4; 2 6 7 3; 4 3 7 8 ; 1 5 8 4; 1 2 6 5; 5 6 7 8];
 
-%[1 2 3 4; 2 6 7 3; 4 3 7 8; 1 5 8 4; 1 2 6 5; 5 6 7 8];
 if( isgraphics(handleIn,'Figure') )
     % Create a new box
-    handleOut = patch('Vertices', rotVert_vIdx_XYZ, 'Faces', my_faces, 'FaceColor', color);
+    handleOut = patch('Vertices', rotVert_vIdx_XYZ, 'Faces', my_faces, 'FaceVertexCData',color, 'FaceColor', 'flat','MarkerFaceColor','flat','Marker','o');
     
 elseif( isgraphics(handleIn,'Patch') )
     
