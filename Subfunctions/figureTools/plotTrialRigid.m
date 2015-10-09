@@ -57,18 +57,19 @@ camproj('orthographic')
 camva('manual') 
 camva(60)
 
-GIW = trialData.ETG.cycGIW_fr_vec;
-GIWx = trialData.ETG.cycGIWx_fr_vec;
-GIWy = trialData.ETG.cycGIWy_fr_vec;
-GIWz = trialData.ETG.cycGIWz_fr_vec;
+% GIW = trialData.ETG.cycGIW_fr_vec;
+% GIWx = trialData.ETG.cycGIWx_fr_vec;
+% GIWy = trialData.ETG.cycGIWy_fr_vec;
+% GIWz = trialData.ETG.cycGIWz_fr_vec;
 
 headPos = trialData.glasses.rbPos_mFr_xyz;
 
 % gazePoint = headPos + GIW*1.5;
-gazePointx = headPos + GIWx*0.5;
-gazePointy = headPos + GIWy*0.5;
-gazePointz = headPos + GIWz*0.5;
-gazePoint = trialData.ETG.GVPosOnObj;
+% gazePointx = headPos + GIWx*0.5;
+% gazePointy = headPos + GIWy*0.5;
+% gazePointz = headPos + GIWz*0.5;
+gazePoint = trialData.ETG.GVPosOnPlane_fr;
+closestPointOnObj = trialData.ETG.closestPtOnObj_fr;
 
 frIdx = 1;
 
@@ -83,7 +84,6 @@ rotMat_d1_d2 = squeeze(trialData.rFoot.rot_fr_d1_d2(frIdx,:,:));
 rFootBox = plotBox(figure1, footPos_XYZ, footSize_LWH, rotMat_d1_d2, 'r');
 
 footPos_XYZ = trialData.lFoot.rbPos_mFr_xyz(frIdx,:);
-footSize_LWH = [.25 .1 .07];
 rotMat_d1_d2 = squeeze(trialData.lFoot.rot_fr_d1_d2(frIdx,:,:));
 
 lFootBox = plotBox(figure1, footPos_XYZ, footSize_LWH, rotMat_d1_d2, 'b');
@@ -93,6 +93,7 @@ rotMat_d1_d2 = squeeze(trialData.glasses.rot_fr_d1_d2(frIdx,:,:));
 glassesBox = plotBox(figure1, headPos(frIdx,:), headSize_LWH, rotMat_d1_d2, 'g');
 
 gaze = plotGV(figure1, headPos, gazePoint, frIdx);
+closest = plotPt(figure1, closestPointOnObj(frIdx,:), [0.2 0.2 0.2]);
 
 nFrames = length(1:20:numFrames);
 
@@ -100,9 +101,9 @@ nFrames = length(1:20:numFrames);
 F(1:nFrames) = struct('cdata', [], 'colormap', []);
 
 counter = 1;
-for frIdx = 1:20:numFrames
+for frIdx = 1:30:numFrames
    
-    camPos_XYZ =  [3 headPos(frIdx,2) 3];
+    camPos_XYZ =  [1 headPos(frIdx,2)-1 2];
     camTarg_XYZ = [0 headPos(frIdx,2) .5];
     
     if any(isnan(camPos_XYZ))
@@ -113,27 +114,28 @@ for frIdx = 1:20:numFrames
     campos(camPos_XYZ);
     camtarget(camTarg_XYZ);
     
-    %footPos_XYZ = trialData.rFoot.rbPos_mFr_xyz(frIdx,:);
-    %rotMat_d1_d2 = squeeze(trialData.rFoot.rot_fr_d1_d2(frIdx,:,:));
+    footPos_XYZ = trialData.rFoot.rbPos_mFr_xyz(frIdx,:);
+    rotMat_d1_d2 = squeeze(trialData.rFoot.rot_fr_d1_d2(frIdx,:,:));
     
-    %rFootBox = plotBox(rFootBox, footPos_XYZ, footSize_LWH, rotMat_d1_d2, 'r');
+    rFootBox = plotBox(rFootBox, footPos_XYZ, footSize_LWH, rotMat_d1_d2, 'r');
     
-	%footPos_XYZ = trialData.lFoot.rbPos_mFr_xyz(frIdx,:);
-    %rotMat_d1_d2 = squeeze(trialData.lFoot.rot_fr_d1_d2(frIdx,:,:));
+	footPos_XYZ = trialData.lFoot.rbPos_mFr_xyz(frIdx,:);
+    rotMat_d1_d2 = squeeze(trialData.lFoot.rot_fr_d1_d2(frIdx,:,:));
     
-    %lFootBox = plotBox(lFootBox, footPos_XYZ, footSize_LWH, rotMat_d1_d2, 'b');
+    lFootBox = plotBox(lFootBox, footPos_XYZ, footSize_LWH, rotMat_d1_d2, 'b');
     
-%     headPos_XYZ = headPos(frIdx,:);
-%     rotMat_d1_d2 = squeeze(trialData.glasses.rot_fr_d1_d2(frIdx,:,:));
-%     
-%     glassesBox = plotBox(glassesBox, headPos_XYZ, headSize_LWH, rotMat_d1_d2, 'g');
+    headPos_XYZ = headPos(frIdx,:);
+    rotMat_d1_d2 = squeeze(trialData.glasses.rot_fr_d1_d2(frIdx,:,:));
     
-    % update gaze vector
+    glassesBox = plotBox(glassesBox, headPos_XYZ, headSize_LWH, rotMat_d1_d2, 'g');
+    
     gaze = plotGV(gaze, headPos, gazePoint, frIdx);
     
-    gazex = line([headPos(frIdx,1) gazePointx(frIdx,1)],[headPos(frIdx,2) gazePointx(frIdx,2)],[headPos(frIdx,3) gazePointx(frIdx,3)],'Color',[1 0 0],'LineWidth',2);
-    gazey = line([headPos(frIdx,1) gazePointy(frIdx,1)],[headPos(frIdx,2) gazePointy(frIdx,2)],[headPos(frIdx,3) gazePointy(frIdx,3)],'Color',[0 1 0],'LineWidth',2);
-    gazez = line([headPos(frIdx,1) gazePointz(frIdx,1)],[headPos(frIdx,2) gazePointz(frIdx,2)],[headPos(frIdx,3) gazePointz(frIdx,3)],'Color',[0 0 1],'LineWidth',2);
+    closest = plotPt(closest, closestPointOnObj(frIdx,:), [0.2 0.2 0.2]);
+    
+%     gazex = line([headPos(frIdx,1) gazePointx(frIdx,1)],[headPos(frIdx,2) gazePointx(frIdx,2)],[headPos(frIdx,3) gazePointx(frIdx,3)],'Color',[1 0 0],'LineWidth',2);
+%     gazey = line([headPos(frIdx,1) gazePointy(frIdx,1)],[headPos(frIdx,2) gazePointy(frIdx,2)],[headPos(frIdx,3) gazePointy(frIdx,3)],'Color',[0 1 0],'LineWidth',2);
+%     gazez = line([headPos(frIdx,1) gazePointz(frIdx,1)],[headPos(frIdx,2) gazePointz(frIdx,2)],[headPos(frIdx,3) gazePointz(frIdx,3)],'Color',[0 0 1],'LineWidth',2);
     
     drawnow
     

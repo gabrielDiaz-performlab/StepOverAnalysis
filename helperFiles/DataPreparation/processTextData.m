@@ -1,0 +1,564 @@
+
+
+display('Processing data...')
+ 
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %%  Find experiment events
+
+%       # 1 ball created
+% 		# 2 ball launched
+% 		# 3 ball has hit floor
+% 		# 4 ball has hit paddle
+% 		# 5 ball has hit back wall
+% 		# 6 trial end
+% 		# 7 block end
+        
+numFrames = numel(sceneTime_fr);
+blockTransition =  find(eventFlag_fr==3);
+
+%find(eventFlag_fr==5);
+
+trialStartFr_tr = find(eventFlag_fr == 1 ); 
+ballLaunched_tr = find(eventFlag_fr == 2 ); 
+%ballHitFloor_tr = find(eventFlag_fr == 3); 
+bounceFrame_tr = find(eventFlag_fr == 3); 
+ballHitPaddle_tr = find(eventFlag_fr == 4); % trial
+ballHitBackWall_tr = find(eventFlag_fr == 5); % trial
+trialEndFr_tr =   union(find(eventFlag_fr == 6),find(eventFlag_fr == 7)); % block
+blkTransition_bl =   find(eventFlag_fr == 7); % block
+
+numBlocks = numel(blkTransition_bl);
+
+% display('***** NOT CHECKING STARTS AND ENDS *****')
+% fprintf('\n\n***** CHECKING STARTS AND ENDS *****\n')
+% validateTrialOrder
+%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Find frame of once-a-trial events
+
+clear catchFrame_tr
+
+trialStartFr_blk_Ctr = cell(numBlocks,1);
+trialEndFr_blk_Ctr = cell(numBlocks,1);
+
+for tIdx = 1:numel(trialStartFr_tr)
+    
+    ballHitPaddleIdx = intersect( find( ballHitPaddle_tr  > trialStartFr_tr(tIdx)), find( ballHitPaddle_tr  < trialEndFr_tr(tIdx) ));
+    
+    if( ballHitPaddleIdx )
+        catchFrame_tr(tIdx) = ballHitPaddle_tr(ballHitPaddleIdx);
+    else
+        catchFrame_tr(tIdx) = NaN;
+    end
+    
+end
+
+%%
+
+for blkIdx = 1:numBlocks
+    
+    if(blkIdx ==1)
+        firstFrameInBlock = 0;
+        lastFrameInBlock = blkTransition_bl(blkIdx);
+    
+    else
+        firstFrameInBlock = blkTransition_bl(blkIdx-1)+1;
+        lastFrameInBlock = blkTransition_bl(blkIdx);
+    end
+    
+    trialStartFr_blk_Ctr(blkIdx,:) = {intersect( find( trialStartFr_tr > firstFrameInBlock), find( trialStartFr_tr < lastFrameInBlock))};
+    trialEndFr_blk_Ctr(blkIdx,:) = {intersect( find( trialEndFr_tr > firstFrameInBlock), find( trialEndFr_tr < lastFrameInBlock))};
+    
+    numTrials_blk(blkIdx)= numel(trialStartFr_blk_Ctr{blkIdx});
+    
+    trInBlk_Cblk(blkIdx,:) = {(1 + numTrials_blk(blkIdx)*(blkIdx-1)) : numTrials_blk(blkIdx)*(blkIdx)};
+    
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%  Calculate ball and gaze SX, SY
+
+% SX AND SY denotes location on the screen.
+        
+ballSX_fr  = (ballPix_fr_xyDist(:,1)-.5) .* nearW;
+ballSY_fr  = (ballPix_fr_xyDist(:,2) - .5) .* nearH;
+
+gazePixX_fr = gazePixelNormX_fr .* arrPixX;
+gazePixY_fr = gazePixelNormY_fr .* arrPixY;
+
+gazeSX_fr = (gazePixelNormX_fr - .5) .* nearW;
+gazeSY_fr = -(gazePixelNormY_fr - .5) .* nearH;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%  Filter!
+display('* Applying a median and lowpass Guassian filter to the gaze SX and SY')
+
+if( rem(gaussFiltSize,2) ~= 1 || rem(medFiltSize,2) ~= 1)
+    beep
+    display('Error! s must be an odd number.')
+    return
+end
+
+
+gazeFiltSX_fr= rballDataFilter(gazeSX_fr);
+gazeFiltSY_fr= rballDataFilter(gazeSY_fr);
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%  Offset gaze data to compensate for misalignments
+
+if(gazeFrameOffset > 0)
+    display(sprintf('*** Gaze data is offset by %1.0f frames***',gazeFrameOffset));
+    gazePixFiltX_fr = [zeros(gazeFrameOffset,1); gazePixFiltX_fr(1:end-gazeFrameOffset)];
+    gazePixFiltY_fr = [zeros(gazeFrameOffset,1); gazePixFiltY_fr(1:end-gazeFrameOffset)];
+elseif(gazeFrameOffset < 0)
+    gazePixFiltX_fr = [gazePixFiltX_fr(gazeFrameOffset:end); zeros(gazeFrameOffset,1)];
+    gazePixFiltY_fr = [gazePixFiltY_fr(gazeFrameOffset:end); zeros(gazeFrameOffset,1)];
+    display(sprintf('*** Gaze data is offset by %1.0f frames***',gazeFrameOffset));
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%  Calculating gaze location, ball location,
+
+display('* Calculating object locations and offset from gaze in visual degrees')
+
+clear eye2BallDist_fr
+
+numFrames = size(viewRot_fr_d1_d2,1);
+
+eiwRadsX_fr = zeros(numFrames,1);
+eiwRadsY_fr = zeros(numFrames,1);
+eye2ballDist_fr = zeros(numFrames,1);
+
+e2bWorldRadX_fr  = zeros(numFrames,1);
+e2bWorldRadY_fr = zeros(numFrames,1);
+e2bWorldDegsX_fr = zeros(numFrames,1);
+e2bWorldDegsY_fr = zeros(numFrames,1);
+
+g2bounceTheta_fr  = zeros(numFrames,1);
+g2bouncePhi_fr  = zeros(numFrames,1);
+ball2bounceTheta_fr  = zeros(numFrames,1);
+ball2bouncePhi_fr = zeros(numFrames,1);
+
+g2BallDegs_fr = zeros(numFrames,1);
+g2BounceDegs_fr = zeros(numFrames,1);
+
+g2ballTheta_fr = zeros(numFrames,1);
+g2ballPhi_fr = zeros(numFrames,1);
+
+lEyeForwardDir_fr_xyz  = zeros(numFrames,3);
+headUpDir_fr_xyz = zeros(numFrames,3);
+gazeDir_fr_xyz = zeros(numFrames,3);
+ballDir_fr_xyz = zeros(numFrames,3);
+bptDir_fr_xyz = zeros(numFrames,3);
+
+ball2BptBptCentThetaDegs_fr = zeros(numFrames,1);
+ball2BptBptCentPhiDegs_fr= zeros(numFrames,1);
+g2bptBptCentThetaDegs_fr= zeros(numFrames,1);
+g2bptBptCentPhiDegs_fr= zeros(numFrames,1);
+
+ ballVecLengthOnUnitSph_fr  = zeros(numFrames,1);
+ gazeVecLengthParallelToBall_fr = zeros(numFrames,1);
+ gazeVelDegsSec_fr = zeros(numFrames,1);
+ rawGazeVelDegsSec_fr= zeros(numFrames,1);
+ 
+ ballVecNormXYZ_fr  = zeros(3,numFrames);
+ gazeVectorNormXYZ_fr = zeros(3,numFrames);
+ 
+ ballVecNorm_fr_xyz  = zeros(numFrames,3);
+ gazeVecNorm_fr_xyz  = zeros(numFrames,3);
+ rawGazeVecNorm_fr_xyz = zeros(numFrames,3);
+ 
+%lEyeRotandOffsetMat_fr_d1_d2 = zeros(numFrames,);
+leftEyeInWorld_fr_xyz = zeros(numFrames,3);
+
+gazeVecNorm = 0;
+ballVecNorm = 0;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%  Calculate eye rotation and offset matrices
+
+% B/C the helmet's displays are not frontoparallel, there is a software
+% rotation to prevent sheering. These matrices are used to unrotate the screen.
+
+lEyeOffsetMat = eye(4,4);
+lEyeOffsetMat(1,4) = -eyeOffset;
+
+%findEyeRot
+
+disp( 'PROCESSTEXTDATA:  eye rot set to -13')
+
+eyeRotation = -13* (pi/180);
+%rotateLeftEyeMat = [ cos(eyeRotation) 0 -sin(eyeRotation) 0; 0 1 0 0 ; sin(eyeRotation) 0 cos(eyeRotation) 0; 0 0 0 1];
+rotateLeftEyeMat = [ cos(eyeRotation) sin(eyeRotation) 0 0; -sin(eyeRotation) cos(eyeRotation) 0 0; 0 0 1 0 ; 0 0 0 1];
+
+lEyeRotandOffsetMat_fr_d1_d2 = zeros(numFrames,4,4);
+
+for frIdx = 1:numFrames
+    
+    %clear ballScreenLoc_xyz gazeScreenLoc_xyz gazePoint_xyz
+    %clear headUpVec_xyz eye2ballDist_xyz ballVecNorm
+    %rotateLeftEyeMat = [ cos(eyeRotation) 0 -sin(eyeRotation) 0; 0 1 0 0 ; sin(eyeRotation) 0 cos(eyeRotation) 0; 0 0 0 1];
+    
+    
+    lEyeRotandOffsetMat_d1_d2 = squeeze(viewRot_fr_d1_d2(frIdx,:,:)) * rotateLeftEyeMat * lEyeOffsetMat;
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Left eye forward
+    
+    lEyeForward = (squeeze(viewRot_fr_d1_d2(frIdx,:,:)) * rotateLeftEyeMat) * [0 1 0 0]'; % up Y  axis
+    %[0 0 -1 0]';
+    
+    lEyeForwardVecNorm = (lEyeForward./ norm(lEyeForward ))';
+    lEyeForwardVecNorm(4) = [];
+    
+    lEyeForwardDir_fr_xyz(frIdx,:) = lEyeForwardVecNorm;
+    
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% Head up
+    
+    headUpVec_xyz   = (squeeze(viewRot_fr_d1_d2(frIdx,:,:)) * rotateLeftEyeMat) * [0 0  1 0]'; % Z is up
+    headUpVecNorm = (headUpVec_xyz ./ norm(headUpVec_xyz ))';
+    headUpVecNorm(4) =[];
+    
+    headUpDir_fr_xyz(frIdx,:) = headUpVecNorm;
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Gaze in world
+    
+    gazeWorldDir_xyz =   (squeeze(viewRot_fr_d1_d2(frIdx,:,:)) * rotateLeftEyeMat) * [gazeFiltSX_fr(frIdx) 1 gazeFiltSY_fr(frIdx) 0]'; % Z is up, looking down X
+    %[1 gazeFiltSY_fr(frIdx) gazeFiltSX_fr(frIdx) 0]'; 
+    gazeVecNorm = gazeWorldDir_xyz ./ norm(gazeWorldDir_xyz );
+    gazeVecNorm(4) = [];
+   
+    gazeVecNorm_fr_xyz(frIdx,:) = gazeVecNorm;
+    %gazeVecNorm_fr_xyz(bf,:)
+    gazeDir_fr_xyz(frIdx,:) = gazeVecNorm;
+    
+  
+    %%
+    rawGazeWorldDir_xyz =   (squeeze(viewRot_fr_d1_d2(frIdx,:,:)) * rotateLeftEyeMat) *  [gazeSX_fr(frIdx) 1 gazeSY_fr(frIdx) 0]'; % Z is up, looking down X    
+    % [1 gazeSX_fr(frIdx) gazeSY_fr(frIdx) 0]'; 
+    rawGazeVecNorm = rawGazeWorldDir_xyz ./ norm(rawGazeWorldDir_xyz );
+    rawGazeVecNorm(4) = [];
+    
+    rawGazeVecNorm_fr_xyz(frIdx,:) = rawGazeVecNorm;
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% Eye in world coordinates
+    
+    eiwRadsX_fr(frIdx) =  atan2(gazeVecNorm(1),gazeVecNorm(2));
+    eiwRadsY_fr(frIdx) =  asin(gazeVecNorm(3));
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% Eye to ball
+    
+    %ballWorldDir_xyz =   (squeeze(viewRot_fr_d1_d2(frIdx,:,:)) * rotateLeftEyeMat) * [ballSX_fr(frIdx) 1 ballSY_fr(frIdx) 0 ]'; % Z is up, looking down X    
+    ballWorldDir_xyz =   squeeze(viewRot_fr_d1_d2(frIdx,:,:)) * [ballSX_fr(frIdx) 1 ballSY_fr(frIdx) 0 ]'; % Z is up, looking down X    
+    ballVecNorm = (ballWorldDir_xyz ./ norm(ballWorldDir_xyz) );
+    ballVecNorm(4) = [];
+    
+    ballVecNorm_fr_xyz(frIdx,:) = ballVecNorm;
+    
+    ballDir_fr_xyz(frIdx,:) = ballVecNorm;
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% Ball in world coordinates
+    
+    e2bWorldRadX_fr(frIdx) =  atan2(ballVecNorm(1),ballVecNorm(2));
+    e2bWorldRadY_fr(frIdx) =  asin(ballVecNorm(3)) ;
+    
+    e2bWorldDegsX_fr(frIdx) =  atan2(ballVecNorm(1),ballVecNorm(2)) .* (180/pi);
+    e2bWorldDegsY_fr(frIdx) =  asin(ballVecNorm(3))  .* (180/pi);
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%% Bouncepoint
+    
+    lEyePosRelToView_xyz =  squeeze(lEyeRotandOffsetMat_d1_d2 * [0 0  0 1]');    
+    leftEyeInWorld_xyz = lEyePosRelToView_xyz(1:3)' + viewPos_fr_xyz(frIdx,:);
+    leftEyeInWorld_fr_xyz(frIdx,:) = leftEyeInWorld_xyz ;
+    
+    trIdx = find( trialEndFr_tr > frIdx, 1, 'first');
+    
+    if(isempty(trIdx)) 
+        trIdx = sum( numTrials_blk); 
+    end
+    
+    bounce_xyz = [ballBounceX_tr(trIdx) ballBounceY_tr(trIdx) ballBounceZ_tr(trIdx)];
+    bptVecNorm = (bounce_xyz - leftEyeInWorld_xyz) ./ norm(bounce_xyz - leftEyeInWorld_xyz);
+    
+    bptDir_fr_xyz(frIdx,:) = bptVecNorm;
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%  Gaze distance in one dimension along sphere
+    
+    g2BallDegs_fr(frIdx)   = acos( dot(ballVecNorm,gazeVecNorm) ) .* (180/pi);
+    g2BounceDegs_fr(frIdx) = acos( dot(bptVecNorm,gazeVecNorm') ) .* (180/pi);
+    
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%  Angular distance from gaze to the ball
+    
+    % H is a vector to teh right of the gaze vector - perp to worldUpNorm
+    % U vector is "up" on the plane perpendicular to the point of gaze
+    % [0 0 1]' is the world up norm
+    
+    H = cross(gazeVecNorm,[0 0 1]' ) ./ norm(cross(gazeVecNorm,[0 0 1]' ));
+    U = cross(H,gazeVecNorm);
+    
+    g2ballTheta_fr(frIdx) =    atan2( dot(ballVecNorm,H),dot(ballVecNorm,gazeVecNorm)) * (180/pi);
+    g2ballPhi_fr(frIdx)     =    atan2( dot(ballVecNorm,U),dot(ballVecNorm,gazeVecNorm)) * (180/pi);
+    
+    %%  Angular distance from gaze to the bouncepoint
+    
+    g2bounceTheta_fr(frIdx) =    atan2( dot(bptVecNorm,H),dot(bptVecNorm,gazeVecNorm)) * (180/pi);
+    g2bouncePhi_fr(frIdx)     =    atan2( dot(bptVecNorm,U),dot(bptVecNorm,gazeVecNorm)) * (180/pi);
+    
+    %% angular distance from the ball to the bouncepoint
+    
+    H = cross(ballVecNorm,[0 0 1]' ) ./ norm(cross(ballVecNorm,[0 0 1]' ));
+    U = cross(H,ballVecNorm);
+    
+    ball2bounceTheta_fr(frIdx) =    atan2( dot(bptVecNorm,H),dot(bptVecNorm,ballVecNorm)) * (180/pi);
+    ball2bouncePhi_fr(frIdx)     =    atan2( dot(bptVecNorm,U),dot(bptVecNorm,ballVecNorm)) * (180/pi);
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%  Project to plane centered at and perpendicular to the bouncepoint
+    
+    H = cross((bptVecNorm),[0 0 1]' ) ./ norm(cross((bptVecNorm),[0 0 1]' ));
+    U = cross(H,(bptVecNorm));
+    
+    ball2BptBptCentThetaRads_fr(frIdx) =    dot(ballVecNorm,H);
+    ball2BptBptCentPhiRads_fr(frIdx) =    dot(ballVecNorm,U);
+    
+    ball2BptBptCentThetaDegs_fr(frIdx) = atan2( dot(ballVecNorm,H),dot(ballVecNorm,bptVecNorm)) * (180/pi);
+    ball2BptBptCentPhiDegs_fr(frIdx) = atan2( dot(ballVecNorm,U),dot(ballVecNorm,bptVecNorm)) * (180/pi);
+    
+    g2bptBptCentThetaDegs_fr(frIdx) = atan2( dot(gazeVecNorm,H),dot(gazeVecNorm,bptVecNorm(1:3))) * (180/pi);
+    g2bptBptCentPhiDegs_fr(frIdx) = atan2( dot(gazeVecNorm,U),dot(gazeVecNorm,bptVecNorm(1:3))) * (180/pi);
+    
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%  Calculate pursuit gain
+
+for frIdx = 1:(numFrames-1)
+    
+    if( ballVecNorm_fr_xyz(frIdx,:) == ballVecNorm_fr_xyz(frIdx+1,:))
+        
+        ballVecLengthOnUnitSph_fr(frIdx) = 0;
+        gazeVecLengthParallelToBall_fr(frIdx) = 0; % ball is stationary.
+        
+        gazeVelDegsSec_fr(frIdx)   = 0;
+        rawGazeVelDegsSec_fr(frIdx)   = 0;
+        
+    else
+        
+        % Define the vector between these points
+        % Direction that the ball has moved as perceived by the eye
+        d  =  (ballVecNorm_fr_xyz(frIdx+1,:) - ballVecNorm_fr_xyz(frIdx,:)) ./ norm(ballVecNorm_fr_xyz(frIdx+1,:) - ballVecNorm_fr_xyz(frIdx,:));
+        % the length of ball movement when projected onto a plane
+        % orthogonal to the eye
+        h = dot(gazeVecNorm_fr_xyz(frIdx+1,:) - gazeVecNorm_fr_xyz(frIdx,:),d)* d;
+        
+        % j - length of the component of the gaze vector parallel to the ball vector
+        j = (gazeVecNorm_fr_xyz(frIdx,:) + h) ./ norm( gazeVecNorm_fr_xyz(frIdx,:)+h)';
+        
+        ballVecLengthOnUnitSph_fr(frIdx) = acos( dot(ballVecNorm_fr_xyz(frIdx,:),ballVecNorm_fr_xyz(frIdx+1,:))) .* (180/pi);
+        gazeVecLengthParallelToBall_fr(frIdx) = acos ( dot(gazeVecNorm_fr_xyz(frIdx,:),j)) .* (180/pi);
+        
+        if(  dot(gazeVecNorm_fr_xyz(frIdx+1,:) - gazeVecNorm_fr_xyz(frIdx,:),d) < 0 )
+            gazeVecLengthParallelToBall_fr(frIdx) = -gazeVecLengthParallelToBall_fr(frIdx);
+        end
+        
+        
+        %  Gaze velocity
+        gazeVelDegsSec_fr(frIdx) = acos( dot(gazeVecNorm_fr_xyz(frIdx+1,:),gazeVecNorm_fr_xyz(frIdx,:))) .* (180/pi);
+        rawGazeVelDegsSec_fr(frIdx) = acos( dot(rawGazeVecNorm_fr_xyz(frIdx+1,:),rawGazeVecNorm_fr_xyz(frIdx,:))) .* (180/pi);
+        
+    end
+end
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%  Convert from rads to degs
+
+eiwDegsX_fr = eiwRadsX_fr * (180/pi);
+eiwDegsY_fr = eiwRadsY_fr * (180/pi);
+
+%e2bWorldDegsX_fr  = e2bWorldRadX_fr * (180/pi);
+%e2bWorldDegsY_fr  = e2bWorldRadY_fr * (180/pi);
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %%  Adjust gaze error measurements for optical ball size
+% 
+eye2BallDist_fr = sqrt(sum( ((leftEyeInWorld_fr_xyz - ballPos_fr_xyz ).^2),2))';
+ 
+display 'FIXME: In processTextData, using constant ball diameter'
+ballDiameter = ballDiameter(1);
+ballRadiusRad_fr =  atan2( (.5*ballDiameter),eye2BallDist_fr )';
+ballRadiusDeg_fr = (180/pi) .* ballRadiusRad_fr;
+
+% e2bWorldRadY_fr(find( abs(e2bWorldRadY_fr) <= ballRadiusRad_fr)) = 0;
+% e2bWorldRadY_fr( find(e2bWorldRadY_fr(frIdx)>0) ) = e2bWorldRadY_fr( find(e2bWorldRadY_fr(frIdx)>0) )- ballRadiusRad_fr( find(e2bWorldRadY_fr(frIdx)>0) );
+% e2bWorldRadY_fr( find(e2bWorldRadY_fr(frIdx)<0) ) = e2bWorldRadY_fr( find(e2bWorldRadY_fr(frIdx)<0) )+ballRadiusRad_fr( find(e2bWorldRadY_fr(frIdx)<0) );
+% 
+% e2bWorldRadX_fr(find( abs(e2bWorldRadX_fr) <= ballRadiusRad_fr)) = 0;
+% e2bWorldRadX_fr( find(e2bWorldRadX_fr(frIdx)>0) ) = e2bWorldRadX_fr( find(e2bWorldRadX_fr(frIdx)>0) ) - ballRadiusRad_fr( find(e2bWorldRadX_fr(frIdx)>0) );
+% e2bWorldRadX_fr( find(e2bWorldRadX_fr(frIdx)<0) ) = e2bWorldRadX_fr( find(e2bWorldRadX_fr(frIdx)<0) ) + ballRadiusRad_fr( find(e2bWorldRadX_fr(frIdx)<0) );
+% 
+% g2ballTheta_fr(find( abs(g2ballTheta_fr) <= ballRadiusDeg_fr)) = 0;
+% g2ballTheta_fr( find(g2ballTheta_fr>0) ) = g2ballTheta_fr( find(g2ballTheta_fr>0) ) - ballRadiusDeg_fr( find(g2ballTheta_fr>0) );
+% g2ballTheta_fr( find(g2ballTheta_fr<0) ) = g2ballTheta_fr( find(g2ballTheta_fr<0) ) + ballRadiusDeg_fr( find(g2ballTheta_fr<0) );
+% 
+% g2ballPhi_fr(find( abs(g2ballPhi_fr) <= ballRadiusDeg_fr)) = 0;
+% g2ballPhi_fr( find(g2ballPhi_fr>0) ) = g2ballPhi_fr( find(g2ballPhi_fr>0) ) - ballRadiusDeg_fr( find(g2ballPhi_fr>0) );
+% g2ballPhi_fr( find(g2ballPhi_fr<0) ) = g2ballPhi_fr( find(g2ballPhi_fr<0) ) + ballRadiusDeg_fr( find(g2ballPhi_fr<0) );
+% 
+% g2BallDegs_fr( find( g2BallDegs_fr <= ballRadiusDeg_fr)) = 0;
+% g2BallDegs_fr( find( g2BallDegs_fr>0) ) = g2BallDegs_fr(
+% find(g2BallDegs_fr>0) ) - ballRadiusDeg_fr( find(g2BallDegs_fr>0) );
+
+%%
+
+%g2BounceDegs_fr = g2BounceDegs_fr';
+%ballRadiusDeg_fr = ballRadiusDeg_fr';
+
+%%
+
+g2bounceTheta_fr(find( abs(g2bounceTheta_fr) <= ballRadiusDeg_fr)) = 0;
+g2bounceTheta_fr( find(g2bounceTheta_fr>0) ) = g2bounceTheta_fr( find(g2bounceTheta_fr>0) ) - ballRadiusDeg_fr( find(g2bounceTheta_fr>0) );
+g2bounceTheta_fr( find(g2bounceTheta_fr<0) ) = g2bounceTheta_fr( find(g2bounceTheta_fr<0) ) + ballRadiusDeg_fr( find(g2bounceTheta_fr<0) );
+
+g2bouncePhi_fr(find( abs(g2bouncePhi_fr) <= ballRadiusDeg_fr)) = 0;
+g2bouncePhi_fr( find(g2bouncePhi_fr>0) ) = g2bouncePhi_fr( find(g2bouncePhi_fr>0) ) - ballRadiusDeg_fr( find(g2bouncePhi_fr>0) );
+g2bouncePhi_fr( find(g2bouncePhi_fr<0) ) = g2bouncePhi_fr( find(g2bouncePhi_fr<0) ) + ballRadiusDeg_fr( find(g2bouncePhi_fr<0) );
+
+g2BounceDegs_fr(find( abs(g2BounceDegs_fr) <= ballRadiusDeg_fr)) = 0;
+g2BounceDegs_fr( find(g2BounceDegs_fr>0) ) = g2BounceDegs_fr( find(g2BounceDegs_fr>0) ) - ballRadiusDeg_fr( find(g2BounceDegs_fr>0) );
+g2BounceDegs_fr( find(g2BounceDegs_fr<0) ) = g2BounceDegs_fr( find(g2BounceDegs_fr<0) ) + ballRadiusDeg_fr( find(g2BounceDegs_fr<0) );
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Filter eiw data .
+% %  At this point, data has been filtered twice.
+% 
+% display('* Applying a median and lowpass Guassian filter to EIW data')
+% eiwFiltDegsX_fr = rballDataFilter(eiwDegsX_fr);
+% eiwFiltDegsY_fr = rballDataFilter(eiwDegsY_fr);
+% 
+% display('* Applying a median and lowpass Guassian filter to E2B data')
+% e2bWorldFiltDegsX_fr = rballDataFilter(e2bWorldDegsX_fr);
+% e2bWorldFiltDegsY_fr = rballDataFilter(e2bWorldDegsY_fr);
+
+eiwFiltDegsX_fr = (eiwDegsX_fr);
+eiwFiltDegsY_fr = (eiwDegsY_fr);
+
+e2bWorldFiltDegsX_fr = e2bWorldDegsX_fr;
+e2bWorldFiltDegsY_fr = e2bWorldDegsY_fr;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%  Calculate pursuit gain
+
+e2bVelDegSec_fr = compute_vel(eyeDataTime_fr ,[e2bWorldDegsX_fr e2bWorldDegsY_fr]);
+pursuitGain_fr =  (rballDataFilter(gazeVecLengthParallelToBall_fr))./(rballDataFilter(ballVecLengthOnUnitSph_fr));
+
+sceneDur_fr = [0; diff(sceneTime_fr)]';
+
+% Filter velocity measures
+% Convert from degs/frame to degs/second
+
+ballVectorVelDegs_fr = rballDataFilter( ballVecLengthOnUnitSph_fr .* (1./sceneDur_fr'));
+gazeVelParToBallDegsSec_fr = rballDataFilter( gazeVecLengthParallelToBall_fr .* (1./sceneDur_fr'));
+
+gazeVelDegsSec_fr  = ( gazeVelDegsSec_fr .* (1./sceneDur_fr'));
+rawGazeVelDegsSec_fr = ( rawGazeVelDegsSec_fr .* (1./sceneDur_fr'));
+
+%  Convolve data with saccade kernel for saccade analysis
+convGazeVelDegsSec_fr  = conv( gazeVelDegsSec_fr, (filterKernel./sum(filterKernel)),'same');
+
+%%  Hand velocity
+
+handVel_fr = sqrt( sum(racqVel_fr_xyz().^2,2) );
+handPlanarVel_fr = sqrt( sum(racqVel_fr_xyz(:,[1 2]).^2,2) );
+
+filter = fspecial('gaussian',[handFiltWidth 1], handFiltSD);  % gaussian kernel where s= size of contour
+handVelFilt_fr  = conv(handVel_fr ,filter,'same');
+
+handPlanarVelFilt_fr = conv(handPlanarVel_fr ,filter,'same');
+handPlanarVelFilt_tr  = handPlanarVelFilt_fr(bounceFrame_tr);
+
+%
+
+close all
+
+framesAfterBounce = 60;
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+figure(100);
+set(gcf,'WindowStyle','docked')
+
+for idx = 10:100
+
+    plotIdx = (bounceFrame_tr(idx)-30):bounceFrame_tr(idx)+30;
+    plotID = sceneTime_fr( plotIdx);
+
+    subplot(2,2,1:2)
+    hold on
+    cla
+    axis([plotID(1) plotID(end) 0 200])
+    plot( plotID,rawGazeVelDegsSec_fr(plotIdx),'b');
+    plot( plotID,gazeVelDegsSec_fr(plotIdx),'r');
+    
+    %plot( plotID,ballVectorVelDegs_fr(plotIdx));
+    %plot( plotID,gazeVelParToBallDegsSec_fr(plotIdx),'r');
+    %vline(hitFloorIdx_tr(idx)-2,'g')
+    %vline(hitFloorIdx_tr(idx)-1,'y')
+    vline(bounceFrame_tr(idx),'r')
+    x = get(gca,'XTick');
+
+    set(gca,'XTickLabel',sprintf('%3.0f|',x))
+    dcmObj = datacursormode(100);
+    set(dcmObj,'UpdateFcn',@dataTip_callback_racquetball)
+    datacursormode on
+% 
+%     subplot(2,2,3:4)
+%     hold on
+%     axis([plotID(1) plotID(end) -2 2])
+%     cla
+%     plot(plotID,pursuitGain_fr(plotIdx))
+%     hline(0)
+% 
+%     hline( purs_e2bChangeThresh+(1-purs_e2bChangeThresh),'g',1,'-')
+%     hline( purs_e2bChangeThresh-(1-purs_e2bChangeThresh),'g',1,'-')
+%     vline(hitFloorID_tr(idx),'r')
+%     x = get(gca,'XTick');
+%     set(gca,'XTickLabel',sprintf('%3.0f|',x))
+% 
+%     dcmObj = datacursormode(100);
+%     set(dcmObj,'UpdateFcn',@dataTip_callback_racquetball)
+%     datacursormode on
+
+%     figure(2)
+%     hold on
+%     plot(ballVecNormXYZ_fr(1,plotIdx),'r');
+%     plot(ballVecNormXYZ_fr(2,plotIdx),'g');
+%     plot(ballVecNormXYZ_fr(3,plotIdx),'b');
+
+end
+
+display('Done processing data!  Bleep bloop bloop.')

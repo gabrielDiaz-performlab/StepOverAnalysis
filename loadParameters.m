@@ -2,6 +2,7 @@ addpath(genpath('data'));
 addpath(genpath('subFunctions'));
 addpath(genpath('figureTools'));
 addpath(genpath('AudioFunctions'))
+addpath(genpath('geom3d'))
 
 textFileDir = 'data/raw/';
 parsedTextFileDir = 'data/parsedTXT/';
@@ -70,6 +71,12 @@ footSize_LWH = [.25 .1 .07];
 
 fAudio = 5000; 
 beep_Dur = 0.25;
+
+%% Eye to Obstacle Angular separation threshold
+tAngSep = 5;
+
+roiTemporalClumpThreshMS = 50;
+roiOnObsMinDuration = 50;
 
 %% Figure colors / linestyles
 

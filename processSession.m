@@ -36,7 +36,7 @@ clear all
 close all
 
 sessionNumber = 1;
-cleanRunBool = 1;
+cleanRunBool = 0;
 
 close all
 
@@ -88,7 +88,7 @@ display(['Mean trial duration:' num2str(sessionData.expInfo.meanTrialDuration)])
 for trIdx = 1:numel(sessionData.rawData_tr)
     
 %     [ sessionData ] = calcMeanRigidBodyPos(sessionData, trIdx);
-    [ sessionData ] = findSteps(sessionData, trIdx, 1);
+    [ sessionData ] = findSteps(sessionData, trIdx, 0);
     [ sessionData ] = findFootCrossing(sessionData, trIdx);
     [ sessionData ] = stepLengthAndDur(sessionData, trIdx);
     [ sessionData ] = stepLengthAndDurASO(sessionData, trIdx);
@@ -99,18 +99,14 @@ for trIdx = 1:numel(sessionData.rawData_tr)
     [ sessionData ] = calcObjCenteredTraj(sessionData, trIdx);
     [ sessionData ] = toeHeightAndClearanceASO(sessionData, trIdx);
     [ sessionData ] = findMinDistanceAXS(sessionData, trIdx);  
-%     [ sessionData ] = processEyeTrackerInfo(sessionData, trIdx);
-%     [ sessionData ] = calcGVPosOnObj(sessionData, trIdx);
+    [ sessionData ] = processEyeTrackerInfo(sessionData, trIdx);
+    [ sessionData ] = calcGVPosOnObj(sessionData, trIdx);
+    [ sessionData ] = findObstacleFix(sessionData, trIdx, 0);
 end
 
-keyboard
 %% Plot functions for a Trial
 
-close all
-trIdx = 2
-[ sessionData ] = processEyeTrackerInfo(sessionData, trIdx);
-[ sessionData ] = calcGVPosOnObj(sessionData, trIdx);
-%plotTrialMarkers(sessionData,trIdx);
+plotTrialMarkers(sessionData,trIdx);
 F = plotTrialRigid(sessionData,trIdx);
 
 %%

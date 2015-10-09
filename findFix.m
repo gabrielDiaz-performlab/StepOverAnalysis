@@ -1,7 +1,5 @@
 display('* identifying fixations...')
 
-
-
 % Time must be converted into milliseconds
 % timeStampMS_fr =  timestamp in MILLIseconds
 
