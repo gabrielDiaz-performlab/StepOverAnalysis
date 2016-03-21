@@ -2,7 +2,7 @@ function [figH] = plotAvgTraj_CxH(sessionData)
 
 xLimVals = [-3.5 1];
 
-figH1 = figure(1010)
+figH1 = figure(1010);
 hold on
 cla
 xlabel('foot distance (m)')
@@ -11,7 +11,7 @@ set(1010,'Units','Normalized','Position',[0.118055555555556 0.235555555555556 0.
 title({'lead foot position','for 1 obstacle height'})
 xlim(xLimVals)
 
-figH2 = figure(1011)
+figH2 = figure(1011);
 hold on
 cla
 xlabel('foot distance (m)')
@@ -21,7 +21,7 @@ title({'variation in lead foot position','for 1 obstacle height'})
 xlim(xLimVals)
 ylim([0 0.2])
 
-figH2 = figure(1012)
+figH2 = figure(1012);
 hold on
 cla
 xlabel('foot distance (m)')
@@ -40,17 +40,20 @@ padLength = round(sessionData.expInfo.meanTrialDuration / sessionData.expInfo.me
 
 
 for hIdx = 1:3;
-    for cIdx = 1:2
+    for cIdx = 1:1
         
         ttypeNum = hIdx + ((cIdx-1)*3);
+        
         % Get indices for the trial type specified by hIdx and cIdx
-        trOfType_tIdx = find( [sessionData.rawData_tr.trialType] == ttypeNum );
+        trOfType_tIdx = find( [sessionData.expInfo.trialTypes_Idx] == ttypeNum );
+            
         % Get indices for trials to be exlcuded
-        excludeTrials_tIdx = find( [sessionData.rawData_tr.excludeTrial] == 1 );
+        excludeTrials_tIdx = find( [sessionData.expInfo.excludeTrial] == 1 );
+        
         % Set diff
         trOfType_tIdx = setdiff(trOfType_tIdx,excludeTrials_tIdx);
-        frameTime_tr_fr = nan(numel(trOfType_tIdx),padLength);
-        TTC_tr_fr = nan(numel(trOfType_tIdx),padLength);
+%         frameTime_tr_fr = nan(numel(trOfType_tIdx),padLength);
+%         TTC_tr_fr = nan(numel(trOfType_tIdx),padLength);
         leadFoot_tr_fr_XYZ = nan(numel(trOfType_tIdx),padLength,3);
         
         for trIdx = 1:numel(trOfType_tIdx)
@@ -58,20 +61,24 @@ for hIdx = 1:3;
             trNum = trOfType_tIdx(trIdx);
             
             if( strcmp( sessionData.dependentMeasures_tr(trNum).firstCrossingFoot, 'Left' ) )
-                
-                crossFr = find(sessionData.processedData_tr(trNum).lFootObsCentered_fr_XYZ(:,2) < 0,1,'first');
-                footData_fr_XYZ = sessionData.processedData_tr(trNum).lFootObsCentered_fr_XYZ;
+                Foot_xyz = sessionData.processedData_tr(trNum).lFoot.rbPos_mFr_xyz;
+                Obs_xyz = repmat(sessionData.processedData_tr(trNum).obs.pos_xyz,[length(Foot_xyz) 1]);
+                obsCentered = Obs_xyz(2) - Foot_xyz(2);
+                crossFr = find( obsCentered < 0,1,'first');
+                footData_fr_XYZ = Obs_xyz - Foot_xyz;
                 
             else
-                crossFr = find(sessionData.processedData_tr(trNum).rFootObsCentered_fr_XYZ(:,2) < 0,1,'first');
-                footData_fr_XYZ = sessionData.processedData_tr(trNum).rFootObsCentered_fr_XYZ;
+                Foot_xyz = sessionData.processedData_tr(trNum).rFoot.rbPos_mFr_xyz;
+                Obs_xyz = repmat(sessionData.processedData_tr(trNum).obs.pos_xyz,[length(Foot_xyz) 1]);
+                obsCentered = Obs_xyz(2) - Foot_xyz(2);
+                crossFr = find( obsCentered < 0,1,'first');
+                footData_fr_XYZ = Obs_xyz - Foot_xyz ;          
             end
-            
             % footdata moves from positive to negative
             
             if( ~isempty(crossFr) )
                 
-                paddedFrNums = [1:size(footData_fr_XYZ,1)] + ceil(padLength/2) - crossFr;
+                paddedFrNums = 1:size(footData_fr_XYZ,1) + ceil(padLength/2) - crossFr;
                 leadFoot_tr_fr_XYZ(trIdx,paddedFrNums,:) = footData_fr_XYZ;
                 
 %                 frameTime_tr_fr(trNum,paddedFrNums) = sessionData.rawData_tr(trNum).frameTime_fr - sessionData.rawData_tr(trNum).frameTime_fr(1);
@@ -135,7 +142,3 @@ for hIdx = 1:3;
         
     end
 end
-%vline(0,'k',2,':')
-
-
-

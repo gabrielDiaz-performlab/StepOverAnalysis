@@ -13,61 +13,64 @@ function [sessionData] = checkForExclusions(sessionData)
 loadParameters
 %
 for trIdx = 1:sessionData.expInfo.numTrials
-    
-    lFoot = sessionData.rawData_tr.lFoot;
-    rFoot = sessionData.rawData_tr.rFoot;
-    
-    rawData = sessionData.rawData_tr(trIdx);
-    %data_cFr_mkr_XYZ = [{lFoot.leftFoot_fr_mkr_XYZ},{rawData.rightFoot_fr_mkr_XYZ}];
-    %lFoot.mkrPos_mIdx_Cfr_xyz
-            
-    %% Left foot
+
+    data_cFr_mkr_XYZ = [{sessionData.rawData_tr(trIdx).lFoot.mkrPos_mIdx_Cfr_xyz},...
+        {sessionData.rawData_tr(trIdx).rFoot.mkrPos_mIdx_Cfr_xyz}];
+              
     for cIdx = 1:length(data_cFr_mkr_XYZ)
-        
-        %%
-        % Get marker position over time
-        mYData_fr_mIdx = squeeze(data_cFr_mkr_XYZ{cIdx}(:,:,2));
-        
-        % Calculate marker displacement over time along Y dimension
-        mYData_fr_mIdx = mYData_fr_mIdx - repmat(mYData_fr_mIdx(1,:),size(mYData_fr_mIdx,1),1);
-        
-        % Calc total displacement along Y axis
-        totalYDisp_mIdx = mYData_fr_mIdx(end,:);
-        
+               
+        % Get marker positions over time
+        mYData_fr_mIdx = data_cFr_mkr_XYZ{cIdx};
+       
+        totalYDisp_cIdx = zeros(length(mYData_fr_mIdx),1);
+        % Loop over each Marker
+        for i = 1:length(mYData_fr_mIdx)
+           temp = mYData_fr_mIdx{i};
+           % Find the displacement
+           temp = temp(end,:) - temp(1,:);
+           
+           %Total displacement along the Y axis
+           totalYDisp_cIdx(i) = temp(1,2);
+
+        end
+               
         % Find markers 'left behind"
         % That is:  although other markers moved > .5*obstacle distance,
         % the markers 'left behind' did not
-        distToObs = rawData.obstacle_XposYposHeight(2);
-        [numMarkersLeftBehind leftBehind_mIdx]= find( totalYDisp_mIdx < distToObs/2 ) ;
+        distToObs = sessionData.rawData_tr(trIdx).obs.pos_xyz(2);
+        leftBehind_cIdx = find( totalYDisp_cIdx < distToObs/2 ) ;
         
-        % If > 2 markers are 'left behind' assuem that the subject did
-        if( numMarkersLeftBehind > 3 )
+        numMarkersLeftBehind = sum(leftBehind_cIdx);
+        
+        % If > 2 markers are 'left behind' assume that the subject was left
+        % behind
+        
+        if( numMarkersLeftBehind > 2 )
             
-            %display('1')
-            %keyboard
-            
+                       
             % Omit trial
-            sessionData.rawData_tr(trIdx).excludeTrial = 1;
+            sessionData.rawData_tr(trIdx).info.excludeTrial = 1;
             excludeMessage = sprintf('checkForExclusions: found >2 markers left behind');
             
-            if( isempty( sessionData.rawData_tr(trIdx).excludeTrialExplanation) )
-                sessionData.rawData_tr(trIdx).excludeTrialExplanation{1} = excludeMessage;
+            if( isempty( sessionData.rawData_tr(trIdx).info.excludeTrialExplanation) )
+                sessionData.rawData_tr(trIdx).info.excludeTrialExplanation{1} = excludeMessage;
             else
-                sessionData.rawData_tr(trIdx).excludeTrialExplanation{end+1} = excludeMessage;
+                sessionData.rawData_tr(trIdx).info.excludeTrialExplanation{end+1} = excludeMessage;
             end
+               
+        elseif( numMarkersLeftBehind == 1 )
             
+            sessionData.rawData_tr(trIdx).info.excludeTrial = 1;
+            % Replace session data with edited data
+            mYData_fr_mIdx{leftBehind_cIdx} = zeros(size(mYData_fr_mIdx{leftBehind_cIdx}));
             
-        elseif( numMarkersLeftBehind > 0 )
+            data_cFr_mkr_XYZ{cIdx} = mYData_fr_mIdx;
             
-            %% Replace session data with edited data
-            
-            data_cFr_mkr_XYZ{cIdx}(:,leftBehind_mIdx,:) = NaN;
-            
-            if( cIdx == 1 )
-                sessionData.rawData_tr(trIdx).leftFoot_fr_mkr_XYZ = data_cFr_mkr_XYZ{cIdx};
-            elseif( cIdx == 2)
-                sessionData.rawData_tr(trIdx).rightFoot_fr_mkr_XYZ = data_cFr_mkr_XYZ{cIdx};
-            end
+%             if( cIdx == 1 )
+%                 sessionData.rawData_tr(trIdx).leftFoot_fr_mkr_XYZ = data_cFr_mkr_XYZ{cIdx};
+%             elseif( cIdx == 2)
+%                 sessionData.rawData_tr(trIdx).rightFoot_fr_mkr_XYZ = data_cFr_mkr_XYZ{cIdx};
+%             end
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %%  Log changes!
@@ -75,10 +78,10 @@ for trIdx = 1:sessionData.expInfo.numTrials
             %%% Append changes to trial log
             modMessage = sprintf('checkForExclusions: Marker data missing for a single marker in a rigid body.  To correct, values were set to NAN.');
             
-            if( isempty( sessionData.rawData_tr(trIdx).trialModifications_cModIdx) )
-                sessionData.rawData_tr(trIdx).trialModifications_cModIdx{1} = modMessage;
+            if( isempty( sessionData.rawData_tr(trIdx).info.trialModifications_cModIdx) )
+                sessionData.rawData_tr(trIdx).info.trialModifications_cModIdx{1} = modMessage;
             else
-                sessionData.rawData_tr(trIdx).trialModifications_cModIdx{end+1} = modMessage;
+                sessionData.rawData_tr(trIdx).info.trialModifications_cModIdx{end+1} = modMessage;
             end
              
             %%% Append changes to experiment log
@@ -89,7 +92,7 @@ for trIdx = 1:sessionData.expInfo.numTrials
             end
             
             
-            modMessage = sprintf('checkForExclusions: Significant marker data missing and replaced. trIdx: %u foot: %s mIdx: %s .',trIdx,footStr,mat2str(leftBehind_mIdx));
+            modMessage = sprintf('checkForExclusions: Significant marker data missing and replaced. trIdx: %u foot: %s mIdx: %s .',trIdx,footStr,mat2str(leftBehind_cIdx));
             
             if( isempty( sessionData.expInfo.changeLog_cChangeIdx) )
                 sessionData.expInfo.changeLog_cChangeIdx{1} = modMessage;
@@ -97,9 +100,25 @@ for trIdx = 1:sessionData.expInfo.numTrials
                 sessionData.expInfo.changeLog_cChangeIdx{end+1} = modMessage;
             end
             
+        else
+            display('No markers left behind')
         end
+        if sum(sessionData.rawData_tr(trIdx).info.eventFlag_fr == 8) > 0
 
-    end 
+            excludeMessage = sprintf('Error found in Trial. Collision or failed number task');
+            sessionData.rawData_tr(trIdx).info.excludeTrial = 1;
+            
+            if( isempty( sessionData.rawData_tr(trIdx).info.excludeTrialExplanation) )
+                sessionData.rawData_tr(trIdx).info.excludeTrialExplanation{1} = excludeMessage;
+            else
+                sessionData.rawData_tr(trIdx).info.excludeTrialExplanation{end+1} = excludeMessage;
+            end         
+            
+        end
+    end
+    
+    sessionData.rawData_tr(trIdx).lFoot.mkrPos_mIdx_Cfr_xyz = data_cFr_mkr_XYZ{1};
+    sessionData.rawData_tr(trIdx).rFoot.mkrPos_mIdx_Cfr_xyz = data_cFr_mkr_XYZ{2};
 end
 
 

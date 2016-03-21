@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<GazeCorrectionChronicle Version="1.0">
+  <GazeCorrectionData ApplyAtFrame="4294967295" EyeId="EYEID_LEFTEYE" CalibrationType="CALIBRATIONTYPE_3_POINT" Type="linear">
+     <Parameter Name="theta.x" Value="1.04789" />
+     <Parameter Name="theta.y" Value="-0.60387" />
+     <Parameter Name="theta.z" Value="1.10706" />
+     <Parameter Name="phi.x" Value="-0.141581" />
+     <Parameter Name="phi.y" Value="0.873718" />
+     <Parameter Name="phi.z" Value="0.221053" />
+  </GazeCorrectionData>
+  <GazeCorrectionData ApplyAtFrame="0" EyeId="EYEID_RIGHTEYE" CalibrationType="CALIBRATIONTYPE_3_POINT" Type="linear">
+     <Parameter Name="theta.x" Value="1.03015" />
+     <Parameter Name="theta.y" Value="-0.461583" />
+     <Parameter Name="theta.z" Value="0.965746" />
+     <Parameter Name="phi.x" Value="-0.140135" />
+     <Parameter Name="phi.y" Value="0.755392" />
+     <Parameter Name="phi.z" Value="0.45945" />
+  </GazeCorrectionData>
+  <GazeCorrectionData ApplyAtFrame="4294967295" EyeId="EYEID_LEFTEYE" CalibrationType="CALIBRATIONTYPE_1_POINT_SPHERICAL" Type="angle">
+     <Parameter Name="angle.x" Value="0.0425198" />
+     <Parameter Name="angle.y" Value="-0.0398981" />
+     <Parameter Name="angle.z" Value="0" />
+  </GazeCorrectionData>
+  <GazeCorrectionData ApplyAtFrame="4294967295" EyeId="EYEID_RIGHTEYE" CalibrationType="CALIBRATIONTYPE_1_POINT_SPHERICAL" Type="angle">
+     <Parameter Name="angle.x" Value="0.171883" />
+     <Parameter Name="angle.y" Value="0.0344817" />
+     <Parameter Name="angle.z" Value="0" />
+  </GazeCorrectionData>
+</GazeCorrectionChronicle>

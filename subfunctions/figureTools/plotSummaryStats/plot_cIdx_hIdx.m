@@ -20,7 +20,7 @@ stdYData_cIdx_hIdx = summaryStruct.std_cIdx_hIdx;
 values_cIdx_hIdx = summaryStruct.values_cIdx_hIdx;
 
 l1 = errorbar( xData, meanYData_cIdx_hIdx(1,:)',stdYData_cIdx_hIdx(1,:)','LineWidth',3,'LineStyle',lineStyle_cond(1),'Color',lineColor_cond(1),'Marker','o','MarkerFaceColor',lineColor_cond(1),'MarkerSize',10,'MarkerEdgeColor','k');
-l2 = errorbar( xData, meanYData_cIdx_hIdx(2,:)',stdYData_cIdx_hIdx(1,:)','LineWidth',3,'LineStyle',lineStyle_cond(2),'Color',lineColor_cond(2),'Marker','o','MarkerFaceColor',lineColor_cond(2),'MarkerSize',10,'MarkerEdgeColor','k');
+% l2 = errorbar( xData, meanYData_cIdx_hIdx(2,:)',stdYData_cIdx_hIdx(1,:)','LineWidth',3,'LineStyle',lineStyle_cond(2),'Color',lineColor_cond(2),'Marker','o','MarkerFaceColor',lineColor_cond(2),'MarkerSize',10,'MarkerEdgeColor','k');
 
 %% Plot Scatterplot xdata
 if (showIndividualTrials )
@@ -49,10 +49,10 @@ if (showIndividualTrials )
 end
 
 %%
-allXData = [ l1.XData l2.XData ];
+allXData = [ l1.XData];% l2.XData ];
 
-l2X = l2.XData;
-l2.XData = l2X - .1 * figBufferPro * range(allXData);
+% l2X = l2.XData;
+% l2.XData = l2X - .1 * figBufferPro * range(allXData);
 
 l1X = l1.XData;
 l1.XData = l1X+ .1 * figBufferPro *range(allXData);

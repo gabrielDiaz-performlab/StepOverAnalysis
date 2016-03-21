@@ -1,39 +1,41 @@
-function plotTrialRigid(sessionData,trialNum)
+function F = plotTrialRigid(sessionData,trialNum)
 
 loadParameters
 
-trialData = sessionData.rawData_tr(trialNum);
-numFrames = size(trialData.rightFoot_fr_mkr_XYZ,1);
+trialData = sessionData.processedData_tr(trialNum);
+numFrames = size(trialData.rFoot.rbPos_mFr_xyz,1);
 
-if( sessionData.rawData_tr(trialNum).subIsWalkingUpAxis == 0 )
+if( trialData.info.subIsWalkingUpAxis == 0 )
     fprintf('Trial is flipped\n')
 end
 
 % Create figure
-figure1 = figure(trialNum);
+% figure1 = figure('units','normalized','outerposition',[0 0 1 1]);
+figure1 = figure;
 clf
 set(gcf,'Renderer','OpenGL');
 hold on 
 axis off
+axis manual
 
 %% Plot markers over time
 
-% plotMarkersFromRigid(figure1,trialData.rightFoot_fr_mkr_XYZ,'r')
-% plotMarkersFromRigid(figure1,trialData.leftFoot_fr_mkr_XYZ,'b')
-% plotMarkersFromRigid(figure1,trialData.head_fr_mkr_XYZ,'k')
-% plotMarkersFromRigid(figure1,trialData.spine_fr_mkr_XYZ,'g')
+plotMarkersFromRigid(trialData.rFoot.mkrPos_mIdx_Cfr_xyz,'r')
+plotMarkersFromRigid(trialData.lFoot.mkrPos_mIdx_Cfr_xyz,'b')
+plotMarkersFromRigid(trialData.glasses.mkrPos_mIdx_Cfr_xyz,'k')
+plotMarkersFromRigid(trialData.spine.mkrPos_mIdx_Cfr_xyz,'g');
 
 %% Plot obstacle
 plotObs(sessionData,trialNum,'c');
 
-axis([-2, 2, -0.5, 7.5, 0,2.25])
+axis([-2, 2, -0.5, 7.5, 0,7])
 axis equal
 
 %%
-TitleText = sprintf('Trial number %1.0f ', trialNum);
+%TitleText = sprintf('Trial number %1.0f ', trialNum);
 
 % Create title
-title(TitleText,'FontWeight','bold','FontSize',14,'FontName','Arial');
+%title(TitleText,'FontWeight','bold','FontSize',14,'FontName','Arial');
 
 % Create xlabel
 xlabel('X (m)','FontWeight','bold','FontSize',12,'FontName','Arial');
@@ -48,53 +50,96 @@ zlabel('Z (m)','FontWeight','bold','FontSize',12,'FontName','Arial');
 
 set(gcf,'position',[0,350,950,450])
 
-% FixMe:  foot posiion should be saved
-%%
-rFootBox = 0;
-lFootBox = 0;
-
+set(gca,'cameraviewanglemode','manual');
 camtarget('manual')
 campos('manual')
 camproj('orthographic')
 camva('manual') 
 camva(60)
 
-spine_fr_xyz = sessionData.processedData_tr(trialNum).spine_fr_xyz;
+% GIW = trialData.ETG.cycGIW_fr_vec;
+% GIWx = trialData.ETG.cycGIWx_fr_vec;
+% GIWy = trialData.ETG.cycGIWy_fr_vec;
+% GIWz = trialData.ETG.cycGIWz_fr_vec;
+
+headPos = trialData.glasses.rbPos_mFr_xyz;
+
+% gazePoint = headPos + GIW*1.5;
+% gazePointx = headPos + GIWx*0.5;
+% gazePointy = headPos + GIWy*0.5;
+% gazePointz = headPos + GIWz*0.5;
+gazePoint = trialData.ETG.GVPosOnPlane_fr;
+closestPointOnObj = trialData.ETG.closestPtOnObj_fr;
 
 frIdx = 1;
 
-footPos_XYZ = squeeze(mean(trialData.rightFoot_fr_mkr_XYZ(frIdx,[ 1 3], :)));
+footPos_XYZ = trialData.rFoot.rbPos_mFr_xyz(frIdx,:);
 footSize_LWH = [.25 .1 .07];
-rotMat_d1_d2 = squeeze(trialData.rightFootRot_fr_d1_d2(frIdx,:,:));
+headSize_LWH = [0.3 0.3 0.3];
+
+rotMat_d1_d2 = squeeze(trialData.rFoot.rot_fr_d1_d2(frIdx,:,:));
 
 % WHen the first arg passed to plotBox() is a figure object, it adds a new
 % patch object
-rFootBox = plotBox(figure1,footPos_XYZ,footSize_LWH,rotMat_d1_d2,'r');
+rFootBox = plotBox(figure1, footPos_XYZ, footSize_LWH, rotMat_d1_d2, 'r');
 
-footPos_XYZ = squeeze(mean(trialData.leftFoot_fr_mkr_XYZ(frIdx,[ 1 3], :)));
-footSize_LWH = [.25 .1 .07];
-rotMat_d1_d2 = squeeze(trialData.leftFootRot_fr_d1_d2(frIdx,:,:));
-lFootBox = plotBox(figure1,footPos_XYZ,footSize_LWH,rotMat_d1_d2,'b');
+footPos_XYZ = trialData.lFoot.rbPos_mFr_xyz(frIdx,:);
+rotMat_d1_d2 = squeeze(trialData.lFoot.rot_fr_d1_d2(frIdx,:,:));
 
-for frIdx = 1:5:numFrames
+lFootBox = plotBox(figure1, footPos_XYZ, footSize_LWH, rotMat_d1_d2, 'b');
+
+%Plot a box for the head too
+rotMat_d1_d2 = squeeze(trialData.glasses.rot_fr_d1_d2(frIdx,:,:));
+glassesBox = plotBox(figure1, headPos(frIdx,:), headSize_LWH, rotMat_d1_d2, 'g');
+
+gaze = plotGV(figure1, headPos, gazePoint, frIdx);
+closest = plotPt(figure1, closestPointOnObj(frIdx,:), [0.2 0.2 0.2]);
+
+nFrames = length(1:20:numFrames);
+
+% Preallocate movie structure.
+F(1:nFrames) = struct('cdata', [], 'colormap', []);
+
+counter = 1;
+for frIdx = 1:30:numFrames
    
-    camPos_XYZ = [1 spine_fr_xyz(frIdx,2) .7];
-    camTarg_XYZ = [0 spine_fr_xyz(frIdx,2) .7];
+    camPos_XYZ =  [1 headPos(frIdx,2)-1 2];
+    camTarg_XYZ = [0 headPos(frIdx,2) .5];
+    
+    if any(isnan(camPos_XYZ))
+        camPos_XYZ = [0 0 0];
+        camTarg_XYZ = [0 0 0];
+    end
     
     campos(camPos_XYZ);
     camtarget(camTarg_XYZ);
     
-    footPos_XYZ = squeeze(mean(trialData.rightFoot_fr_mkr_XYZ(frIdx,[ 1 3], :)));
-    rotMat_d1_d2 = squeeze(trialData.rightFootRot_fr_d1_d2(frIdx,:,:)); 
-    % WHen the first arg passed to plotBox() is a patch object, it updates
-    % the patch object
-    rFootBox = plotBox(rFootBox,footPos_XYZ,footSize_LWH,rotMat_d1_d2,'r');
+    footPos_XYZ = trialData.rFoot.rbPos_mFr_xyz(frIdx,:);
+    rotMat_d1_d2 = squeeze(trialData.rFoot.rot_fr_d1_d2(frIdx,:,:));
     
-	footPos_XYZ = squeeze(mean(trialData.leftFoot_fr_mkr_XYZ(frIdx,[ 1 3], :)));
-    rotMat_d1_d2 = squeeze(trialData.leftFootRot_fr_d1_d2(frIdx,:,:)); 
-    lFootBox = plotBox(lFootBox,footPos_XYZ,footSize_LWH,rotMat_d1_d2,'b');
+    rFootBox = plotBox(rFootBox, footPos_XYZ, footSize_LWH, rotMat_d1_d2, 'r');
     
-    %pause(1/60)
+	footPos_XYZ = trialData.lFoot.rbPos_mFr_xyz(frIdx,:);
+    rotMat_d1_d2 = squeeze(trialData.lFoot.rot_fr_d1_d2(frIdx,:,:));
+    
+    lFootBox = plotBox(lFootBox, footPos_XYZ, footSize_LWH, rotMat_d1_d2, 'b');
+    
+    headPos_XYZ = headPos(frIdx,:);
+    rotMat_d1_d2 = squeeze(trialData.glasses.rot_fr_d1_d2(frIdx,:,:));
+    
+    glassesBox = plotBox(glassesBox, headPos_XYZ, headSize_LWH, rotMat_d1_d2, 'g');
+    
+    gaze = plotGV(gaze, headPos, gazePoint, frIdx);
+    
+    closest = plotPt(closest, closestPointOnObj(frIdx,:), [0.2 0.2 0.2]);
+    
+%     gazex = line([headPos(frIdx,1) gazePointx(frIdx,1)],[headPos(frIdx,2) gazePointx(frIdx,2)],[headPos(frIdx,3) gazePointx(frIdx,3)],'Color',[1 0 0],'LineWidth',2);
+%     gazey = line([headPos(frIdx,1) gazePointy(frIdx,1)],[headPos(frIdx,2) gazePointy(frIdx,2)],[headPos(frIdx,3) gazePointy(frIdx,3)],'Color',[0 1 0],'LineWidth',2);
+%     gazez = line([headPos(frIdx,1) gazePointz(frIdx,1)],[headPos(frIdx,2) gazePointz(frIdx,2)],[headPos(frIdx,3) gazePointz(frIdx,3)],'Color',[0 0 1],'LineWidth',2);
+    
     drawnow
+    
+    F(counter) = getframe(figure1);
+    counter = counter + 1;
     
 end

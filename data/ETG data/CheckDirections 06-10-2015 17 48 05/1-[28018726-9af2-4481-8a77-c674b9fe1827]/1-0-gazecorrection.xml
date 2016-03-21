@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<GazeCorrectionChronicle Version="1.0">
+  <GazeCorrectionData ApplyAtFrame="0" EyeId="EYEID_LEFTEYE" CalibrationType="CALIBRATIONTYPE_1_POINT_SPHERICAL" Type="angle">
+     <Parameter Name="angle.x" Value="0.0112901" />
+     <Parameter Name="angle.y" Value="-0.0157946" />
+     <Parameter Name="angle.z" Value="0" />
+  </GazeCorrectionData>
+  <GazeCorrectionData ApplyAtFrame="0" EyeId="EYEID_RIGHTEYE" CalibrationType="CALIBRATIONTYPE_1_POINT_SPHERICAL" Type="angle">
+     <Parameter Name="angle.x" Value="0.203047" />
+     <Parameter Name="angle.y" Value="-0.065677" />
+     <Parameter Name="angle.z" Value="0" />
+  </GazeCorrectionData>
+</GazeCorrectionChronicle>

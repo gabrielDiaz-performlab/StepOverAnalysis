@@ -22,8 +22,8 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
 %     # 6 Trial end
 %     # 7 Block end
 		
-    trialStartFr_tIdx = find(eventFlag == 1 );
-    trialStopFr_tIdx = union(find(eventFlag == 6),find(eventFlag == 7));
+    trialStartFr_trIdx = find(eventFlag == 1 );
+    trialStopFr_trIdx = union(find(eventFlag == 6),find(eventFlag == 7));
     blockEndFr_blIdx = find(eventFlag == 7);
     
     %%
@@ -36,7 +36,7 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
         
     for bIdx = 1:numel(bList)-1
 
-        trialsInBIdx = intersect( find(trialStartFr_tIdx > bList(bIdx)), find(trialStartFr_tIdx < bList(bIdx+1)));
+        trialsInBIdx = intersect( find(trialStartFr_trIdx > bList(bIdx)), find(trialStartFr_trIdx < bList(bIdx+1)));
         blockIndex_tr(trialsInBIdx) = bIdx;
     end
     
@@ -53,14 +53,11 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
     % First, create an array of empty structs.
     
     trialStruct = struct;
-    numTrials = length(trialStartFr_tIdx);
+    numTrials = length(trialStartFr_trIdx);
     trialStructs_tr = repmat(trialStruct, numTrials, 1 );
     
     %% Per trial loop
-    for tIdx = 1:numTrials
-    
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        %% Info
+    for trIdx = 1:numTrials
         
         info = struct;
         
@@ -69,23 +66,24 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
         info.trialModifications_cModIdx = [];
         
         % Add basic trial start/stop info
-        info.startFr = trialStartFr_tIdx(tIdx);
-        info.stopFr = trialStopFr_tIdx(tIdx);
-        
-%         trialFrames = trialStartFr_tIdx:trialStopFr_tIdx;
-        trialFrames = trialStartFr_tIdx(tIdx):trialStopFr_tIdx(tIdx);
-        info.sysTime_fr = sysTime_fr(trialFrames); % - sysTime_fr(trialFrames(1))
+        info.startFr = trialStartFr_trIdx(trIdx);
+        info.stopFr = trialStopFr_trIdx(trIdx);
+
+        trialFrames = trialStartFr_trIdx(trIdx):trialStopFr_trIdx(trIdx);
+        info.sysTime_fr = sysTime_fr(trialFrames); 
         info.eventFlag_fr = eventFlag(trialFrames );
         
-        subIsWalkingUpAxis = -isWalkingDownAxis_tr(tIdx);
+        %RK: This inversion sign is necessary. subIsWalkingUpAxis = 1 means
+        %walking towards the front wall from the main lab entrance.
+        
+        subIsWalkingUpAxis = ~isWalkingDownAxis_tr(trIdx); 
         info.subIsWalkingUpAxis = subIsWalkingUpAxis;
         
-        info.type = trialType_tr(tIdx); 
-        info.block = blockIndex_tr(tIdx);
-
-        trialStructs_tr(tIdx).info  = info ;
         
-        %frIdxList = trialStartFr_tIdx(tIdx):trialStopFr_tIdx(tIdx);
+        info.type = trialType_tr(trIdx); 
+        info.block = blockIndex_tr(trIdx);
+
+        trialStructs_tr(trIdx).info  = info ;
 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %% Prepare rotation matrix 
@@ -101,70 +99,72 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %% Right foot marker and rb data
-        
-        %% Rakshit:  THis is where I would implement cell2mat
-        
+               
         rFoot = struct;
 
-        rFoot.pos_fr_xyz = rFoot_fr_XYZ(trialFrames ,:);
+        rFoot.pos_fr_xyz = prepareFOR(rFoot_fr_XYZ(trialFrames ,:),subIsWalkingUpAxis,standingBoxOffset_posZ(trIdx),standingBoxOffset_negZ(trIdx));
         rFoot.quat_fr_wxyz = rFootQUAT_fr_WXYZ(trialFrames ,:);
-        rFoot.rot_fr_d1_d2 = quatVecToRotationMatVec(rFootQUAT_fr_WXYZ(trialFrames ,:),subIsWalkingUpAxis);
+        rFoot.rot_fr_d1_d2 = quatVecToRotationMatVec(rFootQUAT_fr_WXYZ(trialFrames ,:),subIsWalkingUpAxis); 
         
+        try
+            rFoot.rbPos_mFr_xyz = cell2mat(rFootRbPos_tr_CmFr(trIdx));
+            rFoot.rbPos_mFr_xyz = prepareFOR(rFoot.rbPos_mFr_xyz,subIsWalkingUpAxis,standingBoxOffset_posZ(trIdx),standingBoxOffset_negZ(trIdx));
+            rFoot.rbPosSysTime_mFr_xyz = cell2mat(rFootRbSysTime_tr_CmFr(trIdx));
+        catch
+           keyboard 
+        end
         
-        rFoot.rbPos_mFr_xyz = rFootRbPos_tr_CmFr(tIdx);
-        rFoot.rbPosSysTime_mFr_xyz = rFootRbSysTime_tr_CmFr(tIdx);
-        
-        rFoot.rbQuat_mFr_xyz = rFootRbQuat_tr_CmFr_xyz(tIdx);
-        
-        rFoot.rbQuatSysTime_mFr = rFootRbQuatSysTime_tr_CmFr(tIdx);
+        rFoot.rbQuat_mFr_xyz = cell2mat(rFootRbQuat_tr_CmFr_xyz(trIdx));
+        rFoot.rbQuatSysTime_mFr = cell2mat(rFootRbQuatSysTime_tr_CmFr(trIdx));
         
         %%
         % Marker data
         for mIdx = 1:size(rFootMData_tr_mIdx_CmFr_xyz,2)
             
-            rFoot.mkrPos_mIdx_Cfr_xyz(mIdx,:,:) = rFootMData_tr_mIdx_CmFr_xyz(tIdx,mIdx);
-            rFoot.mkrSysTime_mIdx_Cfr(mIdx,:) = rFootSysTime_tr_mIdx_CmFr(tIdx,1);
+            rFoot.mkrPos_mIdx_Cfr_xyz(mIdx,:,:) = {prepareFOR(cell2mat(rFootMData_tr_mIdx_CmFr_xyz(trIdx,mIdx)), subIsWalkingUpAxis,standingBoxOffset_posZ(trIdx),standingBoxOffset_negZ(trIdx))};
+            rFoot.mkrSysTime_mIdx_Cfr(mIdx,:) = rFootSysTime_tr_mIdx_CmFr(trIdx,mIdx);
             
         end
         
         % Collisions
         
         rFootCollisionFrames = intersect( ...
-            rightFootCollisionFr_cIdx(find(rightFootCollisionFr_cIdx > trialStartFr_tIdx(tIdx))),...
-            rightFootCollisionFr_cIdx(find(rightFootCollisionFr_cIdx  < trialStopFr_tIdx(tIdx))));
+            rightFootCollisionFr_cIdx(find(rightFootCollisionFr_cIdx > trialStartFr_trIdx(trIdx))),...
+            rightFootCollisionFr_cIdx(find(rightFootCollisionFr_cIdx  < trialStopFr_trIdx(trIdx))));
         
         rFoot.collisionFrames_idx = rFootCollisionFrames ;
         
-        trialStructs_tr(tIdx).rFoot = rFoot;
+        trialStructs_tr(trIdx).rFoot = rFoot;
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %% Left foot marker and rb data
         
         lFoot = struct;
 
-        lFoot.pos_fr_xyz = lFoot_fr_XYZ(trialFrames ,:);
+        lFoot.pos_fr_xyz = prepareFOR(lFoot_fr_XYZ(trialFrames ,:),subIsWalkingUpAxis,standingBoxOffset_posZ(trIdx),standingBoxOffset_negZ(trIdx));
         lFoot.quat_fr_wxyz = lFootQUAT_fr_WXYZ(trialFrames ,:);
-        lFoot.rot_fr_d1_d2 = quatVecToRotationMatVec(lFootQUAT_fr_WXYZ(trialFrames ,:),subIsWalkingUpAxis);
+        lFoot.rot_fr_d1_d2 = quatVecToRotationMatVec(lFootQUAT_fr_WXYZ(trialFrames ,:), subIsWalkingUpAxis);
         
-        lFoot.rbPos_mFr_xyz = lFootRbPos_tr_CmFr(tIdx);
-        lFoot.rbPosSysTime_mFr_xyz = lFootRbSysTime_tr_CmFr(tIdx);
+        lFoot.rbPos_mFr_xyz = cell2mat(lFootRbPos_tr_CmFr(trIdx));
+        lFoot.rbPos_mFr_xyz = prepareFOR(lFoot.rbPos_mFr_xyz,subIsWalkingUpAxis,standingBoxOffset_posZ(trIdx),standingBoxOffset_negZ(trIdx));
+        lFoot.rbPosSysTime_mFr_xyz = cell2mat(lFootRbSysTime_tr_CmFr(trIdx));
         
-        lFoot.rbQuat_mFr_xyz = lFootRbQuat_tr_CmFr_xyz(tIdx);
-        lFoot.rbQuatSysTime_mFr = lFootRbQuatSysTime_tr_CmFr(tIdx);
-        
+        lFoot.rbQuat_mFr_xyz = cell2mat(lFootRbQuat_tr_CmFr_xyz(trIdx));
+        lFoot.rbQuatSysTime_mFr = cell2mat(lFootRbQuatSysTime_tr_CmFr(trIdx));
+                       
         % Marker data
         for mIdx = 1:size(lFootMData_tr_mIdx_CmFr_xyz,2)
-            lFoot.mkrPos_mIdx_Cfr_xyz(mIdx,:,:) = lFootMData_tr_mIdx_CmFr_xyz(tIdx,mIdx);
-            lFoot.mkrSysTime_mIdx_Cfr(mIdx,:) = lFootSysTime_tr_mIdx_CmFr(tIdx,mIdx);
+            lFoot.mkrPos_mIdx_Cfr_xyz(mIdx,:,:) = {prepareFOR(cell2mat(lFootMData_tr_mIdx_CmFr_xyz(trIdx,mIdx)), subIsWalkingUpAxis,standingBoxOffset_posZ(trIdx),standingBoxOffset_negZ(trIdx))};
+            lFoot.mkrSysTime_mIdx_Cfr(mIdx,:) = lFootSysTime_tr_mIdx_CmFr(trIdx,mIdx);
         end
         
         lFootCollisionFrames = intersect( ...
-            leftFootCollisionFr_idx(find(leftFootCollisionFr_idx > trialStartFr_tIdx(tIdx))),...
-            leftFootCollisionFr_idx(find(leftFootCollisionFr_idx  < trialStopFr_tIdx(tIdx))));
+            leftFootCollisionFr_idx(find(leftFootCollisionFr_idx > trialStartFr_trIdx(trIdx))),...
+            leftFootCollisionFr_idx(find(leftFootCollisionFr_idx  < trialStopFr_trIdx(trIdx))));
         
         lFoot.collisionFrames_idx = lFootCollisionFrames ;
         
-        trialStructs_tr(tIdx).lFoot = lFoot;
+        trialStructs_tr(trIdx).lFoot = lFoot;
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %% Glasses marker and rb data
@@ -175,50 +175,44 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
         % fixed position relative to the glasses.  however, it may be
         % shifted slightly from the rbPos
         
-        glasses.pos_fr_xyz = mainView_fr_XYZ(trialFrames ,:);
-        glasses.quat_fr_wxyz = mainViewQUAT_fr_WXYZ(trialFrames ,:);
-        glasses.rot_fr_d1_d2 = quatVecToRotationMatVec(mainViewQUAT_fr_WXYZ(trialFrames ,:),subIsWalkingUpAxis);
+        glasses.pos_fr_xyz = prepareFOR(glasses_fr_XYZ(trialFrames ,:),subIsWalkingUpAxis,standingBoxOffset_posZ(trIdx),standingBoxOffset_negZ(trIdx));
+        glasses.quat_fr_wxyz = glassesQUAT_fr_WXYZ(trialFrames ,:);
+        glasses.rot_fr_d1_d2 = quatVecToRotationMatVec(glassesQUAT_fr_WXYZ(trialFrames ,:),subIsWalkingUpAxis);
         
-        glasses.rbPos_mFr_xyz = glassRbPos_tr_CmFr(tIdx);
-        glasses.rbPosSysTime_mFr_xyz = glassRbSysTime_tr_CmFr(tIdx);
+        glasses.rbPos_mFr_xyz = cell2mat(glassRbPos_tr_CmFr(trIdx));
+        glasses.rbPos_mFr_xyz = prepareFOR(glasses.rbPos_mFr_xyz,subIsWalkingUpAxis,standingBoxOffset_posZ(trIdx),standingBoxOffset_negZ(trIdx));
+        glasses.rbPosSysTime_mFr_xyz = cell2mat(glassRbSysTime_tr_CmFr(trIdx));
         
-        glasses.rbQuat_mFr_xyz = glassRbQuat_tr_CmFr_xyz(tIdx);
-        glasses.rbQuatSysTime_mFr = glassRbQuatSysTime_tr_CmFr(tIdx);
+        glasses.rbQuat_mFr_xyz = cell2mat(glassRbQuat_tr_CmFr_xyz(trIdx));
+        glasses.rbQuatSysTime_mFr = cell2mat(glassRbQuatSysTime_tr_CmFr(trIdx));
         
         % Marker data
         for mIdx = 1:size(glassesMData_tr_mIdx_CmFr_xyz,2)
-            glasses.mkrPos_mIdx_Cfr_xyz(mIdx,:) = glassesMData_tr_mIdx_CmFr_xyz(tIdx,mIdx);
-            glasses.mkrSysTime_mIdx_Cfr(mIdx,:) = glassesSysTime_tr_mIdx_CmFr(tIdx,mIdx);
+            glasses.mkrPos_mIdx_Cfr_xyz(mIdx,:) = {prepareFOR(cell2mat(glassesMData_tr_mIdx_CmFr_xyz(trIdx,mIdx)), subIsWalkingUpAxis,standingBoxOffset_posZ(trIdx),standingBoxOffset_negZ(trIdx))};
+            glasses.mkrSysTime_mIdx_Cfr(mIdx,:) = glassesSysTime_tr_mIdx_CmFr(trIdx,mIdx);
         end
         
-        trialStructs_tr(tIdx).glasses = glasses;
+        trialStructs_tr(trIdx).glasses = glasses;
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        %% Glasses marker and rb data
+        %% Spine marker and rb data
         
         spine = struct;
-
-        % This is actually the position of the mainview, which is in a
-        % fixed position relative to the glasses.  however, it may be
-        % shifted slightly from the rbPos
         
-        spine.pos_fr_xyz = mainView_fr_XYZ(trialFrames ,:);
-        spine.quat_fr_wxyz = mainViewQUAT_fr_WXYZ(trialFrames ,:);
-        spine.rot_fr_d1_d2 = quatVecToRotationMatVec(mainViewQUAT_fr_WXYZ(trialFrames ,:),subIsWalkingUpAxis);
+        spine.rbPos_mFr_xyz = cell2mat(spineRbPos_tr_CmFr(trIdx));
+        spine.rbPos_mFr_xyz = prepareFOR(spine.rbPos_mFr_xyz,subIsWalkingUpAxis,standingBoxOffset_posZ(trIdx),standingBoxOffset_negZ(trIdx));
+        spine.rbPosSysTime_mFr_xyz = cell2mat(spineRbSysTime_tr_CmFr(trIdx));
         
-        spine.rbPos_mFr_xyz = glassRbPos_tr_CmFr(tIdx);
-        spine.rbPosSysTime_mFr_xyz = glassRbSysTime_tr_CmFr(tIdx);
+        spine.rbQuat_mFr_xyz = cell2mat(spineRbQuat_tr_CmFr_xyz(trIdx));
+        spine.rbQuatSysTime_mFr = cell2mat(spineRbQuatSysTime_tr_CmFr(trIdx));
         
-        spine.rbQuat_mFr_xyz = glassRbQuat_tr_CmFr_xyz(tIdx);
-        spine.rbQuatSysTime_mFr = glassRbQuatSysTime_tr_CmFr(tIdx);
-        
-        % Marker data
+        % Marker data 
         for mIdx = 1:size(spineMData_tr_mIdx_CmFr_xyz,2)
-            spine.mkrPos_mIdx_Cfr_xyz(mIdx,:) = spineMData_tr_mIdx_CmFr_xyz(tIdx,mIdx);
-            spine.mkrSysTime_mIdx_Cfr(mIdx,:) = spineSysTime_tr_mIdx_CmFr(tIdx,mIdx);
+            spine.mkrPos_mIdx_Cfr_xyz(mIdx,:) = {prepareFOR(cell2mat(spineMData_tr_mIdx_CmFr_xyz(trIdx,mIdx)), subIsWalkingUpAxis,standingBoxOffset_posZ(trIdx),standingBoxOffset_negZ(trIdx))};
+            spine.mkrSysTime_mIdx_Cfr(mIdx,:) = spineSysTime_tr_mIdx_CmFr(trIdx,mIdx);
         end
         
-        trialStructs_tr(tIdx).spine = spine;
+        trialStructs_tr(trIdx).spine = spine;
         
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -226,10 +220,10 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
         
         obs = struct;
         
-        obs.pos_xyz = prepareFOR(obstacle_tr_XYZ(tIdx,:),subIsWalkingUpAxis);
-        obs.height = obstacleHeight_tr(tIdx);
+        obs.pos_xyz = prepareFOR(obstacle_tr_XYZ(trIdx,:),subIsWalkingUpAxis,standingBoxOffset_posZ(trIdx),standingBoxOffset_negZ(trIdx));
+        obs.height = obstacleHeight_tr(trIdx);
 
-        trialStructs_tr(tIdx).obs = obs;
+        trialStructs_tr(trIdx).obs = obs;
         
         
     end
@@ -239,13 +233,10 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
     %% Set session struct and expStruct info
     
     expInfo = struct;
-
     
     % This will build an unordered vector of unique values that appear
     % in the list of trials
     %%
-    %expInfo.obstacleHeights = sort(unique( obstacleHeight_tr ));
-    %expInfo.trialTypes = sort(unique( [trialStructs_tr.trialType] ));
         
     expInfo.numTrials = numTrials;
     expInfo.numBlocks = numel(unique(blockIndex_tr));

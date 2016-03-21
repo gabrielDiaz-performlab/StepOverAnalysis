@@ -4,6 +4,7 @@ function T = quaternion2matrix(Q)
     
     % Set up convenience variables
     w = Q(1); x = Q(2); y = Q(3); z = Q(4);
+    
     w2 = w^2; x2 = x^2; y2 = y^2; z2 = z^2;
     xy = x*y; xz = x*z; yz = y*z;
     wx = w*x; wy = w*y; wz = w*z;

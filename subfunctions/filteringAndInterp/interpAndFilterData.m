@@ -30,12 +30,12 @@ for trIdx = 1:numTrials
     
     rawData = sessionData.rawData_tr(trIdx);
     
-    data_cFr_mkr_XYZ = [{rawData.leftFoot_fr_mkr_XYZ},...
-    {rawData.rightFoot_fr_mkr_XYZ},...
-    {rawData.spine_fr_mkr_XYZ},...
-    {rawData.head_fr_mkr_XYZ}];
+    data_cFr_mkr_XYZ = [{rawData.lFoot.mkrPos_mIdx_Cfr_xyz},...
+    {rawData.rFoot.mkrPos_mIdx_Cfr_xyz},...
+    {rawData.glasses.mkrPos_mIdx_Cfr_xyz},...
+    {rawData.spine.mkrPos_mIdx_Cfr_xyz}];
 
-    frameTime_fr = sessionData.rawData_tr(trIdx).frameTime_fr;
+    frameTime_fr = sessionData.rawData_tr(trIdx).info.sysTime_fr   ;
     
     processedData = struct;
     
@@ -45,11 +45,11 @@ for trIdx = 1:numTrials
         data_fr_mkr_XYZ = data_cFr_mkr_XYZ{cIdx};
         interpData_fr_mkr_XYZ = data_cFr_mkr_XYZ{cIdx};
         
-        for mIdx = 1:size(data_cFr_mkr_XYZ,2)
+        for mIdx = 1:length(data_fr_mkr_XYZ)
             for xyzIdx = 1:3
                 
                 % Find number that are not equal to NaN
-                goodIdx = find( ~isnan(data_fr_mkr_XYZ(:,mIdx,xyzIdx) ));
+                goodIdx = find( ~isnan( data_fr_mkr_XYZ{mIdx}(:,xyzIdx) ));
                 
                 % Note that if the marker was not seen during capture, it could be
                 % set to NAN for the entire trial in checkForExclusions.m
@@ -57,21 +57,14 @@ for trIdx = 1:numTrials
                 
                 if( numel(goodIdx)  > 0 && numel(goodIdx) < size(data_fr_mkr_XYZ,1) )
                     
-                    numFrames = size(data_fr_mkr_XYZ(:,mIdx,xyzIdx),1);
-                    
-                    %spineInterpFrames_mkr_XYZ_cFr(mIdx,xyzIdx) = ...
-                    %    {setdiff(1:numFrames,goodIdx)};
-                    
                     try
                         display('Interpolated!')
-                        %processedData.spine_fr_mkr_XYZ(:,mIdx,xyzIdx) =
-                        interpData_fr_mkr_XYZ(:,mIdx,xyzIdx) = interp1(...
-                            frameTime_fr(goodIdx),...
-                            data_fr_mkr_XYZ(goodIdx,mIdx,xyzIdx),...
-                            frameTime_fr,...
-                            'spline','extrap');
+                        
+                       interpData_fr_mkr_XYZ{mIdx}(:,xyzIdx) = interp1(frameTime_fr(goodIdx),...
+                            data_fr_mkr_XYZ{mIdx}(:,xyzIdx),...
+                            frameTime_fr, 'spline','extrap');
                     catch
-                        keyboard
+%                         keyboard
                         %processedData.spine_fr_mkr_XYZ(:,mIdx,xyzIdx) = rawData.spine_fr_mkr_XYZ(:,mIdx,xyzIdx);
                         %fprintf('Unable to interpolate spine data\n')
                     end
@@ -101,6 +94,6 @@ for trIdx = 1:numTrials
 end
 
 
-sessionData = filterMocapData(sessionData, 0);
+
 
 

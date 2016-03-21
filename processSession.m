@@ -18,7 +18,7 @@
 % rbPos_mFr_xyz: [2881x3 double]
 % rbPosSysTime_mFr_xyz: [2881x1 double]
 % rbQuat_mFr_xyz: [2881x4 double]
-% rbQuatSysTime_mFr: [2881x1 double]
+% rbQuatSysTime_mFr: [2881x1 double]  
 % mkrPos_mIdx_Cfr_xyz: {5x1 cell}
 % mkrSysTime_mIdx_Cfr: {5x1 cell}
 %%%%% 
@@ -31,12 +31,12 @@
 %%%%% 
 
 %%
-
+clc
 clear all
 close all
 
 sessionNumber = 1;
-cleanRunBool = 1;
+cleanRunBool = 0;
 
 close all
 
@@ -44,8 +44,10 @@ tic
 
 loadParameters
 
+addpath(genpath('helperFiles'))
+
 % You just need to pass the .mat file name and the experiment Data structure will be generated
-dataFileString = sprintf('%s.mat',dataFileList{sessionNumber})
+dataFileString = sprintf('%s.mat',dataFileList{sessionNumber});
 
 %% Generate or open session file struct
 
@@ -63,138 +65,184 @@ end
 
 sessionData =  loadSession(sessionNumber);
 
+%%
+% DisplaySessionData(sessionData, 2, 1, 'rawData_tr', 1) % rawData_tr -> view raw data; processedData_tr -> view processed data
 
-%% Gabe:  
+sessionData = checkForExclusions(sessionData);
 
-i=6;
+sessionData = synchronizeData(sessionData);
 
-rbAx = 3;  % This is wrong!  Z should be up
-vizAx = rbAx ;
+%% Override exclude trials
+% for trIdx = 1:sessionData.expInfo.numTrials
+%     sessionData.rawData_tr(trIdx).info.excludeTrial = 0;
+%     sessionData.processedData_tr(trIdx).info.excludeTrial = 0;
+% end
+%% filter
 
-figure(1)
-hold on
-cla
-rbPosMat_mFr_xyz = cell2mat(sessionData.rawData_tr(i).lFoot.rbPos_mFr_xyz);
-rbPos = rbPosMat_mFr_xyz(:,rbAx);
-rbTime  = cell2mat(sessionData.rawData_tr(i).lFoot.rbPosSysTime_mFr_xyz)
+sessionData = calculateSamplingRate(sessionData);
+sessionData = filterData(sessionData);
 
-pos = sessionData.rawData_tr(i).lFoot.pos_fr_xyz(:,vizAx);
-time = sessionData.rawData_tr(i).info.sysTime_fr;
+% DisplaySessionData(sessionData, 3, 13, 'processedData_tr', 1) % rawData_tr -> view raw data; processedData_tr -> view processed data
 
-plot( rbTime, rbPos,':r','LineWidth',2)
-plot( time, pos,'b')
+sessionData.expInfo.obsHeightRatios = sessionData.expInfo.obsHeightRatios(~isnan(sessionData.expInfo.obsHeightRatios));
+sessionData.expInfo.legLength = input('Enter leg length in meters: ');
+%% Mean Trial Duration
+sessionData = avgTrialDuration(sessionData);
+display(['Mean trial duration:' num2str(sessionData.expInfo.meanTrialDuration)]);
+
+%% Trial process functions
+
+for trIdx = 1:numel(sessionData.rawData_tr)
+
+    isBlankTrial = strcmp(sessionData.rawData_tr(trIdx).info.type{1}, 't4');
+    excludeTrial = sessionData.processedData_tr(trIdx).info.excludeTrial;
+    
+    sessionData.processedData_tr(trIdx).info.isBlankTrial = isBlankTrial;
+    
+    if ~isBlankTrial && ~excludeTrial    
+        [ sessionData ] = findSteps(sessionData, trIdx, 0);
+        [ sessionData ] = findFootCrossing(sessionData, trIdx);
+        [ sessionData ] = stepLengthAndDur(sessionData, trIdx);
+        [ sessionData ] = stepLengthAndDurASO(sessionData, trIdx);
+        [ sessionData ] = findCOM(sessionData, trIdx);
+        [ sessionData ] = avgCOMVelocity(sessionData, trIdx);
+        [ sessionData ] = maxVelAndHeightAXS(sessionData, trIdx);
+        [ sessionData ] = findDistPlantedFootASO(sessionData, trIdx);
+        
+        [ sessionData ] = calcObjCenteredTraj(sessionData, trIdx);
+        [ sessionData ] = toeHeightAndClearanceASO(sessionData, trIdx);
+        [ sessionData ] = findMinDistanceAXS(sessionData, trIdx); 
+        
+        [ sessionData ] = generateStepTrajectories(sessionData, trIdx);
+        
+        [ sessionData ] = processEyeTrackerInfo(sessionData, trIdx, 0);
+        [ sessionData ] = calcGVPosOnObj(sessionData, trIdx);
+        [ sessionData ] = findObstacleFix(sessionData, trIdx, 1);        
+        
+    elseif isBlankTrial && ~excludeTrial     
+        [ sessionData ] = findSteps(sessionData, trIdx, 0);
+        [ sessionData ] = generateStepTrajectories(sessionData, trIdx);      
+    end
+end
 
 %%
-% I think that, here, you should add a function to interpolate data to a
-% common timestamp
+StepNumber = 1;
 
-%DisplaySessionData(sessionData, 2, 4)
+DisplayTemplates(sessionData, 'lFoot', StepNumber);
+sessionData = generateUnbiasedModel(sessionData);
+sessionData = generateStepFlow(sessionData);
 
-% sessionData = synchronizeData(sessionData);
-% DisplaySessionData(sessionData, 2)
+plotModel(sessionData, StepNumber)
+analyseModel(sessionData)
+plotFootVariability(sessionData)
+%% Step heel down point analysis
 
-% sessionData = checkForExclusions(sessionData);
+% %% 3D plot of Walking Data
 % 
-% 
-% %% Interpolate and filter
-% 
-% sessionData = calculateSamplingRate(sessionData);
-% sessionData = interpAndFilterData(sessionData, 0); %Fixme - add trialModification messages
-% 
-% %%
-% 
-% sessionData = avgTrialDuration(sessionData);
-% sessionData.expInfo.meanTrialDuration;
-% 
-% 
-% %% Some per-trial functions
-% 
+% CT = 0;
 % for trIdx = 1:numel(sessionData.rawData_tr)
-%     
-%     [ sessionData ] = calcMeanRigidBodyPos(sessionData, trIdx);
-%     
-%     [ sessionData ] = findSteps(sessionData, trIdx, 0);
-%     [ sessionData ] = findFootCrossing(sessionData, trIdx,0);
-%     [ sessionData ] = stepLengthAndDur(sessionData,trIdx);
-%     [ sessionData ] = stepLengthAndDurASO(sessionData,trIdx);
-%     [ sessionData ] = findCOM(sessionData,trIdx);
-%     [ sessionData ] = avgCOMVelocity(sessionData,trIdx);
-%     [ sessionData ] = maxVelAndHeightAXS(sessionData,trIdx);
-%     [ sessionData ] = findDistPlantedFootASO(sessionData,trIdx);
-%     
-%     [ sessionData ] = calcObjCenteredTraj(sessionData,trIdx);
-%     
-%     %[ sessionData ] = toeHeightAndClearanceASO(sessionData, trIdx);
-%     [ sessionData ] = findMinDistanceAXS(sessionData,trIdx);
-%     
+%     t = sessionData.processedData_tr(trIdx).lFoot.rbPosSysTime_mFr_xyz;
+%     CT = unique([CT; t]);  
 % end
 % 
-% % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % %% Plot body scaled
-% % 
-% % figure(1010)
-% % hold on
-% % cla
-% % set(1010,'Units','Normalized','Position',[0.118055555555556 0.235555555555556 0.829166666666667 0.65]);
-% % title({'lead foot position','in units of leg length','for 1 obstacle height'})
-% % 
-% % for hIdx = 1:3
-% %     
-% %     trIdxList = find([sessionData.rawData_tr.trialType] == hIdx);
-% %     trIdxList = [trIdxList  find([sessionData.rawData_tr.trialType] == hIdx+3)];
-% %         
-% %     for trIdx = 1:numel(trIdxList)
-% %         
-% %         trNum = trIdxList(trIdx);
-% %         
-% %         if( strcmp( sessionData.dependentMeasures_tr(trNum).firstCrossingFoot, 'Left' ) )
-% %             
-% %             leadFoot_fr_XYZ = sessionData.processedData_tr(trIdxList(trIdx)).lFootBS_fr_XYZ;
-% %         else
-% %             leadFoot_fr_XYZ = sessionData.processedData_tr(trIdxList(trIdx)).rFootBS_fr_XYZ;
-% %         end
-% %         
-% %         X = repmat(trIdx,1,length(leadFoot_fr_XYZ ));
-% %         Y = leadFoot_fr_XYZ(:,2);
-% %         Z = leadFoot_fr_XYZ(:,3);
-% %         plot3(X,Y,Z)
-% %         
-% %     end
+% Y_lFoot_data = zeros(length(CT), numel(sessionData.rawData_tr));
+% Z_lFoot_data = zeros(length(CT), numel(sessionData.rawData_tr));
+% 
+% for trIdx = 1:numel(sessionData.rawData_tr)
+%     t = sessionData.processedData_tr(trIdx).lFoot.rbPosSysTime_mFr_xyz;
+%     Y_lFoot_data(:,trIdx) = interp1(t, sessionData.processedData_tr(trIdx).lFoot.rbPos_mFr_xyz(:,2), CT);
+%     Z_lFoot_data(:,trIdx) = interp1(t, sessionData.processedData_tr(trIdx).lFoot.rbPos_mFr_xyz(:,3), CT);
+% end
+% 
+% figure; hold on
+% for trIdx = 1:numel(sessionData.rawData_tr)
+%     plot3(CT, Y_lFoot_data(:,trIdx), Z_lFoot_data(:,trIdx));grid on  
+% end
+% xlabel('Time')
+% ylabel('Y Data')
+% zlabel('Z Data')
+% hold off
+% 
+% figure; hold on
+% for trIdx = 1:numel(sessionData.rawData_tr)
+%     plot(CT, Z_lFoot_data(:,trIdx));grid on  
+% end
+% xlabel('Time')
+% ylabel('Z Data')
+% hold off
+% 
+% figure; hold on
+% for trIdx = 1:numel(sessionData.rawData_tr)
+%     plot(Y_lFoot_data(:,trIdx), Z_lFoot_data(:,trIdx));grid on  
+% end
+% xlabel('Y Data')
+% ylabel('Z Data')
+% hold off
+%%
+% for i = 1:45
+%     temp(i) = sessionData.processedData_tr(i).ETG.NumOfSaccades;
+% end
+%% For Seth
+
+% ETG_data = cell(45,2);
+% 
+% % for i = 1:45
+% %     cgv = sessionData.processedData_tr(i).ETG.cycGIW_fr_vec;
+% %     ts = sessionData.processedData_tr(i).ETG.ETG_ts;
+% %     SR = 1/mean(diff(ts));
+% %     theta_X = atand(cgv(:,1)./cgv(:,2));
+% %     theta_Y = atand(cgv(:,3)./cgv(:,2));
+% %     ETG_data(i,1) = {[theta_X'; theta_Y']}; 
+% %     ETG_data(i,2) = {SR};
 % % end
 % 
+% for i = 1:45
+%     cgv = sessionData.rawData_tr(i).ETG.L_GVEC + sessionData.rawData_tr(i).ETG.R_GVEC; 
+%     cgv = normr(cgv);
+%     ts = sessionData.rawData_tr(i).ETG.ETG_ts;
+%     SR = 1/mean(diff(ts));
+%     theta_X = atand(cgv(:,1)./cgv(:,3));
+%     theta_Y = atand(cgv(:,2)./cgv(:,3));
+%     ETG_data(i,1) = {[theta_X'; theta_Y']}; 
+%     ETG_data(i,2) = {SR};
+% end
+
+%% Plot functions for a Trial
+
+% plotTrialMarkers(sessionData,trIdx);
+% F = plotTrialRigid(sessionData,trIdx);
+
+
+%% Analysis and Generate figures
+
+
+%%
+% movFig = figure;
+% movie(movFig,F,1)
+% movie2avi(F,'Animation.avi','compression','None');
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% plotAvgTraj_CxH - a work in progress
+% Analyzing to see if postural adjustments occurred during the approach,
+% or as they left the go-box
+
+% plotAvgTraj_CxH(sessionData)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Make some figures
 % 
-% %%
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % Some methods for plotting a trial
-% 
-% %plotTrialMarkers(sessionData,2);
-% %plotTrialRigid(sessionData,3)
-% 
-% 
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% %% plotAvgTraj_CxH - a work in progress
-% % Analyzing to see if postural adjustments occurred during the approach,
-% % or as they left the go-box
-% 
-% %plotAvgTraj_CxH(sessionData)
-% 
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% %% Make some figures
-% 
-% removeOutliers = 1
-% showIndividualTrials= 1;
+% removeOutliers = 1;
+% showIndividualTrials = 0;
 % sessionFigH = struct;
 % 
-% [sessionData sessionFigH ] = calculateSSandPlot(sessionData,removeOutliers,showIndividualTrials)
-% 
-% %%  Save figures
-% 
+% [sessionData, sessionFigH ] = calculateSSandPlot(sessionData,removeOutliers,showIndividualTrials);
+
+%%  Save figures
+
 % saveFigStructToDir(dataFileList{sessionNumber},sessionFigH);
 % 
 % %% Save session file
-% 
-% save([ sessionFileDir dataFileList{sessionNumber} '.mat'] , 'sessionData');
+display('Finished processing session')
+save([ sessionFileDir dataFileList{sessionNumber} '.mat'] , 'sessionData');

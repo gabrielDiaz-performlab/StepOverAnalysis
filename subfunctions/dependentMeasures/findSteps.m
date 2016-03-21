@@ -1,13 +1,12 @@
-function [sessionData figH] = findSteps(sessionData, trIdx, plotOn)
+function [sessionData, figH] = findSteps(sessionData, trIdx, plotOn)
 
-if nargin < 3
-    
-    plotOn = 0;
-    
+if nargin < 3  
+    plotOn = 0;    
 end
 
 if( plotOn)
-    figH = figure(3);
+%     close all
+    figH = figure;
     clf
 else
     figH = [];
@@ -21,7 +20,7 @@ loadParameters
 % presented in Zeni et al 2008 in Gait and Posture.
 %
 % The basic idea is to first situate the data by subtracting the
-% coordinates of the Root marker from each marker position at each frame,
+% coordinates of the Foot marker from each marker position at each frame,
 % essentially setting the origin to the subject's root.
 %
 % The velocity of each foot in the Y direction is then calculated. Zero
@@ -46,7 +45,7 @@ loadParameters
 % Simplified syntax.
 % Added a height threshold saved in through to loadParameters
 
-if(sessionData.rawData_tr(trIdx).excludeTrial == 1)
+if(sessionData.processedData_tr(trIdx).info.excludeTrial == 1)
     
     sessionData.dependentMeasures_tr(trIdx).rFoot = struct;
     sessionData.dependentMeasures_tr(trIdx).lFoot = struct;
@@ -60,9 +59,10 @@ if(sessionData.rawData_tr(trIdx).excludeTrial == 1)
     return
 end
 
-rightFoot_fr_XYZ = sessionData.processedData_tr(trIdx).rightFoot_fr_XYZ;
-leftFoot_fr_XYZ = sessionData.processedData_tr(trIdx).leftFoot_fr_XYZ;
-spine_fr_xyz= sessionData.processedData_tr(trIdx).spine_fr_xyz;
+rightFoot_fr_XYZ = sessionData.processedData_tr(trIdx).rFoot.rbPos_mFr_xyz;
+leftFoot_fr_XYZ = sessionData.processedData_tr(trIdx).lFoot.rbPos_mFr_xyz;
+spine_fr_xyz = sessionData.processedData_tr(trIdx).spine.rbPos_mFr_xyz;
+CTS = sessionData.processedData_tr(trIdx).rFoot.rbPosSysTime_mFr_xyz;
 
 try
     % Before subtracting spine position, get height
@@ -76,36 +76,23 @@ end
 rightFoot_fr_XYZ = rightFoot_fr_XYZ - spine_fr_xyz;
 leftFoot_fr_XYZ = leftFoot_fr_XYZ - spine_fr_xyz;
 
-% Calculate velocities along the Y axis
-spineVelY = diff(spine_fr_xyz(:,2)) ./ diff( spine_fr_xyz(:,1));
-
-%%
-%find frame wherein feet are moving
-%timeElapsed_fr = [1/60 diff(trialData.frameTime_fr)];
-
 meanFrameDur = sessionData.expInfo.meanFrameDur;
-meanFrameRate = sessionData.expInfo.meanFrameRate;
 
-%frameRate = mean(diff(sessionData.rawData_tr(1).frameTime_fr));
-%meanFrameRate = 1/frameRate ;
-
-rAnkVelY = [0 diff(rightFoot_fr_XYZ(:,2))'] ./ meanFrameRate;
-lAnkVelY = [0 diff(leftFoot_fr_XYZ(:,2))'] ./ meanFrameRate;
-
+rAnkVelY = [0 diff(rightFoot_fr_XYZ(:,2))'] ./ [0 diff(CTS)'];
+lAnkVelY = [0 diff(leftFoot_fr_XYZ(:,2))'] ./ [0 diff(CTS)'];
 
 %% Find frames when foot is under a height threshold
 
 lFootUnderHeightThresh_idx = find( lFootHeight_fr < footHeightThresh );
-lFootAboveHeightThresh_idx = find( lFootHeight_fr >= footHeightThresh);
 
 rFootUnderHeightThresh_idx = find( rFootHeight_fr < footHeightThresh);
-rFootAboveHeightThresh_idx = find( rFootHeight_fr >= footHeightThresh);
 
 %% Find zero crossings of foot velocity, with direction (e.g. neg to pos)
 
 x = diff(sign(rAnkVelY));
 rAnkVelY_upIdx = find(x >0) +1;
 rAnkVelY_downIdx= find(x <0) +1;
+
 rUpIter = 1;
 rDownIter = 1;
 
@@ -115,8 +102,6 @@ lAnkVelY_downIdx= find(x <0) +1;
 
 lUpIter = 1;
 lDownIter = 1;
-
-
 
 % Vectors for toe-offs and heel-strikes
 rTO = [];
@@ -137,7 +122,7 @@ for i = 1:maxIndex
         
         nextRTO = rFootUnderHeightThresh_idx( find( rFootUnderHeightThresh_idx <= rAnkVelY_upIdx(rUpIter),1,'last')) -1;
         
-        if( nextRTO == 0 ) nextRTO  = 1; end
+        if( nextRTO == 0 ), nextRTO  = 1; end
         
         if( ~isempty(nextRTO))
             % Do NOT count as a TO if...
@@ -163,7 +148,8 @@ for i = 1:maxIndex
     if leftlookingfor == 2 && lUpIter <= numel(lAnkVelY_upIdx)
         
         nextLTO = lFootUnderHeightThresh_idx( find( lFootUnderHeightThresh_idx <= lAnkVelY_upIdx(lUpIter),1,'last')) -1;
-        if( nextLTO == 0 ) nextLTO  = 1; end
+        if( nextLTO == 0 ) 
+            nextLTO  = 1; end
         
         if( ~isempty(nextLTO))
             % Do NOT count as a TO if...
@@ -204,8 +190,7 @@ for i = 1:maxIndex
                 
                 rDownIter = rDownIter + 1;
             else
-                
-                
+                               
                 rHS = [ rHS nextRHS];
                 rDownIter = rDownIter + 1;
                 rightlookingfor = 2;
@@ -267,7 +252,7 @@ end
 
 %
 
-%% Make sure there is a 1:1 toe-off to heel-strike relationship
+%% Make sure there is a 1:1  toe-off to heel-strike relationship
 
 for i = 1:numel(rHS)
     if( numel(rTO) >= i )
@@ -292,7 +277,7 @@ end
 %% Find toe-offs that occur shortly before heelstrikes
 
 
-frameTime_fr = sessionData.rawData_tr(trIdx).frameTime_fr;
+frameTime_fr = sessionData.processedData_tr(trIdx).info.sysTime_fr;
 % Check for rTO that occur just before lHS
 for toIdx = 1:numel(rTO)
     for hsIdx = 1:numel(lHS)
@@ -328,10 +313,12 @@ for toIdx = 1:numel(lTO)
 end
 
 %%
+
 if plotOn == 1
     
+    
     %%
-    figure(3);
+%     figure;
     
     %     subplot(211);
     %     hold on
@@ -363,7 +350,7 @@ if plotOn == 1
     %         vline(lHS(idx),'r',2,':')
     %     end
     
-    frameTime_fr = sessionData.rawData_tr(trIdx).frameTime_fr - frameTime_fr(1);
+    frameTime_fr = frameTime_fr - frameTime_fr(1);
     
     subplot(211)
     hold on
@@ -375,7 +362,6 @@ if plotOn == 1
     ylabel('foot height (m)')
     
     plot(frameTime_fr,rFootHeight_fr,'k');
-    %plot(frameTime_fr,lFootHeight_fr,'m:');
     
     %hline(footHeightThresh,'y')
     %legend('right','left','threshold height','location','Best')
@@ -387,8 +373,6 @@ if plotOn == 1
     for idx = 1:numel(rHS)
         vline(frameTime_fr(rHS(idx)),'r',2,':')
     end
-    
-    
     
     subplot(212)
     hold on
@@ -422,8 +406,8 @@ if plotOn == 1
     end
     
     figDir = sprintf('outputFigures/StepFigs/%s/',sessionData.expInfo.fileID);
-    [junk junk] = mkdir(figDir );
-    set(3,'Units','Normalized','Position',[0.0923611111111111 0.21 0.565972222222222 0.674444444444444]);
+    [~, ~] = mkdir(figDir );
+%     set(gca,'Units','Normalized','Position',[0.0923611111111111 0.21 0.565972222222222 0.674444444444444]);
     saveas(figH,sprintf('%s%u.pdf',figDir,trIdx));
     
     %waitforbuttonpress
@@ -434,9 +418,7 @@ sessionData.dependentMeasures_tr(trIdx).rFoot = struct;
 sessionData.dependentMeasures_tr(trIdx).lFoot = struct;
 
 sessionData.dependentMeasures_tr(trIdx).rFoot.toeOff_idx = rTO;
-sessionData.dependentMeasures_tr(trIdx).rFoot.heelStrike_idx = rHS;
+sessionData.dependentMeasures_tr(trIdx).rFoot.heelStrike_idx = rHS; 
 
 sessionData.dependentMeasures_tr(trIdx).lFoot.toeOff_idx = lTO;
 sessionData.dependentMeasures_tr(trIdx).lFoot.heelStrike_idx = lHS;
-
-

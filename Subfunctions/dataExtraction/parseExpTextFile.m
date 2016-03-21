@@ -39,6 +39,7 @@ blockNum = zeros(numberOfLines, 1);
 frameTime_fr = zeros(numberOfLines, 1);
 sysTime_fr = zeros(numberOfLines, 1);
 eventFlag_fr = zeros(numberOfLines, 1);
+isBlankTrial = zeros(numberOfLines, 1);
 
 rFoot_fr_XYZ = nan(numberOfLines, 3);
 lFoot_fr_XYZ = nan(numberOfLines, 3);
@@ -49,36 +50,6 @@ rFootQUAT_fr_WXYZ = nan(numberOfLines, 4);
 lFootQUAT_fr_WXYZ = nan(numberOfLines, 4);
 glassesQuat_fr_WXYZ = nan(numberOfLines, 4);
 viewQuat_fr_WXYZ= nan(numberOfLines, 4);
-
-
-% If I knew the number of trials, I could initialize these and use a parfor
-% loop
-% glasseSysTime_tr_CmIdx_mFr_xyz 
-% glassesMData_tr_CmIdx_mFr_xyz 
-% rFootSysTime_tr_CmIdx_mFr 
-% rFootMData_tr_CmIdx_mFr_xyz
-% lFootSysTime_tr_CmIdx_mFr 
-% lFootMData_tr_CmIdx_mFr_xyz
-        
-%% Read the text file into memory
-
-% chunkSize = 100;
-% numChunks = numberOfLines/100;
-% chIdx = 1
-%%
-
-% for chIdx = 1:numChunks
-%
-%     startLine = 1 + (chIdx-1)*chunkSize;
-%
-%     endLine = 1 + chIdx*chunkSize;
-%
-%     if(endLine >= numberOfLines-1 )
-%         endLine = numberOfLines;
-%     end
-%
-%textData = textscan(fid, '%s', 1, 'delimiter', '\n', 'headerlines', linenum-1);
-%textData  = textread([textFileName '.txt'], '%s','delimiter', '\n');
 
 fid = fopen([textFileName '.txt']);
 
@@ -121,6 +92,11 @@ while ~feof(fid)
     
     % ======================================================================================
     % ======================================================================================
+    
+    %% ============= Blank Trial Info ============
+    
+    isBlankTrial(i) = extractVarFromLine(currentLine, 'isBlankTrial', 1);
+    
     %% ============= Upon experiment start (evantFlag = X) =================
     % ======================================================================================
     % ======================================================================================
@@ -146,6 +122,11 @@ while ~feof(fid)
         obsXYZ = extractVarFromLine(currentLine, 'obstacle_XYZ', 3  );
         obstacle_tr_XYZ(trialNum,:) = obsXYZ([1 3 2]);
         
+        standingBoxOffset_negZ(trialNum,:) = extractVarFromLine(currentLine, 'standingBoxOffset_negZ', 1);
+        standingBoxOffset_posZ(trialNum,:) = extractVarFromLine(currentLine, 'standingBoxOffset_posZ', 1);
+        
+        leftFoot_LWH(trialNum,:) = extractVarFromLine(currentLine, 'leftFoot_LWH', 3);
+        rightFoot_LWH(trialNum,:) = extractVarFromLine(currentLine, 'rightFoot_LWH', 3);
         
     end
     
@@ -189,7 +170,7 @@ while ~feof(fid)
     glasses_fr_XYZ(i,:) = [ data_valIdx(1) data_valIdx(3) data_valIdx(2) ];
     
     data_valIdx = extractVarFromLine(currentLine, 'glassesQUAT_XYZW', 4);
-    glassesQUAT_fr_WXYZ(i,:) = [ -data_valIdx(4) data_valIdx(1) data_valIdx(3) data_valIdx(2) ];
+    glassesQUAT_fr_WXYZ(i,:) = [ data_valIdx(4) data_valIdx(1) data_valIdx(3) data_valIdx(2) ];
 
     %% ============= MainView visNode pos + quat
     
@@ -197,13 +178,13 @@ while ~feof(fid)
     mainView_fr_XYZ(i,:) = [ data_valIdx(1) data_valIdx(3) data_valIdx(2) ];
     
     data_valIdx = extractVarFromLine(currentLine, 'viewQUAT_XYZW', 4);
-    mainViewQUAT_fr_WXYZ(i,:) = [ -data_valIdx(4) data_valIdx(1) data_valIdx(3) data_valIdx(2) ];
+    mainViewQUAT_fr_WXYZ(i,:) = [ data_valIdx(4) data_valIdx(1) data_valIdx(3) data_valIdx(2) ];
     
     i = i+1;
 end
 
 %%
-
+ 
 fclose(fid);
  
 %
@@ -211,10 +192,11 @@ fclose(fid);
 
 outFileDir = [ 'parsed' textFileName(4:end)];
 
-save ([ parsedTextFileDir outFileDir '.mat'],'sysTime_fr','trialType_tr','isWalkingDownAxis_tr',...
+save ([ parsedTextFileDir outFileDir '.mat'],'sysTime_fr','isBlankTrial','trialType_tr','isWalkingDownAxis_tr',...
     'legLengthCM','eventFlag', 'obstacleHeight_tr','obstacle_tr_XYZ','collision_XYZ',...
     'rFoot_fr_XYZ','lFoot_fr_XYZ','glasses_fr_XYZ','mainView_fr_XYZ',...
-    'rFootQUAT_fr_WXYZ','lFootQUAT_fr_WXYZ','glassesQUAT_fr_WXYZ','mainViewQUAT_fr_WXYZ');
+    'rFootQUAT_fr_WXYZ','lFootQUAT_fr_WXYZ','glassesQUAT_fr_WXYZ','mainViewQUAT_fr_WXYZ','standingBoxOffset_negZ',...
+    'standingBoxOffset_posZ','leftFoot_LWH','rightFoot_LWH');
 
 fprintf ('Parsed exp data saved to text file %s.mat \n', parsedTextFileDir )
 

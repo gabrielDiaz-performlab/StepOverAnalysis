@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ExperimentDefinition>
+  <Version>1.1</Version>
+  <ClientVersion>2.0.0.11810</ClientVersion>
+  <ExperimentName>sanketh0205</ExperimentName>
+  <ExperimentId>cea03aab-9f3a-41cb-82d8-65c28a453a3f</ExperimentId>
+  <Date>02/05/2016 18:31:19</Date>
+  <EyeCameraFirmwareVersion>10</EyeCameraFirmwareVersion>
+  <SceneCameraSoftwareVersion>20140215</SceneCameraSoftwareVersion>
+  <IsDirectGazeExperiment>False</IsDirectGazeExperiment>
+  <ExperimentSettings>
+    <DefaultCalibrationMode>Calibration1Point</DefaultCalibrationMode>
+    <IsCalibrationRequired>False</IsCalibrationRequired>
+    <IsCalibrationMandatory>True</IsCalibrationMandatory>
+    <IsCustomCalibrationModeAllowed>True</IsCustomCalibrationModeAllowed>
+    <PasswordDigestForUnlockingExperiment />
+    <FilterGazeCursorForLiveView>True</FilterGazeCursorForLiveView>
+    <DataAcquisitionWithRecodingUnit>False</DataAcquisitionWithRecodingUnit>
+    <ShowEventLog>False</ShowEventLog>
+  </ExperimentSettings>
+  <HardwareConfiguration>
+    <EyeVideoResolution>QVGA320x240</EyeVideoResolution>
+    <IsMicrophoneOn>True</IsMicrophoneOn>
+    <IsEegOn>False</IsEegOn>
+    <EyeCameraMode>Binocular</EyeCameraMode>
+    <SampleRate>60</SampleRate>
+    <SceneCameraMode>SceneMode_1280x960_24FPS</SceneCameraMode>
+    <DefaultSceneCameraWhiteBalance>AutoWhiteBalance</DefaultSceneCameraWhiteBalance>
+  </HardwareConfiguration>
+  <ParticipantPropertyDefinitions />
+  <VideoOverlaySettings />
+  <AnnotationDefinition
+    Version="1.0" />
+</ExperimentDefinition>

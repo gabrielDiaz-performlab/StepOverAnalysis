@@ -1,5 +1,7 @@
-function parseTextFile(textFileDir, textFileName)
+function parseMocapTextFile(textFileDir, textFileName)
 
+% textFileDir = 'F:\Data\Stepover\2015-9-24-15-14\';
+% textFileName =  [textFileDir 'mocap_data-2015-9-24-15-14']
 loadParameters
 
 %fieldNames = fieldnames(structHandler{1,1});
@@ -8,7 +10,7 @@ loadParameters
 
 %% First, count the number of lines in the text file
 
-fid = fopen([textFileName '.txt']);
+fid = fopen([textFileName '.log']);
 numberOfLines = 0;
 chunksize = 1e6; % read chuncks of 1MB at a time
 
@@ -22,137 +24,240 @@ end
 
 fclose(fid);
 
-%%  Initialize all of my variables
+fid = fopen([textFileName '.log']);
 
-rFootSysTime_tr_mIdx_CmFr = cell(numberOfLines, 4);
-rFootMData_tr_mIdx_CmFr_xyz = cell(numberOfLines, 4);
-
-lFootSysTime_tr_mIdx_CmFr = cell(numberOfLines, 4);
-lFootMData_tr_mIdx_CmFr_xyz = cell(numberOfLines, 4);
-
-glassesSysTime_tr_mIdx_CmFr = cell(numberOfLines, 5);
-glassesMData_tr_mIdx_CmFr_xyz = cell(numberOfLines, 5);
-
-fid = fopen([textFileName '.txt']);
-
-trialNum = 1;
-
+% i initialize vectors to arrays of NaN.
+% I later remove the NaN before addingt trial data to a cell of all trial
+% data
+trialDur = 10 * 480; % lets assume 10 seconds of 480 Hz
 %%
 while ~feof(fid)
     %for i = 1:numberOfLines
     
     currentLine = fgetl(fid);
+    %fprintf('%s\n',currentLine)
     
-    %  ============= BUFFERED DATA
+    if( strfind( currentLine, 'Start:' ) )
+        
+        trialNum = cell2mat(textscan( currentLine, 'Start: %f' ));
+        gFr = 1;
+        rfFr = 1;
+        lfFr = 1;
+        sFr = 1;
+        
+        clear glassesSysTime_fr_mkr glassesMData_fr_mkr glassRbSysTime_fr glassRbPos_fr_xyz glassRbQuatSysTime_fr glassRbQuat_fr_xyzw
+        clear rFootSysTime_fr_mkr rFootMData_fr_mkr rFootRbSysTime_fr rFootRbPos_fr_xyz rFootRbQuatSysTime_fr rFootRbQuat_fr_xyzw
+        clear lFootSysTime_fr_mkr lFootMData_fr_mkr lFootRbSysTime_fr lFootRbPos_fr_xyz lFootRbQuatSysTime_fr lFootRbQuat_fr_xyzw
+        clear spineSysTime_fr_mkr spineMData_fr_mkr spineRbSysTime_fr spineRbPos_fr_xyz spineRbQuatSysTime_fr spineRbQuat_fr_xyzw
+        
+    end
     
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %% Glasses marker data
-    
-    [glassesM0time_mFr glassesM0_mFr_xyz] = getBufferedMarkerData(currentLine, 'shutterGlass.rb', 0);
-    [glassesM1time_mFr glassesM1_mFr_xyz] = getBufferedMarkerData(currentLine, 'shutterGlass.rb', 1);
-    [glassesM2time_mFr glassesM2_mFr_xyz] = getBufferedMarkerData(currentLine, 'shutterGlass.rb', 2);
-    [glassesM3time_mFr glassesM3_mFr_xyz] = getBufferedMarkerData(currentLine, 'shutterGlass.rb', 3);
-    [glassesM4time_mFr glassesM4_mFr_xyz] = getBufferedMarkerData(currentLine, 'shutterGlass.rb', 4);
-    
-    glassesSysTime_tr_mIdx_CmFr(trialNum,1) = {glassesM0time_mFr};
-    glassesSysTime_tr_mIdx_CmFr(trialNum,2) = {glassesM1time_mFr};
-    glassesSysTime_tr_mIdx_CmFr(trialNum,3) = {glassesM2time_mFr};
-    glassesSysTime_tr_mIdx_CmFr(trialNum,4) = {glassesM3time_mFr};
-    glassesSysTime_tr_mIdx_CmFr(trialNum,5) = {glassesM4time_mFr};
-    
-    glassesMData_tr_mIdx_CmFr_xyz(trialNum,1) = {glassesM0_mFr_xyz};
-    glassesMData_tr_mIdx_CmFr_xyz(trialNum,2) = {glassesM1_mFr_xyz};
-    glassesMData_tr_mIdx_CmFr_xyz(trialNum,3) = {glassesM2_mFr_xyz};
-    glassesMData_tr_mIdx_CmFr_xyz(trialNum,4) = {glassesM3_mFr_xyz};
-    glassesMData_tr_mIdx_CmFr_xyz(trialNum,5) = {glassesM4_mFr_xyz};
-    
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %% Right foot marker data
-    
-    [rFootM0time_mFr rFootM0_mFr_xyz] = getBufferedMarkerData(currentLine, 'rightFoot.rb', 5); 
-    [rFootM1time_mFr rFootM1_mFr_xyz] = getBufferedMarkerData(currentLine, 'rightFoot.rb', 6);
-    [rFootM2time_mFr rFootM2_mFr_xyz] = getBufferedMarkerData(currentLine, 'rightFoot.rb', 7);
-    [rFootM3time_mFr rFootM3_mFr_xyz] = getBufferedMarkerData(currentLine, 'rightFoot.rb', 8);
-    
-    rFootSysTime_tr_mIdx_CmFr(trialNum,1) = {rFootM0time_mFr};
-    rFootSysTime_tr_mIdx_CmFr(trialNum,2) = {rFootM1time_mFr};
-    rFootSysTime_tr_mIdx_CmFr(trialNum,3) = {rFootM2time_mFr};
-    rFootSysTime_tr_mIdx_CmFr(trialNum,4) = {rFootM3time_mFr};
-    
-    rFootMData_tr_mIdx_CmFr_xyz(trialNum,1) = {rFootM0_mFr_xyz};
-    rFootMData_tr_mIdx_CmFr_xyz(trialNum,2) = {rFootM1_mFr_xyz};
-    rFootMData_tr_mIdx_CmFr_xyz(trialNum,3) = {rFootM2_mFr_xyz};
-    rFootMData_tr_mIdx_CmFr_xyz(trialNum,4) = {rFootM3_mFr_xyz};
-    
-    
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %% Left foot marker data
-    
-    [lFootM0time_mFr lFootM0_mFr_xyz] = getBufferedMarkerData(currentLine, 'leftFoot.rb', 9);
-    [lFootM1time_mFr lFootM1_mFr_xyz] = getBufferedMarkerData(currentLine, 'leftFoot.rb', 10);
-    [lFootM2time_mFr lFootM2_mFr_xyz] = getBufferedMarkerData(currentLine, 'leftFoot.rb', 11);
-    [lFootM3time_mFr lFootM3_mFr_xyz] = getBufferedMarkerData(currentLine, 'leftFoot.rb', 12);
-    
-    lFootSysTime_tr_mIdx_CmFr(trialNum,1) = {lFootM0time_mFr};
-    lFootSysTime_tr_mIdx_CmFr(trialNum,2) = {lFootM1time_mFr};
-    lFootSysTime_tr_mIdx_CmFr(trialNum,3) = {lFootM2time_mFr};
-    lFootSysTime_tr_mIdx_CmFr(trialNum,4) = {lFootM3time_mFr};
-    
-    lFootMData_tr_mIdx_CmFr_xyz(trialNum,1) = {lFootM0_mFr_xyz};
-    lFootMData_tr_mIdx_CmFr_xyz(trialNum,2) = {lFootM1_mFr_xyz};
-    lFootMData_tr_mIdx_CmFr_xyz(trialNum,3) = {lFootM2_mFr_xyz};
-    lFootMData_tr_mIdx_CmFr_xyz(trialNum,4) = {lFootM3_mFr_xyz};
-    
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %% Spine marker data
-    
-    [spineM0time_mFr spineM0_mFr_xyz] = getBufferedMarkerData(currentLine, 'spine.rb', 13);
-    [spineM1time_mFr spineM1_mFr_xyz] = getBufferedMarkerData(currentLine, 'spine.rb', 14);
-    [spineM2time_mFr spineM2_mFr_xyz] = getBufferedMarkerData(currentLine, 'spine.rb', 15);
-    [spineM3time_mFr spineM3_mFr_xyz] = getBufferedMarkerData(currentLine, 'spine.rb', 16);
-    
-    spineSysTime_tr_mIdx_CmFr(trialNum,1) = {spineM0time_mFr};
-    spineSysTime_tr_mIdx_CmFr(trialNum,2) = {spineM1time_mFr};
-    spineSysTime_tr_mIdx_CmFr(trialNum,3) = {spineM2time_mFr};
-    spineSysTime_tr_mIdx_CmFr(trialNum,4) = {spineM3time_mFr};
-    
-    spineMData_tr_mIdx_CmFr_xyz(trialNum,1) = {spineM0_mFr_xyz};
-    spineMData_tr_mIdx_CmFr_xyz(trialNum,2) = {spineM1_mFr_xyz};
-    spineMData_tr_mIdx_CmFr_xyz(trialNum,3) = {spineM2_mFr_xyz};
-    spineMData_tr_mIdx_CmFr_xyz(trialNum,4) = {spineM3_mFr_xyz};
-    
-    %% Quats and positions
-    
-    [glassRbSysTime_mFr glassRbPos_mFr_xyz glassRbQuatSysTime_mFr glassRbQuat_mFr_xyz] = getBufferedRigidData(currentLine, 'shutterGlass.rb');
-    [lFootRbSysTime_mFr lFootRbPos_mFr_xyz lFootRbQuatSysTime_mFr lFootRbQuat_mFr_xyz] = getBufferedRigidData(currentLine, 'leftFoot.rb');
-    [rFootRbSysTime_mFr rFootRbPos_mFr_xyz rFootRbQuatSysTime_mFr rFootRbQuat_mFr_xyz] = getBufferedRigidData(currentLine, 'rightFoot.rb');
-    [spineRbSysTime_mFr spineRbPos_mFr_xyz spineRbQuatSysTime_mFr spineRbQuat_mFr_xyz] = getBufferedRigidData(currentLine, 'spine.rb');
+    if( strfind( currentLine, 'End:' ) )
+    % Starting a new trial!  Store buffered trial data in cell array of
+    % trials
+        % Store trial data into cell arrays
+        if trialNum > 0
+            
+            trIdx = trialNum ;
+            % Store marker time data
+            
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %%% GLASSES
+            for mIdx = 1:5
+                glassesSysTime_tr_mIdx_CmFr(trIdx ,mIdx) = {glassesSysTime_fr_mkr(:,mIdx)};%(~isnan(glassesSysTime_fr_mkr(:,mIdx)))};
+                glassesMData_tr_mIdx_CmFr_xyz(trIdx ,mIdx) = {squeeze(glassesMData_fr_mkr(:,mIdx,:))};%(~isnan(glassesMData_fr_mkr))};
+            end
+            
+            glassRbSysTime_tr_CmFr(trIdx) =  {glassRbSysTime_fr};%(~isnan(glassRbSysTime_fr))};
+            glassRbPos_tr_CmFr(trIdx) = {glassRbPos_fr_xyz};%(~isnan(glassRbPos_fr_xyz))};
+            glassRbQuatSysTime_tr_CmFr(trIdx) = {glassRbQuatSysTime_fr};%(~isnan(glassRbQuatSysTime_fr))};
+            glassRbQuat_tr_CmFr_xyz(trIdx) = {glassRbQuat_fr_xyzw};%(~isnan(glassRbQuat_fr_xyzw))};
+            
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            % RFOOT
+            for mIdx = 1:4
+                rFootSysTime_tr_mIdx_CmFr(trIdx ,mIdx) = {rFootSysTime_fr_mkr(:,mIdx)};%(~isnan(rFootSysTime_fr_mkr(:,mIdx)))};
+                rFootMData_tr_mIdx_CmFr_xyz(trIdx ,mIdx) = {squeeze(rFootMData_fr_mkr(:,mIdx,:))};%(~isnan(rFootMData_fr_mkr))};
+            end
+            
+            rFootRbSysTime_tr_CmFr(trIdx) =  {rFootRbSysTime_fr};%(~isnan(rFootRbSysTime_fr))};
+            rFootRbPos_tr_CmFr(trIdx) = {rFootRbPos_fr_xyz};%(~isnan(rFootRbPos_fr_xyz),:)};
+            rFootRbQuatSysTime_tr_CmFr(trIdx) = {rFootRbQuatSysTime_fr}; %(~isnan(rFootRbQuatSysTime_fr))};
+            rFootRbQuat_tr_CmFr_xyz(trIdx) = {rFootRbQuat_fr_xyzw}; %(~isnan(rFootRbQuat_fr_xyzw))};
+            
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            % LFOOT
+            for mIdx = 1:4
+                
+                lFootSysTime_tr_mIdx_CmFr(trIdx ,mIdx) = {lFootSysTime_fr_mkr(:,mIdx)};%(~isnan(lFootSysTime_fr_mkr(:,mIdx)))};
+                lFootMData_tr_mIdx_CmFr_xyz(trIdx ,mIdx) = {squeeze(lFootMData_fr_mkr(:,mIdx,:))};%(~isnan(lFootMData_fr_mkr))};
+            end
+            
+            lFootRbSysTime_tr_CmFr(trIdx) =  {lFootRbSysTime_fr};%(~isnan(lFootRbSysTime_fr))};
+            lFootRbPos_tr_CmFr(trIdx) = {lFootRbPos_fr_xyz};%(~isnan(lFootRbPos_fr_xyz))};
+            lFootRbQuatSysTime_tr_CmFr(trIdx) = {lFootRbQuatSysTime_fr};%(~isnan(lFootRbQuatSysTime_fr))};
+            lFootRbQuat_tr_CmFr_xyz(trIdx) = {lFootRbQuat_fr_xyzw};%(~isnan(lFootRbQuat_fr_xyzw))};         
+            
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            % Spine
+            for mIdx = 1:4
+                spineSysTime_tr_mIdx_CmFr(trIdx ,mIdx) = {spineSysTime_fr_mkr(:,mIdx)};%(~isnan(spineSysTime_fr_mkr(:,mIdx)))};
+                spineMData_tr_mIdx_CmFr_xyz(trIdx ,mIdx) = {squeeze(spineMData_fr_mkr(:,mIdx,:))};%(~isnan(spineMData_fr_mkr))};
+            end
+            
+            spineRbSysTime_tr_CmFr(trIdx) =  {spineRbSysTime_fr};%(~isnan(spineRbSysTime_fr))};
+            spineRbPos_tr_CmFr(trIdx) = {spineRbPos_fr_xyz};%(~isnan(spineRbPos_fr_xyz))};
+            spineRbQuatSysTime_tr_CmFr(trIdx) = {spineRbQuatSysTime_fr};%(~isnan(spineRbQuatSysTime_fr))};
+            spineRbQuat_tr_CmFr_xyz(trIdx) = {spineRbQuat_fr_xyzw};%(~isnan(spineRbQuat_fr_xyzw))};
+            
+        end
+           
+        
+        %% Initialize trial variables
+%         glassesSysTime_fr_mkr = NaN(trialDur,4);
+%         glassesMData_fr_mkr_xyz = NaN(trialDur,4,3);
+%         
+%         glassRbSysTime_fr = NaN(trialDur,1);
+%         glassRbPos_fr_xyz = NaN(trialDur,3);
+%         glassRbQuatSysTime_fr = NaN(trialDur,1);
+%         glassRbQuat_fr_xyzw = NaN(trialDur,4);
+        
 
-    glassRbSysTime_tr_CmFr(trialNum) = {glassRbSysTime_mFr};
-    glassRbPos_tr_CmFr(trialNum) = {glassRbPos_mFr_xyz};
-    glassRbQuatSysTime_tr_CmFr(trialNum) = {glassRbQuatSysTime_mFr};
-    glassRbQuat_tr_CmFr_xyz(trialNum)  = {glassRbQuat_mFr_xyz};
+        continue
+    end
+        
     
-    rFootRbSysTime_tr_CmFr(trialNum) = {rFootRbSysTime_mFr};
-    rFootRbPos_tr_CmFr(trialNum) = {rFootRbPos_mFr_xyz};
-    rFootRbQuatSysTime_tr_CmFr(trialNum) = {rFootRbQuatSysTime_mFr};
-    rFootRbQuat_tr_CmFr_xyz(trialNum)  = {rFootRbQuat_mFr_xyz};
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% Get FRAME data.  Save it to a trial buffer.
+    if( strfind( currentLine, 'shutter' ) )
+        
+        
+        [glassesM0time, glassesM0_xyz] = getBufferedMarkerData(currentLine, 'shutterGlass.rb', 0);
+        [glassesM1time, glassesM1_xyz] = getBufferedMarkerData(currentLine, 'shutterGlass.rb', 1);
+        [glassesM2time, glassesM2_xyz] = getBufferedMarkerData(currentLine, 'shutterGlass.rb', 2);
+        [glassesM3time, glassesM3_xyz] = getBufferedMarkerData(currentLine, 'shutterGlass.rb', 3);
+        [glassesM4time, glassesM4_xyz] = getBufferedMarkerData(currentLine, 'shutterGlass.rb', 4);
     
-    lFootRbSysTime_tr_CmFr(trialNum) = {lFootRbSysTime_mFr};
-    lFootRbPos_tr_CmFr(trialNum) = {lFootRbPos_mFr_xyz};
-    lFootRbQuatSysTime_tr_CmFr(trialNum) = {lFootRbQuatSysTime_mFr};
-    lFootRbQuat_tr_CmFr_xyz(trialNum)  = {lFootRbQuat_mFr_xyz};
+        glassesSysTime_fr_mkr(gFr,1) = glassesM0time;
+        glassesSysTime_fr_mkr(gFr,2) = glassesM1time;
+        glassesSysTime_fr_mkr(gFr,3) = glassesM2time;
+        glassesSysTime_fr_mkr(gFr,4) = glassesM3time;
+        glassesSysTime_fr_mkr(gFr,5) = glassesM4time;
+        
+        glassesMData_fr_mkr(gFr,1,:) = glassesM0_xyz;
+        glassesMData_fr_mkr(gFr,2,:) = glassesM1_xyz;
+        glassesMData_fr_mkr(gFr,3,:) = glassesM2_xyz;
+        glassesMData_fr_mkr(gFr,4,:) = glassesM3_xyz;
+        glassesMData_fr_mkr(gFr,5,:) = glassesM4_xyz;
+        
+        [glassRbSysTime, glassRbPos_xyz, glassRbQuatSysTime, glassRbQuat_xyzw] = ...
+            getBufferedRigidData(currentLine, 'shutterGlass.rb');
+        
+        glassRbSysTime_fr(gFr) = glassRbSysTime;
+        glassRbPos_fr_xyz(gFr,:) = glassRbPos_xyz;
+        glassRbQuatSysTime_fr(gFr) = glassRbQuatSysTime;
+        glassRbQuat_fr_xyzw(gFr,:) = glassRbQuat_xyzw;
+        
+        gFr = gFr+1; % a unique frame counte fo the glasses rigid body
+        
+        continue
+    end
     
-    spineRbSysTime_tr_CmFr(trialNum) = {spineRbSysTime_mFr};
-    spineRbPos_tr_CmFr(trialNum) = {spineRbPos_mFr_xyz};
-    spineRbQuatSysTime_tr_CmFr(trialNum) = {spineRbQuatSysTime_mFr};
-    spineRbQuat_tr_CmFr_xyz(trialNum)  = {spineRbQuat_mFr_xyz};
-    
-    trialNum = trialNum+1;
+    %% Right foot
+     if( strfind( currentLine, 'right' ) )
+          
+        [rFootM0time, rFootM0_xyz] = getBufferedMarkerData(currentLine, 'rightFoot.rb', 5);
+        [rFootM1time, rFootM1_xyz] = getBufferedMarkerData(currentLine, 'rightFoot.rb', 6);
+        [rFootM2time, rFootM2_xyz] = getBufferedMarkerData(currentLine, 'rightFoot.rb', 7);
+        [rFootM3time, rFootM3_xyz] = getBufferedMarkerData(currentLine, 'rightFoot.rb', 8);
+        
+        rFootSysTime_fr_mkr(rfFr,1) = rFootM0time;
+        rFootSysTime_fr_mkr(rfFr,2) = rFootM1time;
+        rFootSysTime_fr_mkr(rfFr,3) = rFootM2time;
+        rFootSysTime_fr_mkr(rfFr,4) = rFootM3time;
+
+        rFootMData_fr_mkr(rfFr,1,:) = rFootM0_xyz;
+        rFootMData_fr_mkr(rfFr,2,:) = rFootM1_xyz;
+        rFootMData_fr_mkr(rfFr,3,:) = rFootM2_xyz;
+        rFootMData_fr_mkr(rfFr,4,:) = rFootM3_xyz;
+        
+        [rFootRbSysTime, rFootRbPos_xyz, rFootRbQuatSysTime, rFootRbQuat_xyzw] = ...
+            getBufferedRigidData(currentLine, 'rightFoot.rb');
+        
+        rFootRbSysTime_fr(rfFr) = rFootRbSysTime;
+        rFootRbPos_fr_xyz(rfFr,:) = rFootRbPos_xyz;
+        rFootRbQuatSysTime_fr(rfFr) = rFootRbQuatSysTime;
+        rFootRbQuat_fr_xyzw(rfFr,:) = rFootRbQuat_xyzw;
+        
+        rfFr = rfFr +1; % a unique frame counte fo the glasses rigid body    
+        
+
+     end
+     
+     %% Left Foot
+     if( strfind( currentLine, 'left' ) )
+       
+        [lFootM0time, lFootM0_xyz] = getBufferedMarkerData(currentLine, 'leftFoot.rb', 9);
+        [lFootM1time, lFootM1_xyz] = getBufferedMarkerData(currentLine, 'leftFoot.rb', 10);
+        [lFootM2time, lFootM2_xyz] = getBufferedMarkerData(currentLine, 'leftFoot.rb', 11);
+        [lFootM3time, lFootM3_xyz] = getBufferedMarkerData(currentLine, 'leftFoot.rb', 12);
+        
+        lFootSysTime_fr_mkr(lfFr,1) = lFootM0time;
+        lFootSysTime_fr_mkr(lfFr,2) = lFootM1time;
+        lFootSysTime_fr_mkr(lfFr,3) = lFootM2time;
+        lFootSysTime_fr_mkr(lfFr,4) = lFootM3time;
+
+        lFootMData_fr_mkr(lfFr,1,:) = lFootM0_xyz;
+        lFootMData_fr_mkr(lfFr,2,:) = lFootM1_xyz;
+        lFootMData_fr_mkr(lfFr,3,:) = lFootM2_xyz;
+        lFootMData_fr_mkr(lfFr,4,:) = lFootM3_xyz;      
+        
+        [lFootRbSysTime, lFootRbPos_xyz, lFootRbQuatSysTime, lFootRbQuat_xyzw] = ...
+            getBufferedRigidData(currentLine, 'leftFoot.rb');
+        
+        lFootRbSysTime_fr(lfFr) = lFootRbSysTime;
+        lFootRbPos_fr_xyz(lfFr,:) = lFootRbPos_xyz;
+        lFootRbQuatSysTime_fr(lfFr) = lFootRbQuatSysTime;
+        lFootRbQuat_fr_xyzw(lfFr,:) = lFootRbQuat_xyzw;
+        
+        lfFr = lfFr +1; % a unique frame counte fo the glasses rigid body   
+        
+
+     end
+     
+     %% Spine
+      if( strfind( currentLine, 'spine' ) )
+       
+        [spineM0time, spineM0_xyz] = getBufferedMarkerData(currentLine, 'spine.rb', 13);
+        [spineM1time, spineM1_xyz] = getBufferedMarkerData(currentLine, 'spine.rb', 14);
+        [spineM2time, spineM2_xyz] = getBufferedMarkerData(currentLine, 'spine.rb', 15);
+        [spineM3time, spineM3_xyz] = getBufferedMarkerData(currentLine, 'spine.rb', 16);
+        
+        spineSysTime_fr_mkr(sFr,1) = spineM0time;
+        spineSysTime_fr_mkr(sFr,2) = spineM1time;
+        spineSysTime_fr_mkr(sFr,3) = spineM2time;
+        spineSysTime_fr_mkr(sFr,4) = spineM3time;
+
+        spineMData_fr_mkr(sFr,1,:) = spineM0_xyz;
+        spineMData_fr_mkr(sFr,2,:) = spineM1_xyz;
+        spineMData_fr_mkr(sFr,3,:) = spineM2_xyz;
+        spineMData_fr_mkr(sFr,4,:) = spineM3_xyz;
+        
+        [spineRbSysTime, spineRbPos_xyz, spineRbQuatSysTime, spineRbQuat_xyzw] = ...
+            getBufferedRigidData(currentLine, 'spine.rb');
+        
+        spineRbSysTime_fr(sFr) = spineRbSysTime;
+        spineRbPos_fr_xyz(sFr,:) = spineRbPos_xyz;
+        spineRbQuatSysTime_fr(sFr) = spineRbQuatSysTime;
+        spineRbQuat_fr_xyzw(sFr,:) = spineRbQuat_xyzw;
+        
+        sFr = sFr +1; % a unique frame counter for the glasses rigid body    
+        
+        
+     end
+     
     
 end
-
-
 
 %%
 

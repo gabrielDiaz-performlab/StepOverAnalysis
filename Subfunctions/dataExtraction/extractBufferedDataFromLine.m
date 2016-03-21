@@ -15,23 +15,24 @@ currentIndex = strfind( currentLine, refString ) + length(refString);
 %%
 
 % The next value specifies the number of entries stored in the variable
-[numMFrames currentIndex]= textscan( currentLine(currentIndex:length(currentLine)), '%u' );
+%[numMFrames currentIndex]= textscan( currentLine(currentIndex:length(currentLine)), '%u' );
 
 sysTime_fr = []
 
 % mFr = mocap frame.  
 % B/C Mocap Framerate is higher than vizard refresh
 % THere are more mocap frames than standard vizard frames
-sysTime_mFr_xyz = NaN(numMFrames,1);
-data_mFr_xyz = NaN(numMFrames,3);
+sysTime_mFr_xyz = NaN;
+data_mFr_xyz = NaN(1,3);
 
-for mFrIdx = 1:numMFrames
+%for mFrIdx = 1:numMFrames
     
-    [timeXYZ currentIndex]= textscan( currentLine(currentIndex:length(currentLine)), '[ %f %f %f %f ]' );
-    sysTime_mFr(mFrIdx) = timeXYZ(1);
-    data_mFr_xyz(mFrIdx,:) = timeXYZ(2:4);
+[timeXYZ currentIndex]= textscan( currentLine(currentIndex:length(currentLine)), '[ %f %f %f %f ]' );
+keyboard
+sysTime_mFr(mFrIdx) = timeXYZ(1);
+data_mFr_xyz(mFrIdx,:) = timeXYZ(2:4);
     
-end
+%end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% POSITION DATA

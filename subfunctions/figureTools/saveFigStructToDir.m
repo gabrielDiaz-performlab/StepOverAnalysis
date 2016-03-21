@@ -18,8 +18,6 @@ figString = [];
 
 %%
 
-screenRes = get(0,'ScreenSize');
-
 for idx = 1:numel(figHandles)
     
     
@@ -28,7 +26,7 @@ for idx = 1:numel(figHandles)
     set(figH,'Units','Normalized','Position',[0.3 0.15 0.5 0.55]);
     
     %%
-    figString = [figDir mat2str(figH.Number) '.pdf'];
+    figString = [figDir mat2str(figH.Number) '.png'];
     saveas(figH,figString)
     
     %myImage = frame2im(figH);

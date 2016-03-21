@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ExperimentDefinition>
+  <Version>1.1</Version>
+  <ClientVersion>2.0.0.11810</ClientVersion>
+  <ExperimentName>GabeDataCheck 07-10-2015 15 45 31</ExperimentName>
+  <ExperimentId>11731710-4f87-4b92-9ce7-0a52fa537330</ExperimentId>
+  <Date>10/07/2015 15:45:50</Date>
+  <EyeCameraFirmwareVersion>10</EyeCameraFirmwareVersion>
+  <SceneCameraSoftwareVersion>20140215</SceneCameraSoftwareVersion>
+  <IsDirectGazeExperiment>False</IsDirectGazeExperiment>
+  <ExperimentSettings>
+    <DefaultCalibrationMode>Calibration1Point</DefaultCalibrationMode>
+    <IsCalibrationRequired>False</IsCalibrationRequired>
+    <IsCalibrationMandatory>True</IsCalibrationMandatory>
+    <IsCustomCalibrationModeAllowed>True</IsCustomCalibrationModeAllowed>
+    <PasswordDigestForUnlockingExperiment />
+    <FilterGazeCursorForLiveView>True</FilterGazeCursorForLiveView>
+    <DataAcquisitionWithRecodingUnit>False</DataAcquisitionWithRecodingUnit>
+    <ShowEventLog>False</ShowEventLog>
+  </ExperimentSettings>
+  <HardwareConfiguration>
+    <EyeVideoResolution>QVGA320x240</EyeVideoResolution>
+    <IsMicrophoneOn>True</IsMicrophoneOn>
+    <IsEegOn>False</IsEegOn>
+    <EyeCameraMode>Binocular</EyeCameraMode>
+    <SampleRate>60</SampleRate>
+    <SceneCameraMode>SceneMode_960x720_30FPS</SceneCameraMode>
+    <DefaultSceneCameraWhiteBalance>AutoWhiteBalance</DefaultSceneCameraWhiteBalance>
+  </HardwareConfiguration>
+  <ParticipantPropertyDefinitions />
+  <VideoOverlaySettings />
+  <AnnotationDefinition
+    Version="1.0" />
+</ExperimentDefinition>

@@ -3,10 +3,9 @@
 
 function [ sessionData ] = stepLengthAndDurASO(sessionData, trIdx)
 
-
 dmTrialStruct = sessionData.dependentMeasures_tr(trIdx);
 
-if( sessionData.rawData_tr(trIdx).excludeTrial == 1)
+if( sessionData.rawData_tr(trIdx).info.excludeTrial == 1)
     
     sessionData.dependentMeasures_tr(trIdx).leadStepLengthASO = nan;
     sessionData.dependentMeasures_tr(trIdx).leadStepDurASO = nan;
@@ -16,27 +15,6 @@ if( sessionData.rawData_tr(trIdx).excludeTrial == 1)
     
     return
 end
-
-
-% 
-% if( isnan(dmTrialStruct.lFoot.crossingStepIdx) || ...
-%         isnan(dmTrialStruct.rFoot.crossingStepIdx))
-%     
-%     %isnan(dmTrialStruct.lFoot.crossingStepIdx) ||...
-%     %isnan(dmTrialStruct.rFoot.crossingStepIdx) )
-%     
-%     sessionData.dependentMeasures_tr(trIdx).leadStepLengthASO = nan;
-%     sessionData.dependentMeasures_tr(trIdx).leadStepDurASO = nan;
-%     
-%     sessionData.dependentMeasures_tr(trIdx).trailStepLengthASO = nan;
-%     sessionData.dependentMeasures_tr(trIdx).trailStepDurASO = nan;
-%     
-%     sessionData.rawData_tr(trIdx).excludeTrial = 1;
-%     sessionData.rawData_tr(trIdx).excludeTrialExplanation{end+1} = 'stepLengthAndDurASO: At least one foot did not pass the barrier.'
-%     
-%     return
-% end
-
 
 %%
 if( strcmp( dmTrialStruct.firstCrossingFoot, 'Left' ) ) 
