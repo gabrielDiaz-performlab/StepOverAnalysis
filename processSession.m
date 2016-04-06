@@ -66,26 +66,29 @@ end
 sessionData =  loadSession(sessionNumber);
 
 %%
-% DisplaySessionData(sessionData, 2, 1, 'rawData_tr', 1) % rawData_tr -> view raw data; processedData_tr -> view processed data
 
 sessionData = checkForExclusions(sessionData);
 
 sessionData = synchronizeData(sessionData);
+
+DisplaySessionData(sessionData, 2, 1, 'processedData_tr', 1) % rawData_tr -> view raw data; processedData_tr -> view processed data
 
 %% Override exclude trials
 % for trIdx = 1:sessionData.expInfo.numTrials
 %     sessionData.rawData_tr(trIdx).info.excludeTrial = 0;
 %     sessionData.processedData_tr(trIdx).info.excludeTrial = 0;
 % end
+
 %% filter
 
 sessionData = calculateSamplingRate(sessionData);
 sessionData = filterData(sessionData);
 
-% DisplaySessionData(sessionData, 3, 13, 'processedData_tr', 1) % rawData_tr -> view raw data; processedData_tr -> view processed data
+DisplaySessionData(sessionData, 3, 13, 'processedData_tr', 1) % rawData_tr -> view raw data; processedData_tr -> view processed data
 
 sessionData.expInfo.obsHeightRatios = sessionData.expInfo.obsHeightRatios(~isnan(sessionData.expInfo.obsHeightRatios));
 sessionData.expInfo.legLength = input('Enter leg length in meters: ');
+
 %% Mean Trial Duration
 sessionData = avgTrialDuration(sessionData);
 display(['Mean trial duration:' num2str(sessionData.expInfo.meanTrialDuration)]);
@@ -114,7 +117,7 @@ for trIdx = 1:numel(sessionData.rawData_tr)
         [ sessionData ] = findMinDistanceAXS(sessionData, trIdx); 
         
         [ sessionData ] = generateStepTrajectories(sessionData, trIdx);
-        
+%         
         [ sessionData ] = processEyeTrackerInfo(sessionData, trIdx, 0);
         [ sessionData ] = calcGVPosOnObj(sessionData, trIdx);
         [ sessionData ] = findObstacleFix(sessionData, trIdx, 1);        
@@ -133,8 +136,13 @@ sessionData = generateUnbiasedModel(sessionData);
 sessionData = generateStepFlow(sessionData);
 
 plotModel(sessionData, StepNumber)
-analyseModel(sessionData)
 plotFootVariability(sessionData)
+
+%% Read ETG Video file and play Trial number trIdx
+ETG_VidObj = VideoReader([videoDir '\' ETG_videoFileList{1}]);
+playTrial(ETG_VidObj, sessionData, 23)
+
+
 %% Step heel down point analysis
 
 % %% 3D plot of Walking Data

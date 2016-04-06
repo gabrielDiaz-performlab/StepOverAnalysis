@@ -61,5 +61,5 @@ for i = 1:length(listOfSessionFiles)
     end  
 end
 
-plotGlobalMeasureVariability(globalData([1 2],:));
+plotGlobalMeasureVariability(globalData(:,:));
 

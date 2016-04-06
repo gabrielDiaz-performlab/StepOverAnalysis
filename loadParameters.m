@@ -9,6 +9,7 @@ textFileDir = 'data/raw/';
 parsedTextFileDir = 'data/parsedTXT/';
 sessionFileDir = 'data/sessionFiles/';
 spssFileDir = 'data/spssFiles/';
+videoDir = 'D:\Walking analysis videos';
 
 [~, ~] = mkdir('figures');
 [~, ~] = mkdir(parsedTextFileDir);
@@ -36,6 +37,11 @@ ETG_dataFileList = {...
     %'Brendan 03-03-2016 16 24 17'
     %'Swati 09-03-2016 14 56 35'
     };
+ETG_videoFileList = {...
+    %'Anna 01-03-2016 16 06 33.mp4'
+    'Sanketh 23-02-2016 18 56 41.mp4'
+    };
+    
 
 % Step detection findSteps.m
 % footHeightThresh_sIdx = [.13,]; We will likely need a diff. threshold for

@@ -47,6 +47,12 @@ roiOnObs_fr = roiOnObs_fr & locObjVisible;
 totalObjVisibleTime = ETGtsSec_fr(locObjVisible);
 totalObjVisibleTime = totalObjVisibleTime(end) - totalObjVisibleTime(1);
 
+if plotOn
+    figure; hold on;
+    plot(ETGtsSec_fr, angSep_fr,'LineWidth',3); xlabel('Time'), ylabel('Angular separation (degrees)')
+    title(['Angular separation for Trial: ' num2str(trIdx) ' Distance: ' num2str(objLoc(2))])
+end
+
 if sum(roiOnObs_fr)>0
     
     % Convert into stops/starts format
@@ -78,15 +84,10 @@ if sum(roiOnObs_fr)>0
             display('Error: Both feet cannot be taking a step')
             keyboard
         end
-            
-        if plotOn
-            figure; hold on;
-            plot(ETGtsSec_fr, angSep_fr,'LineWidth',3); xlabel('Time'), ylabel('Angular separation (degrees)')
-            title(['Angular separation for Trial #: ' trIdx])
-            for i = 1:size(tStart,1)
-                plot([tStart(i) tStart(i)], [0 180],'g--','LineWidth',3);
-                plot([tStop(i) tStop(i)], [0 180],'r--','LineWidth',3);
-            end
+        
+        for i = 1:size(tStart,1)
+            plot([tStart(i) tStart(i)], [0 180],'g--','LineWidth',3);
+            plot([tStop(i) tStop(i)], [0 180],'r--','LineWidth',3);
         end
         
         sessionData.processedData_tr(trIdx).roiOnObs_onOff = roiOnObs_idx_onOff;

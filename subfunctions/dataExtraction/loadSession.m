@@ -6,7 +6,7 @@ loadParameters
 % structure file. This ensures the program does not re-read the raw text
 % files.
 
-ReadFromProcessed = 1;
+ReadFromProcessed = 0;
 
 expTextFileName = ['exp' dataFileList{sessionNumber}];
 mocapTextFileName = ['mocap' dataFileList{sessionNumber}];
@@ -65,6 +65,8 @@ else
     sessionData.expInfo.heights = numObsHeights;
     %FIXME:  add leg length
     %sessionData.expInfo.legLength = sessionData.expInfo.obstacleHeights(1) ./ sessionData.expInfo.obsHeightRatios(1)
+    
+    sessionData = decodeTimeStamps(sessionData);
     
     save( sessionFilePath,'sessionData')
     fprintf ('Session struct created from .mat file and saved\n' )
