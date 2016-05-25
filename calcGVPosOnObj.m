@@ -8,6 +8,7 @@ function [sessionData] = calcGVPosOnObj(sessionData, trIdx)
 loadParameters
 
 Ts = sessionData.processedData_tr(trIdx).ETG.ETG_ts;
+sysTime = sessionData.processedData_tr(trIdx).info.sysTime_fr;
 
 glasses_fr_xyz = sessionData.processedData_tr(trIdx).glasses.pos_fr_xyz;
 GIW = sessionData.processedData_tr(trIdx).ETG.cycGIW_fr_vec;  
@@ -20,7 +21,7 @@ P = glasses_fr_xyz;
 
 GIW_len = (ObjLoc(2) - P(:,2))./GIW(:,2);
 
-loc = ObjLoc(:,2) - P(:,2) > 0 & P(:,2) > showObsAtDistOf;
+loc = (ObjLoc(:,2) - P(:,2)) > 0 & (Ts > sysTime(sessionData.processedData_tr(trIdx).info.eventFlag_fr == 3));
 
 Q = P + repmat(GIW_len,[1 3]).*GIW;
 Q(~loc,:) = NaN;

@@ -1,8 +1,13 @@
 function sessionData = processEyeTracker(sessionData, ETG_T, len_audioData_s)
 
-TS = linspace(0, len_audioData_s, length(ETG_T.Time));
+keyboard
 
-% ETG_VidDim = [720 960];
+% The summation of the differences should add upto the total time of the
+% audio file. This time stamp format will maintain the differences in
+% sammple time and ensure the time stamps are appropriately spaced. 
+
+dt = len_audioData_s/sum(diff(ETG_T.Time));
+TS = [0; cumsum(diff(ETG_T.Time))*dt];
 
 % Get the POR for the Cyclopean, Left and Right
 B_POR = [ETG_T.BPORX_px_ ETG_T.BPORY_px_];
@@ -34,8 +39,7 @@ for i = 1:length(list_bad)
     
     L_GVEC(list_bad(i),:) = L_GVEC(list_good(temp),:);
     R_GVEC(list_bad(i),:) = R_GVEC(list_good(temp),:);
-    C_GVEC(list_bad(i),:) = C_GVEC(list_good(temp),:);
-    
+    C_GVEC(list_bad(i),:) = C_GVEC(list_good(temp),:);  
 end
 
 for i = 1:sessionData.expInfo.numTrials

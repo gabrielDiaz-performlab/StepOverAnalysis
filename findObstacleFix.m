@@ -6,10 +6,14 @@ function [ sessionData ] = findObstacleFix( sessionData, trIdx, plotOn)
 
 loadParameters
 
+Ts = sessionData.processedData_tr(trIdx).ETG.ETG_ts;
+sysTime = sessionData.processedData_tr(trIdx).info.sysTime_fr;
+
 angSep_fr = sessionData.processedData_tr(trIdx).ETG.angSeparation;
 ETGtsSec_fr = sessionData.processedData_tr(trIdx).ETG.ETG_ts;
 rFootStep = [sessionData.dependentMeasures_tr(trIdx).rFoot.toeOff_idx;   sessionData.dependentMeasures_tr(trIdx).rFoot.heelStrike_idx];
 lFootStep = [sessionData.dependentMeasures_tr(trIdx).lFoot.toeOff_idx;   sessionData.dependentMeasures_tr(trIdx).lFoot.heelStrike_idx];
+glasses_fr_xyz = sessionData.processedData_tr(trIdx).glasses.pos_fr_xyz;
 
 objLoc = sessionData.processedData_tr(trIdx).obs.pos_xyz;
 
@@ -40,9 +44,9 @@ for idx = (lastROIOnObsFr+1):numel(roiOnObs_fr)
     end    
 end
 
-locObjVisible = sessionData.processedData_tr(trIdx).glasses.rbPos_mFr_xyz(:,2) > 1 & ...
-                sessionData.processedData_tr(trIdx).glasses.rbPos_mFr_xyz(:,2) < objLoc(2);
-            
+
+locObjVisible = (objLoc(:,2) - glasses_fr_xyz(:,2)) > 0 & (Ts > sysTime(sessionData.processedData_tr(trIdx).info.eventFlag_fr == 3));
+
 roiOnObs_fr = roiOnObs_fr & locObjVisible;
 totalObjVisibleTime = ETGtsSec_fr(locObjVisible);
 totalObjVisibleTime = totalObjVisibleTime(end) - totalObjVisibleTime(1);
@@ -85,10 +89,41 @@ if sum(roiOnObs_fr)>0
             keyboard
         end
         
-        for i = 1:size(tStart,1)
-            plot([tStart(i) tStart(i)], [0 180],'g--','LineWidth',3);
-            plot([tStop(i) tStop(i)], [0 180],'r--','LineWidth',3);
+        if plotOn
+            for i = 1:size(tStart,1)
+                plot([tStart(i) tStart(i)], [0 180],'g--','LineWidth',3);
+                plot([tStop(i) tStop(i)], [0 180],'r--','LineWidth',3);
+            end
         end
+        % Find steps to obstacle after made visible
+        loc = find(locObjVisible, 1);
+        stepLocs = cell2mat(sessionData.dependentMeasures_tr(trIdx).stepFlow(1:end-1, 3));
+        inSteps = loc >= stepLocs(:,1) & loc <= stepLocs(:,2);
+        
+        if sum(inSteps) == 0
+            sessionData.dependentMeasures_tr(trIdx).stepsToObs = sum(stepLocs(:,1) >= loc);
+        else
+            if abs(loc - stepLocs(inSteps, 1)) < abs(loc - stepLocs(inSteps, 2)) 
+                sessionData.dependentMeasures_tr(trIdx).stepsToObs = size(stepLocs, 1) - find(inSteps) + 1;
+            else
+                sessionData.dependentMeasures_tr(trIdx).stepsToObs = size(stepLocs, 1) - find(inSteps);
+            end
+        end
+  
+        loc = roiOnObs_idx_onOff(:, 1);
+        sessionData.dependentMeasures_tr(trIdx).stepsToObs = repmat(sessionData.dependentMeasures_tr(trIdx).stepsToObs, [length(loc) 1]);
+    
+        for k = 1:length(loc)
+           inSteps = loc(k) >= stepLocs(:,1) & loc(k) <= stepLocs(:,2);
+           
+           if sum(inSteps) == 0
+               sessionData.dependentMeasures_tr(trIdx).fixOnStep(k) = sum(stepLocs(:,1) >= loc(k)) + 0.5;
+           else
+               sessionData.dependentMeasures_tr(trIdx).fixOnStep(k) = size(stepLocs, 1) - find(inSteps) + 1;
+           end
+        end
+        
+        sessionData.dependentMeasures_tr(trIdx).fixOnStep = sessionData.dependentMeasures_tr(trIdx).fixOnStep';
         
         sessionData.processedData_tr(trIdx).roiOnObs_onOff = roiOnObs_idx_onOff;
         sessionData.dependentMeasures_tr(trIdx).numFixOnObj = length(tStart);
@@ -106,7 +141,7 @@ if sum(roiOnObs_fr)>0
                 sessionData.processedData_tr(trIdx).spine.rbPos_mFr_xyz(frObjFirstSeen,2);
     else
         sessionData.processedData_tr(trIdx).roiOnObs_onOff = NaN;
-        sessionData.dependentMeasures_tr(trIdx).numFixOnObj = NaN;
+        sessionData.dependentMeasures_tr(trIdx).numFixOnObj = 0;
         sessionData.dependentMeasures_tr(trIdx).totLenFixOnObj = NaN;
         sessionData.dependentMeasures_tr(trIdx).firstLook = NaN;
         sessionData.dependentMeasures_tr(trIdx).distFromObjFirstLook = NaN;

@@ -10,7 +10,7 @@ Y = hilbert(X);
 [heights,idx,~,p] = findpeaks(abs(Y));
 heights = heights/max(heights); p = p/max(p);
 Param_Spike = heights.*p; 
-[~,loc] = sort(Param_Spike, 'descend'); loc = loc(1:NumTrials*2); %Because each trials = 4 spikes
+[~,loc] = sort(Param_Spike, 'descend'); loc = loc(1:NumTrials*2); %Because each trials = 2 spikes
 
 peaklocs = idx(loc);
 peakvals = filt_audioData(peaklocs);

@@ -64,6 +64,7 @@ for trIdx = 1:sessionData.expInfo.numTrials
             m = m + 1;
         end
         sessionData.dependentMeasures_tr(trIdx).stepFlow = StepModel;
+        sessionData.dependentMeasures_tr(trIdx).objStepDist = size(StepModel, 1) - 1;
     end          
 end
 end

@@ -10,7 +10,7 @@ loadParameters
 
 fid = fopen([textFileName '.txt']);
 numberOfLines = 0;
-chunksize = 1e6; % read chuncks of 1MB at a time
+chunksize = 10e6; % read chuncks of 10MB at a time
 
 while ~feof(fid)
     ch = fread(fid, chunksize, '*uchar');
@@ -188,7 +188,7 @@ end
 fclose(fid);
  
 %
-
+keyboard
 
 outFileDir = [ 'parsed' textFileName(4:end)];
 

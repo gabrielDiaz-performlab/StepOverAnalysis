@@ -13,6 +13,8 @@ for i = 1:sessionData.expInfo.numTrials
 
     fr_time = sessionData.rawData_tr(i).info.sysTime_fr; 
     [fr_time,loc,~] = unique(fr_time);
+    
+    eventFlag_fr = sessionData.rawData_tr(i).info.eventFlag_fr;
           
     LFoot = sessionData.rawData_tr(i).lFoot;
     RFoot = sessionData.rawData_tr(i).rFoot;
@@ -20,20 +22,26 @@ for i = 1:sessionData.expInfo.numTrials
     Spine = sessionData.rawData_tr(i).spine;
     ETG = sessionData.rawData_tr(i).ETG;
 
+    % Grab Vizard XYZ values
     LFoot_fr_xyz = LFoot.pos_fr_xyz; LFoot_fr_xyz = LFoot_fr_xyz(loc,:);
     RFoot_fr_xyz = RFoot.pos_fr_xyz; RFoot_fr_xyz = RFoot_fr_xyz(loc,:);
     Glasses_fr_xyz = Glasses.pos_fr_xyz; Glasses_fr_xyz = Glasses_fr_xyz(loc,:);
+    
+    % Grab Vizard Quat values
     Glasses_fr_Quat = Glasses.quat_fr_wxyz; Glasses_fr_Quat = Glasses_fr_Quat(loc,:);
     
+    % Grab rotation vectors
     LFoot_rot_xyz = LFoot.rot_fr_d1_d2; LFoot_rot_xyz = LFoot_rot_xyz(loc,:,:);
     RFoot_rot_xyz = RFoot.rot_fr_d1_d2; RFoot_rot_xyz = RFoot_rot_xyz(loc,:,:);
     Glasses_rot_xyz = Glasses.rot_fr_d1_d2; Glasses_rot_xyz = Glasses_rot_xyz(loc,:,:);
            
+    % Grab rigid body time
     LFoot_rb_time = LFoot.rbPosSysTime_mFr_xyz; [LFoot_rb_time, loc1, ~] = unique(LFoot_rb_time);
     RFoot_rb_time = RFoot.rbPosSysTime_mFr_xyz; [RFoot_rb_time, loc2, ~] = unique(RFoot_rb_time);
     Glasses_rb_time = Glasses.rbPosSysTime_mFr_xyz; [Glasses_rb_time, loc3, ~] = unique(Glasses_rb_time);
     Spine_rb_time = Spine.rbPosSysTime_mFr_xyz; [Spine_rb_time, loc4, ~] = unique(Spine_rb_time);
 
+    % Grab rigid body position
     LFoot_rb_xyz = LFoot.rbPos_mFr_xyz; LFoot_rb_xyz = LFoot_rb_xyz(loc1,:);
     RFoot_rb_xyz = RFoot.rbPos_mFr_xyz; RFoot_rb_xyz = RFoot_rb_xyz(loc2,:);
     Glasses_rb_xyz = Glasses.rbPos_mFr_xyz; Glasses_rb_xyz = Glasses_rb_xyz(loc3,:);
@@ -51,20 +59,59 @@ for i = 1:sessionData.expInfo.numTrials
     
     [Glasses_Quat_time, loc,~] = unique(Glasses.rbQuatSysTime_mFr); 
     Glasses_rb_Quat = Glasses.rbQuat_mFr_xyz; Glasses_rb_Quat = Glasses_rb_Quat(loc,:);
-    
-    fTS = min([fr_time(1) LFoot_rb_time(1) RFoot_rb_time(1) Glasses_rb_time(1) Spine_rb_time(1)...
-        LFoot_mkr_time(1) RFoot_mkr_time(1) Glasses_mkr_time(1) Spine_mkr_time(1) Glasses_Quat_time(1)]);
+  
+%     fTS = min([fr_time(1) LFoot_rb_time(1) RFoot_rb_time(1) Glasses_rb_time(1) Spine_rb_time(1)...
+%         LFoot_mkr_time(1) RFoot_mkr_time(1) Glasses_mkr_time(1) Spine_mkr_time(1) Glasses_Quat_time(1)]);  
+    fTS = fr_time(1);
     
     %% Zeroing different time stamps
     fr_time = fr_time - fTS;
-    LFoot_rb_time = LFoot_rb_time - fTS; LFoot_mkr_time = LFoot_mkr_time - fTS;
-    RFoot_rb_time = RFoot_rb_time - fTS; RFoot_mkr_time = RFoot_mkr_time - fTS;
-    Glasses_rb_time = Glasses_rb_time - fTS; Glasses_mkr_time = Glasses_mkr_time - fTS;
-    Spine_rb_time = Spine_rb_time - fTS; Spine_mkr_time = Spine_mkr_time - fTS;
-    Glasses_Quat_time = Glasses_Quat_time - fTS;
     
+    LFoot_rb_time = LFoot_rb_time - fTS; 
+    LFoot_mkr_time = LFoot_mkr_time - fTS;
+    
+    RFoot_rb_time = RFoot_rb_time - fTS; 
+    RFoot_mkr_time = RFoot_mkr_time - fTS;
+    
+    Glasses_rb_time = Glasses_rb_time - fTS; 
+    Glasses_mkr_time = Glasses_mkr_time - fTS;
+    
+    Spine_rb_time = Spine_rb_time - fTS; 
+    Spine_mkr_time = Spine_mkr_time - fTS;
+    
+    Glasses_Quat_time = Glasses_Quat_time - fTS;
+
+    %% If time stamps are negative, then remove those samples;
+    loc = LFoot_rb_time < 0;
+    LFoot_rb_time(loc) = [];
+    LFoot_rb_xyz(loc, :) = [];
+    
+    LFoot_mkr_time(LFoot_mkr_time < 0) = [];
+    
+    loc = RFoot_rb_time < 0;
+    RFoot_rb_time(loc) = [];
+    RFoot_rb_xyz(loc,:) = [];
+    
+    RFoot_mkr_time(RFoot_mkr_time < 0) = [];
+    
+    loc = Glasses_rb_time < 0;
+    Glasses_rb_time(loc) = []; 
+    Glasses_rb_xyz(loc, :) = [];
+
+    Glasses_mkr_time(Glasses_mkr_time < 0) = [];
+    
+    loc = Spine_rb_time < 0;
+    Spine_rb_time(loc) = [];
+    Spine_rb_xyz(loc, :) = [];
+    
+    Spine_mkr_time(Spine_mkr_time < 0) = [];
+    
+    loc = Glasses_Quat_time < 0;
+    Glasses_Quat_time(loc) = [];
+    Glasses_rb_Quat(loc, :) = [];
+
     CTS = unique([LFoot_rb_time'; RFoot_rb_time'; Glasses_rb_time'; Spine_rb_time'; fr_time;...
-        LFoot_mkr_time; RFoot_mkr_time; Glasses_mkr_time; Spine_mkr_time]);    
+                LFoot_mkr_time; RFoot_mkr_time; Glasses_mkr_time; Spine_mkr_time; Glasses_Quat_time']);    
     
     %% Zeroing ETG time stamp and Interpolate ETG data to CTS
     ETG.ETG_ts = ETG.ETG_ts - ETG.ETG_ts(1);
@@ -90,11 +137,26 @@ for i = 1:sessionData.expInfo.numTrials
     ETG.R_GVEC(loc,:) = NaN;
     
     ETG.ETG_ts = CTS;
-      
+    
+    %% Interpolate System Flags
+    loc = find(eventFlag_fr ~= 0);
+    tempFlag_fr = zeros(length(CTS),1);
+    
+    for j = 1:length(loc)
+        [~, temp] = min(abs(CTS - fr_time(loc(j))));
+        tempFlag_fr(temp) = eventFlag_fr(loc(j));
+    end
+    
+    eventFlag_fr = tempFlag_fr;
+    
+    % Save the updated event flag list right away
+    sessionData.rawData_tr(i).info.eventFlag_fr = eventFlag_fr;  
+    
     %% Interpolate Quaternions
     Glasses_rb_Quat = interp1(Glasses_Quat_time', Glasses_rb_Quat, CTS, 'spline', 'extrap');
     loc = CTS > Glasses_Quat_time(end) | Glasses_Quat_time(1);
     Glasses_rb_Quat(loc,:) = NaN;
+
     
     %% Interpolate Rigid body and Vizard values and assign values before start and end to 0
     LFoot_rb_xyz = interp1(LFoot_rb_time, LFoot_rb_xyz, CTS,'spline','extrap');

@@ -34,11 +34,17 @@ for footIdx = 1:2
         XData = rbPos_footIdx(toeOff_idx(i):heelStrike_idx(i),1);
         TData = TS(toeOff_idx(i):heelStrike_idx(i));
         
-        cond = strcmp(sessionData.dependentMeasures_tr(trIdx).firstCrossingFoot, 'Right') && strcmp(foots{footIdx}, 'rFoot') ||...
-            strcmp(sessionData.dependentMeasures_tr(trIdx).firstCrossingFoot, 'Left') && strcmp(foots{footIdx}, 'lFoot'); 
+        if trIdx == 1 && sessionData.processedData_tr(trIdx).info.isBlankTrial
+           sessionData.dependentMeasures_tr(trIdx).firstCrossingFoot = []; 
+        end
         
-        if rbPos_footIdx(toeOff_idx(i),2) < obs_loc && rbPos_footIdx(heelStrike_idx(i),2) > obs_loc && cond
-           sessionData.dependentMeasures_tr(trIdx).StepToCross = i; 
+        if ~sessionData.processedData_tr(trIdx).info.isBlankTrial
+            cond = strcmp(sessionData.dependentMeasures_tr(trIdx).firstCrossingFoot, 'Right') && strcmp(foots{footIdx}, 'rFoot') ||...
+                strcmp(sessionData.dependentMeasures_tr(trIdx).firstCrossingFoot, 'Left') && strcmp(foots{footIdx}, 'lFoot'); 
+
+            if rbPos_footIdx(toeOff_idx(i),2) < obs_loc && rbPos_footIdx(heelStrike_idx(i),2) > obs_loc && cond
+               sessionData.dependentMeasures_tr(trIdx).StepToCross = i; 
+            end
         end
         
         YData = YData - YData(1);

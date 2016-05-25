@@ -312,47 +312,31 @@ for toIdx = 1:numel(lTO)
     end
 end
 
-%%
+%% Warning
+if numel(rHS) ~= numel(rTO) 
+    display('RIGHT FOOT WARNING: Number of heel strikes and toe offs should be the same')
+end
+if numel(lHS) ~= numel(lTO) 
+    display('LEFT FOOT WARNING: Number of heel strikes and toe offs should be the same')
+end
+    
+%% Remove steps which are too short 
+loc = (rHS - rTO) < 50;
+rHS(loc) = []; rTO(loc) = [];
 
+loc = (lHS - lTO) < 50;
+lHS(loc) = []; lTO(loc) = [];
+
+% if trIdx == 60
+%     keyboard
+% end
+
+%% Figure plot
 if plotOn == 1
-    
-    
-    %%
-%     figure;
-    
-    %     subplot(211);
-    %     hold on
-    %
-    %     ylim([-.7, 1])
-    %     title('Normalized foot velocity in spine-based FOR')
-    %     xlabel('Frame')
-    %     ylabel('normalized velocity')
-    %
-    %     plot((rAnkVelY*meanFrameRate)./ max(abs(rAnkVelY*meanFrameRate)),'c')
-    %     plot((lAnkVelY*meanFrameRate)./ max(abs(lAnkVelY*meanFrameRate)),':m')
-    %     legend('right','left','location','Best')
-    %
-    %     %hline(0,'k')
-    %
-    %     for idx = 1:numel(rTO)
-    %         vline(rTO(idx),'g',2,'-')
-    %     end
-    %
-    %     for idx = 1:numel(rHS)
-    %         vline(rHS(idx),'r',2,'-')
-    %     end
-    %
-    %     for idx = 1:numel(lTO)
-    %         vline(lTO(idx),'g',2,':')
-    %     end
-    %
-    %     for idx = 1:numel(lHS)
-    %         vline(lHS(idx),'r',2,':')
-    %     end
     
     frameTime_fr = frameTime_fr - frameTime_fr(1);
     
-    subplot(211)
+    subplot(2,1,1)
     hold on
     
     xlim([0, frameTime_fr(end)])
@@ -363,9 +347,6 @@ if plotOn == 1
     
     plot(frameTime_fr,rFootHeight_fr,'k');
     
-    %hline(footHeightThresh,'y')
-    %legend('right','left','threshold height','location','Best')
-    
     for idx = 1:numel(rTO)
         vline(frameTime_fr(rTO(idx)),'g',2,':')
     end
@@ -373,30 +354,18 @@ if plotOn == 1
     for idx = 1:numel(rHS)
         vline(frameTime_fr(rHS(idx)),'r',2,':')
     end
-    
-    subplot(212)
+    hold off
+    subplot(2,1,2)
     hold on
     
     xlim([0, frameTime_fr(end)])
     ylim([0, .7])
-    title('foot height')
+    title('left foot height')
     xlabel('time (s)')
     ylabel('foot height (m)')
     
-    %plot(frameTime_fr,rFootHeight_fr,'c');
     plot(frameTime_fr,lFootHeight_fr,'k');
     
-    %hline(footHeightThresh,'y')
-    %legend('right','left','threshold height','location','Best')
-    
-    %     for idx = 1:numel(rTO)
-    %         vline(frameTime_fr(rTO(idx)),'g',2,'-')
-    %     end
-    %
-    %     for idx = 1:numel(rHS)
-    %         vline(frameTime_fr(rHS(idx)),'r',2,'-')
-    %     end
-    %
     for idx = 1:numel(lTO)
         vline(frameTime_fr(lTO(idx)),'g',2,':')
     end
@@ -409,8 +378,9 @@ if plotOn == 1
     [~, ~] = mkdir(figDir );
 %     set(gca,'Units','Normalized','Position',[0.0923611111111111 0.21 0.565972222222222 0.674444444444444]);
     saveas(figH,sprintf('%s%u.pdf',figDir,trIdx));
-    
+    hold off
     %waitforbuttonpress
+    drawnow;
     
 end
 

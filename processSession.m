@@ -69,29 +69,44 @@ sessionData =  loadSession(sessionNumber);
 
 sessionData = checkForExclusions(sessionData);
 
+%%
 sessionData = synchronizeData(sessionData);
 
-DisplaySessionData(sessionData, 2, 1, 'processedData_tr', 1) % rawData_tr -> view raw data; processedData_tr -> view processed data
+% DisplaySessionData(sessionData, 2, 1, 'processedData_tr', 1) % rawData_tr -> view raw data; processedData_tr -> view processed data
 
 %% Override exclude trials
-% for trIdx = 1:sessionData.expInfo.numTrials
-%     sessionData.rawData_tr(trIdx).info.excludeTrial = 0;
-%     sessionData.processedData_tr(trIdx).info.excludeTrial = 0;
-% end
+
+numObsCollisions = 0;
+numTaskErrors = 0;
+
+for trIdx = 1:sessionData.expInfo.numTrials
+    sessionData.rawData_tr(trIdx).info.excludeTrial = 0;
+    sessionData.processedData_tr(trIdx).info.excludeTrial = 0;
+    
+    % Count obstalce collisions
+    temp = sessionData.processedData_tr(trIdx).info.eventFlag_fr;
+    numObsCollisions = numObsCollisions + sum(find(temp == 4 | temp == 5)) > 0;
+    
+    % Count number task errors
+    numTaskErrors = numTaskErrors + sum(find(temp == 8)) > 0;
+end
 
 %% filter
 
 sessionData = calculateSamplingRate(sessionData);
 sessionData = filterData(sessionData);
 
-DisplaySessionData(sessionData, 3, 13, 'processedData_tr', 1) % rawData_tr -> view raw data; processedData_tr -> view processed data
+%%
+DisplaySessionData(sessionData, 3, 2, 'rawData_tr', 1) % rawData_tr -> view raw data; processedData_tr -> view processed data
 
+%%
 sessionData.expInfo.obsHeightRatios = sessionData.expInfo.obsHeightRatios(~isnan(sessionData.expInfo.obsHeightRatios));
+
 sessionData.expInfo.legLength = input('Enter leg length in meters: ');
 
 %% Mean Trial Duration
 sessionData = avgTrialDuration(sessionData);
-display(['Mean trial duration:' num2str(sessionData.expInfo.meanTrialDuration)]);
+display(['Mean trial duration: ' num2str(sessionData.expInfo.meanTrialDuration)]);
 
 %% Trial process functions
 
@@ -103,8 +118,14 @@ for trIdx = 1:numel(sessionData.rawData_tr)
     sessionData.processedData_tr(trIdx).info.isBlankTrial = isBlankTrial;
     
     if ~isBlankTrial && ~excludeTrial    
+        
         [ sessionData ] = findSteps(sessionData, trIdx, 0);
-        [ sessionData ] = findFootCrossing(sessionData, trIdx);
+        
+        [ sessionData, returnFlag ] = findFootCrossing(sessionData, trIdx);
+        if returnFlag == 1
+            continue
+        end
+        
         [ sessionData ] = stepLengthAndDur(sessionData, trIdx);
         [ sessionData ] = stepLengthAndDurASO(sessionData, trIdx);
         [ sessionData ] = findCOM(sessionData, trIdx);
@@ -120,7 +141,7 @@ for trIdx = 1:numel(sessionData.rawData_tr)
 %         
         [ sessionData ] = processEyeTrackerInfo(sessionData, trIdx, 0);
         [ sessionData ] = calcGVPosOnObj(sessionData, trIdx);
-        [ sessionData ] = findObstacleFix(sessionData, trIdx, 1);        
+%         [ sessionData ] = findObstacleFix(sessionData, trIdx, 0);        
         
     elseif isBlankTrial && ~excludeTrial     
         [ sessionData ] = findSteps(sessionData, trIdx, 0);
@@ -129,7 +150,7 @@ for trIdx = 1:numel(sessionData.rawData_tr)
 end
 
 %%
-StepNumber = 1;
+StepNumber = 2;
 
 DisplayTemplates(sessionData, 'lFoot', StepNumber);
 sessionData = generateUnbiasedModel(sessionData);
@@ -137,12 +158,24 @@ sessionData = generateStepFlow(sessionData);
 
 plotModel(sessionData, StepNumber)
 plotFootVariability(sessionData)
+plotComparison(sessionData, StepNumber)
 
+%% 
+for trIdx = 1:numel(sessionData.rawData_tr)
+    excludeTrial = sessionData.processedData_tr(trIdx).info.excludeTrial;
+    
+    if ~excludeTrial && ~sessionData.processedData_tr(trIdx).info.isBlankTrial
+        [ sessionData ] = findObstacleFix(sessionData, trIdx, 0);
+    end
+    
+end
 %% Read ETG Video file and play Trial number trIdx
-ETG_VidObj = VideoReader([videoDir '\' ETG_videoFileList{1}]);
-playTrial(ETG_VidObj, sessionData, 23)
-
-
+if ~isempty(ETG_videoFileList)
+    ETG_VidObj = VideoReader([videoDir '\' ETG_videoFileList{1} '.mp4']);
+    playTrial(ETG_VidObj, sessionData, 60, 0)
+else
+    disp('Video not available for this participant')
+end
 %% Step heel down point analysis
 
 % %% 3D plot of Walking Data
@@ -218,7 +251,7 @@ playTrial(ETG_VidObj, sessionData, 23)
 %% Plot functions for a Trial
 
 % plotTrialMarkers(sessionData,trIdx);
-% F = plotTrialRigid(sessionData,trIdx);
+% F = plotTrialRigid(sessionData, 30);
 
 
 %% Analysis and Generate figures

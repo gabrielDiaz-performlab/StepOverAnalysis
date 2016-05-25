@@ -1,4 +1,4 @@
-function sessionData = findFootCrossing( sessionData, trIdx )
+function [sessionData, returnFlag] = findFootCrossing( sessionData, trIdx )
 %% Summary: 
 % This function finds the marker which furtherest along the plane and finds 
 % the frame where it crosses the object plane. 
@@ -11,6 +11,7 @@ function sessionData = findFootCrossing( sessionData, trIdx )
 % Added a summary and modified code to work with new format.
 
 %% 
+returnFlag = 0;
 if(sum(strcmp(fieldnames(sessionData),'dependentMeasures_tr'))==0)
     fprintf('Must run findSteps.m prior to findFootCrossing.m \n')
     return
@@ -84,47 +85,58 @@ end
 
 %% Find foot placement variability for the lead and trailing feet
 
-lCrossingFr = [lTO_sIdx(leftFootCrossingStepIdx) lHS_sIdx(leftFootCrossingStepIdx)];
-rCrossingFr = [rTO_sIdx(rightFootCrossingStepIdx) rHS_sIdx(rightFootCrossingStepIdx)];
+% if isempty(leftFootCrossingStepIdx) || isempty(rightFootCrossingStepIdx)
+%     sessionData.processedData_tr(trIdx).info.excludeTrial = 1;
+%     sessionData.processedData_tr(trIdx).info.excludeTrialExplanation = [sessionData.processedData_tr(trIdx).info.excludeTrialExplanation 'Incomplete trial'];
+% end
 
-lCrossingStepOn = sessionData.processedData_tr(trIdx).lFoot.rbPos_mFr_xyz(lCrossingFr(1), 2);  
-lCrossingStepOff = sessionData.processedData_tr(trIdx).lFoot.rbPos_mFr_xyz(lCrossingFr(2), 2);
-lCrossingTraj = sessionData.processedData_tr(trIdx).lFoot.rbPos_mFr_xyz(lCrossingFr(1):lCrossingFr(2), :);
-lCrossingStepOn = lCrossingStepOn - sessionData.processedData_tr(trIdx).obs.pos_xyz(2);
-lCrossingStepOff = lCrossingStepOff - sessionData.processedData_tr(trIdx).obs.pos_xyz(2);
+try
+    lCrossingFr = [lTO_sIdx(leftFootCrossingStepIdx) lHS_sIdx(leftFootCrossingStepIdx)];
+    rCrossingFr = [rTO_sIdx(rightFootCrossingStepIdx) rHS_sIdx(rightFootCrossingStepIdx)];
 
-rCrossingStepOn = sessionData.processedData_tr(trIdx).rFoot.rbPos_mFr_xyz(rCrossingFr(1), 2);
-rCrossingStepOff = sessionData.processedData_tr(trIdx).rFoot.rbPos_mFr_xyz(rCrossingFr(2), 2);
-rCrossingTraj = sessionData.processedData_tr(trIdx).rFoot.rbPos_mFr_xyz(rCrossingFr(1):rCrossingFr(2), :);
-rCrossingStepOn = rCrossingStepOn - sessionData.processedData_tr(trIdx).obs.pos_xyz(2);
-rCrossingStepOff = rCrossingStepOff - sessionData.processedData_tr(trIdx).obs.pos_xyz(2);
+    lCrossingStepOn = sessionData.processedData_tr(trIdx).lFoot.rbPos_mFr_xyz(lCrossingFr(1), 2);  
+    lCrossingStepOff = sessionData.processedData_tr(trIdx).lFoot.rbPos_mFr_xyz(lCrossingFr(2), 2);
+    lCrossingTraj = sessionData.processedData_tr(trIdx).lFoot.rbPos_mFr_xyz(lCrossingFr(1):lCrossingFr(2), :);
+    lCrossingStepOn = lCrossingStepOn - sessionData.processedData_tr(trIdx).obs.pos_xyz(2);
+    lCrossingStepOff = lCrossingStepOff - sessionData.processedData_tr(trIdx).obs.pos_xyz(2);
 
-%% Commit data to the session structure
-% This should happen in one place, for simplicity.
+    rCrossingStepOn = sessionData.processedData_tr(trIdx).rFoot.rbPos_mFr_xyz(rCrossingFr(1), 2);
+    rCrossingStepOff = sessionData.processedData_tr(trIdx).rFoot.rbPos_mFr_xyz(rCrossingFr(2), 2);
+    rCrossingTraj = sessionData.processedData_tr(trIdx).rFoot.rbPos_mFr_xyz(rCrossingFr(1):rCrossingFr(2), :);
+    rCrossingStepOn = rCrossingStepOn - sessionData.processedData_tr(trIdx).obs.pos_xyz(2);
+    rCrossingStepOff = rCrossingStepOff - sessionData.processedData_tr(trIdx).obs.pos_xyz(2);
 
-sessionData.dependentMeasures_tr(trIdx).rFoot.crossingFr = rightFootCrossingFr;
-sessionData.dependentMeasures_tr(trIdx).lFoot.crossingFr = leftFootCrossingFr;
+    %% Commit data to the session structure
+    % This should happen in one place, for simplicity.
 
-if strcmp(firstCrossingFoot,'Right')
-    sessionData.dependentMeasures_tr(trIdx).leadFootPlacementVariability = [rCrossingStepOn rCrossingStepOff];
-    sessionData.dependentMeasures_tr(trIdx).trailFootPlacementVariability = [lCrossingStepOn lCrossingStepOff];
-    sessionData.dependentMeasures_tr(trIdx).leadFootCrossingTrajectory = rCrossingTraj;
-    sessionData.dependentMeasures_tr(trIdx).trailFootCrossingTrajectory = lCrossingTraj;
-else
-    
-    sessionData.dependentMeasures_tr(trIdx).leadFootPlacementVariability = [lCrossingStepOn lCrossingStepOff];
-    sessionData.dependentMeasures_tr(trIdx).trailFootPlacementVariability = [rCrossingStepOn rCrossingStepOff];
-    sessionData.dependentMeasures_tr(trIdx).leadFootCrossingTrajectory = lCrossingTraj;
-    sessionData.dependentMeasures_tr(trIdx).trailFootCrossingTrajectory = rCrossingTraj;
+    sessionData.dependentMeasures_tr(trIdx).rFoot.crossingFr = rightFootCrossingFr;
+    sessionData.dependentMeasures_tr(trIdx).lFoot.crossingFr = leftFootCrossingFr;
+
+    if strcmp(firstCrossingFoot,'Right')
+        sessionData.dependentMeasures_tr(trIdx).leadFootPlacementVariability = [rCrossingStepOn rCrossingStepOff];
+        sessionData.dependentMeasures_tr(trIdx).trailFootPlacementVariability = [lCrossingStepOn lCrossingStepOff];
+        sessionData.dependentMeasures_tr(trIdx).leadFootCrossingTrajectory = rCrossingTraj;
+        sessionData.dependentMeasures_tr(trIdx).trailFootCrossingTrajectory = lCrossingTraj;
+    else
+
+        sessionData.dependentMeasures_tr(trIdx).leadFootPlacementVariability = [lCrossingStepOn lCrossingStepOff];
+        sessionData.dependentMeasures_tr(trIdx).trailFootPlacementVariability = [rCrossingStepOn rCrossingStepOff];
+        sessionData.dependentMeasures_tr(trIdx).leadFootCrossingTrajectory = lCrossingTraj;
+        sessionData.dependentMeasures_tr(trIdx).trailFootCrossingTrajectory = rCrossingTraj;
+    end
+
+    sessionData.dependentMeasures_tr(trIdx).rFoot.firstCrossingMkrIdx = rightFootMkrIdx;
+    sessionData.dependentMeasures_tr(trIdx).lFoot.firstCrossingMkrIdx = leftFootMkrIdx;
+
+    sessionData.dependentMeasures_tr(trIdx).rFoot.crossingStepIdx = rightFootCrossingStepIdx;
+    sessionData.dependentMeasures_tr(trIdx).lFoot.crossingStepIdx  = leftFootCrossingStepIdx;
+
+    sessionData.dependentMeasures_tr(trIdx).firstCrossingFoot = firstCrossingFoot;
+catch
+    disp(['Incomplete trial. Trial no:' num2str(trIdx)])
+    sessionData.processedData_tr(trIdx).info.excludeTrial = 1;
+    returnFlag = 1;
 end
-
-sessionData.dependentMeasures_tr(trIdx).rFoot.firstCrossingMkrIdx = rightFootMkrIdx;
-sessionData.dependentMeasures_tr(trIdx).lFoot.firstCrossingMkrIdx = leftFootMkrIdx;
-
-sessionData.dependentMeasures_tr(trIdx).rFoot.crossingStepIdx = rightFootCrossingStepIdx;
-sessionData.dependentMeasures_tr(trIdx).lFoot.crossingStepIdx  = leftFootCrossingStepIdx;
-
-sessionData.dependentMeasures_tr(trIdx).firstCrossingFoot = firstCrossingFoot;
 end
 
 

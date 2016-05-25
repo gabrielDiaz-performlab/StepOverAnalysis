@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<GazeCorrectionChronicle Version="1.0">
+  <GazeCorrectionData ApplyAtFrame="4294967295" EyeId="EYEID_LEFTEYE" CalibrationType="CALIBRATIONTYPE_3_POINT" Type="linear">
+     <Parameter Name="theta.x" Value="0.95016" />
+     <Parameter Name="theta.y" Value="0.159173" />
+     <Parameter Name="theta.z" Value="-0.206939" />
+     <Parameter Name="phi.x" Value="-0.0811195" />
+     <Parameter Name="phi.y" Value="1.18923" />
+     <Parameter Name="phi.z" Value="-0.268805" />
+  </GazeCorrectionData>
+  <GazeCorrectionData ApplyAtFrame="0" EyeId="EYEID_RIGHTEYE" CalibrationType="CALIBRATIONTYPE_3_POINT" Type="linear">
+     <Parameter Name="theta.x" Value="1.00223" />
+     <Parameter Name="theta.y" Value="-0.0260791" />
+     <Parameter Name="theta.z" Value="0.288008" />
+     <Parameter Name="phi.x" Value="-0.104528" />
+     <Parameter Name="phi.y" Value="1.24629" />
+     <Parameter Name="phi.z" Value="-0.425197" />
+  </GazeCorrectionData>
+  <GazeCorrectionData ApplyAtFrame="0" EyeId="EYEID_LEFTEYE" CalibrationType="CALIBRATIONTYPE_3_POINT" Type="linear">
+     <Parameter Name="theta.x" Value="0.942987" />
+     <Parameter Name="theta.y" Value="0.209885" />
+     <Parameter Name="theta.z" Value="-0.294271" />
+     <Parameter Name="phi.x" Value="-0.168038" />
+     <Parameter Name="phi.y" Value="1.03217" />
+     <Parameter Name="phi.z" Value="-0.158398" />
+  </GazeCorrectionData>
+  <GazeCorrectionData ApplyAtFrame="0" EyeId="EYEID_RIGHTEYE" CalibrationType="CALIBRATIONTYPE_3_POINT" Type="linear">
+     <Parameter Name="theta.x" Value="1.02854" />
+     <Parameter Name="theta.y" Value="0.150577" />
+     <Parameter Name="theta.z" Value="-0.00453375" />
+     <Parameter Name="phi.x" Value="-0.162114" />
+     <Parameter Name="phi.y" Value="1.11113" />
+     <Parameter Name="phi.z" Value="-0.273759" />
+  </GazeCorrectionData>
+  <GazeCorrectionData ApplyAtFrame="59233" EyeId="EYEID_RIGHTEYE" CalibrationType="CALIBRATIONTYPE_NONE" Type="none">  </GazeCorrectionData>
+  <GazeCorrectionData ApplyAtFrame="59233" EyeId="EYEID_LEFTEYE" CalibrationType="CALIBRATIONTYPE_NONE" Type="none">  </GazeCorrectionData>
+</GazeCorrectionChronicle>

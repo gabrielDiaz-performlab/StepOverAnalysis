@@ -1,6 +1,5 @@
 function sessionStruct =  createSessionStruct(parsedDataPath)
     
-    
     %MatFileName = 'Exp_RawMat_exp_data-2014-11-26-16-38.mat';
     load(parsedDataPath)
     loadParameters
@@ -16,14 +15,16 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
 % 
 %     # 1 Trial Start
 %     # 2 
-%     # 3 
-%     # 4 Right foot collides with obstacle
-%     # 5 Left foot collides with obstacle
+%     # 3 Obstacle is made visible
+%     # 4 Left foot collides with obstacle
+%     # 5 Right foot collides with obstacle
 %     # 6 Trial end
 %     # 7 Block end
+%     # 8 Number task error 
 		
     trialStartFr_trIdx = find(eventFlag == 1 );
     trialStopFr_trIdx = union(find(eventFlag == 6),find(eventFlag == 7));
+%     trialStopFr_trIdx = find(eventFlag == 6);
     blockEndFr_blIdx = find(eventFlag == 7);
     
     %%
@@ -81,7 +82,7 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
         
         
         info.type = trialType_tr(trIdx); 
-        info.block = blockIndex_tr(trIdx);
+%         info.block = blockIndex_tr(trIdx);
 
         trialStructs_tr(trIdx).info  = info ;
 
@@ -237,7 +238,7 @@ function sessionStruct =  createSessionStruct(parsedDataPath)
     % This will build an unordered vector of unique values that appear
     % in the list of trials
     %%
-        
+    expInfo.legLengthCM = legLengthCM;    
     expInfo.numTrials = numTrials;
     expInfo.numBlocks = numel(unique(blockIndex_tr));
     

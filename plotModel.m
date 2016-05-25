@@ -2,19 +2,19 @@ function plotModel(sessionData, StepNum)
 
 numUnbiasedTrials = length(sessionData.LeftStepModel);
 
-% figure; hold on; grid on
-% for i = 1:numUnbiasedTrials
-%     tempLeft = sessionData.LeftStepModel{StepNum, i, 1};
-%     plot3(tempLeft(:,4), tempLeft(:,2), tempLeft(:,3))
-% end
-% hold off
-% 
-% figure; hold on; grid on
-% for i = 1:numUnbiasedTrials
-%     tempRight = sessionData.RightStepModel{StepNum, i, 1};
-%     plot3(tempRight(:,4), tempRight(:,2), tempRight(:,3))    
-% end
-% hold off
+figure; hold on; grid on
+for i = 1:numUnbiasedTrials
+    tempLeft = sessionData.LeftStepModel{StepNum, i, 1};
+    plot3(tempLeft(:,4), tempLeft(:,2), tempLeft(:,3))
+end
+hold off
+
+figure; hold on; grid on
+for i = 1:numUnbiasedTrials
+    tempRight = sessionData.RightStepModel{StepNum, i, 1};
+    plot3(tempRight(:,4), tempRight(:,2), tempRight(:,3))    
+end
+hold off
 
 tempRight = []; tempLeft = [];
 
@@ -48,7 +48,7 @@ for i = 1:size(sessionData.LeftStepModel,1)
         m = m + 1;
     end
 end
-
+hold off
 legend('Red - Right','Left - Blue')
 
 tempRight = []; tempLeft = [];

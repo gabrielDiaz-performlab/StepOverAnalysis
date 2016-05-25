@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<GazeCorrectionChronicle Version="1.0">
+  <GazeCorrectionData ApplyAtFrame="0" EyeId="EYEID_RIGHTEYE" CalibrationType="CALIBRATIONTYPE_3_POINT" Type="linear">
+     <Parameter Name="theta.x" Value="1.04459" />
+     <Parameter Name="theta.y" Value="0.0664049" />
+     <Parameter Name="theta.z" Value="0.0304354" />
+     <Parameter Name="phi.x" Value="-0.105048" />
+     <Parameter Name="phi.y" Value="1.37798" />
+     <Parameter Name="phi.z" Value="-0.65512" />
+  </GazeCorrectionData>
+  <GazeCorrectionData ApplyAtFrame="0" EyeId="EYEID_LEFTEYE" CalibrationType="CALIBRATIONTYPE_3_POINT" Type="linear">
+     <Parameter Name="theta.x" Value="0.99863" />
+     <Parameter Name="theta.y" Value="0.0528222" />
+     <Parameter Name="theta.z" Value="-0.0444504" />
+     <Parameter Name="phi.x" Value="-0.0280222" />
+     <Parameter Name="phi.y" Value="1.14232" />
+     <Parameter Name="phi.z" Value="-0.187094" />
+  </GazeCorrectionData>
+</GazeCorrectionChronicle>

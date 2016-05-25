@@ -55,9 +55,10 @@ else
     
     %% Generate session struct
     fprintf('Generating session struct.\n');
-    
-    sessionData = createSessionStruct(parsedTextPath);
-    sessionData = findTemporalSpikes(sessionData, audioData, fAudio, Fs, beep_Dur, 1);    
+      
+    sessionData = createSessionStruct(parsedTextPath);       
+    sessionData = findTemporalSpikes(sessionData, audioData, fAudio, Fs, 1);    
+    keyboard
     sessionData = processEyeTracker(sessionData, ETG_T, len_audioData_s);
     sessionData.expInfo.fileID = dataFileList{sessionNumber};
     sessionData.expInfo.numConditions = numConditions;
@@ -66,6 +67,14 @@ else
     %FIXME:  add leg length
     %sessionData.expInfo.legLength = sessionData.expInfo.obstacleHeights(1) ./ sessionData.expInfo.obsHeightRatios(1)
     
+    %% Remove a particular trial completely
+        
+    for i = 1:length(DeleteTrials{1})
+        sessionData.rawData_tr(DeleteTrials{1}(i)) = [];
+    end
+    sessionData.expInfo.numTrials = sessionData.expInfo.numTrials - length(DeleteTrials{1});
+    
+    %%
     sessionData = decodeTimeStamps(sessionData);
     
     save( sessionFilePath,'sessionData')

@@ -24,8 +24,7 @@ for trIdx = 1:sessionData.expInfo.numTrials
         temp2 = sessionData.dependentMeasures_tr(trIdx).lFoot.unbiasedModel;
              
         for i = 1:NumUnbiasedSteps - 1
-            temp1
-            i
+
             right_XYZ = interp1(temp1{i,2}, temp1{i,1}, Time);
             left_XYZ = interp1(temp2{i,2}, temp2{i,1}, Time);
             
