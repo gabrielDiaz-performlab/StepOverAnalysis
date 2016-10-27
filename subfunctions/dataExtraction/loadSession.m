@@ -6,7 +6,8 @@ loadParameters
 % structure file. This ensures the program does not re-read the raw text
 % files.
 
-ReadFromProcessed = 0;
+ReadFromProcessed = 1;
+ReadAudio = 0;
 
 expTextFileName = ['exp' dataFileList{sessionNumber}];
 mocapTextFileName = ['mocap' dataFileList{sessionNumber}];
@@ -40,9 +41,9 @@ else
     %% Attempt to load parsedText file
     if exist(parsedTextPath, 'file')
         load(parsedTextPath)
+        load('data/ParsedTXT/tempStruct.mat')
         fprintf('Loaded struct version of text data from %s\n',parsedTextFileDir  )
     else
-        %% Load parsed text file
         
         %fprintf('.mat File Not Found Parsing The TextFile %s\n', textFileName);
         fprintf('Could not find more ParsedText file %s. Parsing text file...\n', parsedTextFileDir  );
@@ -50,16 +51,21 @@ else
         %textFileStruct = parseTextFiletoStruct(textFilePath);
         parseExpTextFile(textFileDir, expTextFileName)
         parseMocapTextFile(textFileDir, mocapTextFileName)
+        sessionData = createSessionStruct(parsedTextPath);
+        save('data\ParsedTXT\tempStruct.mat', 'sessionData')
         
     end
     
     %% Generate session struct
     fprintf('Generating session struct.\n');
       
-    sessionData = createSessionStruct(parsedTextPath);       
-    sessionData = findTemporalSpikes(sessionData, audioData, fAudio, Fs, 1);    
-    keyboard
-    sessionData = processEyeTracker(sessionData, ETG_T, len_audioData_s);
+    if ReadAudio
+        sessionData = findTemporalSpikes(sessionData, audioData, fAudio, Fs, 1);    
+        sessionData = processEyeTracker(sessionData, ETG_T, len_audioData_s);
+    else
+        sessionData = decodeTimeStamps(sessionData, ETG_T);
+%         sessionData = getTimeStamps(sessionData, ETG_T);
+    end
     sessionData.expInfo.fileID = dataFileList{sessionNumber};
     sessionData.expInfo.numConditions = numConditions;
     sessionData.expInfo.numObsHeights = numObsHeights;
@@ -74,9 +80,7 @@ else
     end
     sessionData.expInfo.numTrials = sessionData.expInfo.numTrials - length(DeleteTrials{1});
     
-    %%
-    sessionData = decodeTimeStamps(sessionData);
-    
+    %%  
     save( sessionFilePath,'sessionData')
     fprintf ('Session struct created from .mat file and saved\n' )
     

@@ -96,32 +96,30 @@ if show_mkr == 1
     hold off;
     title('Spine marker data')
 end
-%% Compare different time stamps
-
-colorMat = linspecer(13);
-
-figure;
-hold on
-% Left foot
-plot(sessionData.(str)(i).lFoot.rbPosSysTime_mFr_xyz,'Color',colorMat(1,:))
-% plot(sessionData.(str)(i).lFoot.rbQuatSysTime_mFr,'Color',colorMat(2,:))
-plot(cell2mat(sessionData.(str)(i).lFoot.mkrSysTime_mIdx_Cfr'),'Color',colorMat(3,:))
-% Right foot
-% plot(sessionData.(str)(i).rFoot.rbPosSysTime_mFr_xyz,'--','Color',colorMat(4,:))
-% plot(sessionData.(str)(i).rFoot.rbQuatSysTime_mFr,'Color',colorMat(5,:))
-% plot(cell2mat(sessionData.(str)(i).rFoot.mkrSysTime_mIdx_Cfr'),'Color',colorMat(6,:),'--')
-% Glasses
-plot(sessionData.(str)(i).glasses.rbPosSysTime_mFr_xyz,'-.','Color',colorMat(7,:))
-plot(sessionData.(str)(i).glasses.rbQuatSysTime_mFr,'-.','Color',colorMat(8,:))
-plot(cell2mat(sessionData.(str)(i).glasses.mkrSysTime_mIdx_Cfr'),'-.','Color',colorMat(9,:))
-% Spine
-% plot(sessionData.(str)(i).spine.rbPosSysTime_mFr_xyz,':','Color',colorMat(10,:))
-% plot(sessionData.(str)(i).spine.rbQuatSysTime_mFr,'Color',colorMat(11,:))
-% plot(cell2mat(sessionData.(str)(i).spine.mkrSysTime_mIdx_Cfr'),':','Color',colorMat(12,:))
-% Vizard
-plot(sessionData.(str)(i).info.sysTime_fr,':','Color',colorMat(13,:))
-hold off
-drawnow
-
-keyboard
+% %% Compare different time stamps
+% 
+% colorMat = linspecer(13);
+% 
+% figure;
+% hold on
+% % Left foot
+% plot(sessionData.(str)(i).lFoot.rbPosSysTime_mFr_xyz,'Color',colorMat(1,:))
+% % plot(sessionData.(str)(i).lFoot.rbQuatSysTime_mFr,'Color',colorMat(2,:))
+% plot(cell2mat(sessionData.(str)(i).lFoot.mkrSysTime_mIdx_Cfr'),'Color',colorMat(3,:))
+% % Right foot
+% % plot(sessionData.(str)(i).rFoot.rbPosSysTime_mFr_xyz,'--','Color',colorMat(4,:))
+% % plot(sessionData.(str)(i).rFoot.rbQuatSysTime_mFr,'Color',colorMat(5,:))
+% % plot(cell2mat(sessionData.(str)(i).rFoot.mkrSysTime_mIdx_Cfr'),'Color',colorMat(6,:),'--')
+% % Glasses
+% plot(sessionData.(str)(i).glasses.rbPosSysTime_mFr_xyz,'-.','Color',colorMat(7,:))
+% plot(sessionData.(str)(i).glasses.rbQuatSysTime_mFr,'-.','Color',colorMat(8,:))
+% plot(cell2mat(sessionData.(str)(i).glasses.mkrSysTime_mIdx_Cfr'),'-.','Color',colorMat(9,:))
+% % Spine
+% % plot(sessionData.(str)(i).spine.rbPosSysTime_mFr_xyz,':','Color',colorMat(10,:))
+% % plot(sessionData.(str)(i).spine.rbQuatSysTime_mFr,'Color',colorMat(11,:))
+% % plot(cell2mat(sessionData.(str)(i).spine.mkrSysTime_mIdx_Cfr'),':','Color',colorMat(12,:))
+% % Vizard
+% plot(sessionData.(str)(i).info.sysTime_fr,':','Color',colorMat(13,:))
+% hold off
+% drawnow
 end

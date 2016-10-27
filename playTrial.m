@@ -1,6 +1,6 @@
 function [] = playTrial(ETG_VidObj, sessionData, trIdx, writeToFile)
 
-% keyboard
+% keyboard 
 
 eventFlag = sessionData.processedData_tr(trIdx).info.eventFlag_fr;
 

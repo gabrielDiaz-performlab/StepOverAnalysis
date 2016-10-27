@@ -1,36 +1,3 @@
-% function [sessionData sessionFigH]= processSession(sessionNumber,cleanRunBool)
-% 
-% if(nargin == 1 )
-%    cleanRunBool = 1; 
-% end
-
-% _tr = trial
-% _fr = frame (vizard frame)
-% _mFr frame (phasespace/mocap frame)
-% _xyz = xyz position data
-% _wxyz = quaternion data wxyz
-% rb = phasespace rigid body data
-% mkr = phasespace marker data
-
-%%%  Subjects are always walking from 0,0,0, (center of the start box) towarsda and over an obstacle placed up the Y axis
-
-%%%%% Examples of phasespace data (highfrequ sampling)
-% rbPos_mFr_xyz: [2881x3 double]
-% rbPosSysTime_mFr_xyz: [2881x1 double]
-% rbQuat_mFr_xyz: [2881x4 double]
-% rbQuatSysTime_mFr: [2881x1 double]  
-% mkrPos_mIdx_Cfr_xyz: {5x1 cell}
-% mkrSysTime_mIdx_Cfr: {5x1 cell}
-%%%%% 
-
-%%%%% Examples of vizard data (low frequ sampling)
-%rFoot.pos_fr_xyz: [1147x3 double]
-%rFoot.quat_fr_wxyz: [1147x4 double]
-%rFoot.rot_fr_d1_d2: [1147x4x4 double]
-% TIMESTAMPS are stored in sessionData.rawData_tr(trialNum).info.sysTime_fr
-%%%%% 
-
-%%
 clc
 clear all
 close all
@@ -97,7 +64,7 @@ sessionData = calculateSamplingRate(sessionData);
 sessionData = filterData(sessionData);
 
 %%
-DisplaySessionData(sessionData, 3, 2, 'rawData_tr', 1) % rawData_tr -> view raw data; processedData_tr -> view processed data
+DisplaySessionData(sessionData, 3, 20, 'processedData_tr', 1) % rawData_tr -> view raw data; processedData_tr -> view processed data
 
 %%
 sessionData.expInfo.obsHeightRatios = sessionData.expInfo.obsHeightRatios(~isnan(sessionData.expInfo.obsHeightRatios));
@@ -165,17 +132,17 @@ for trIdx = 1:numel(sessionData.rawData_tr)
     excludeTrial = sessionData.processedData_tr(trIdx).info.excludeTrial;
     
     if ~excludeTrial && ~sessionData.processedData_tr(trIdx).info.isBlankTrial
-        [ sessionData ] = findObstacleFix(sessionData, trIdx, 0);
+        [ sessionData ] = findObstacleFix(sessionData, trIdx, 1);
     end
     
 end
 %% Read ETG Video file and play Trial number trIdx
-if ~isempty(ETG_videoFileList)
-    ETG_VidObj = VideoReader([videoDir '\' ETG_videoFileList{1} '.mp4']);
-    playTrial(ETG_VidObj, sessionData, 60, 0)
-else
-    disp('Video not available for this participant')
-end
+% if ~isempty(ETG_videoFileList)
+%     ETG_VidObj = VideoReader([videoDir '\' ETG_videoFileList{1} '.mp4']);
+%     playTrial(ETG_VidObj, sessionData, 60, 0)
+% else
+%     disp('Video not available for this participant')
+% end
 %% Step heel down point analysis
 
 % %% 3D plot of Walking Data

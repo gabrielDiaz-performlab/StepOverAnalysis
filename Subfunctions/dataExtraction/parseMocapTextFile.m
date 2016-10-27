@@ -25,11 +25,6 @@ end
 fclose(fid);
 
 fid = fopen([textFileName '.log']);
-
-% i initialize vectors to arrays of NaN.
-% I later remove the NaN before addingt trial data to a cell of all trial
-% data
-trialDur = 10 * 480; % lets assume 10 seconds of 480 Hz
 %%
 while ~feof(fid)
     %for i = 1:numberOfLines
@@ -264,7 +259,7 @@ end
 fclose(fid);
 
 %%
-
+keyboard
 outFileDir = [ 'parsed' textFileName(6:end)];
 
 save ([ parsedTextFileDir outFileDir '.mat'],...

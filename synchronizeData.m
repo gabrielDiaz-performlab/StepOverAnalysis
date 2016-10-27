@@ -60,9 +60,11 @@ for i = 1:sessionData.expInfo.numTrials
     [Glasses_Quat_time, loc,~] = unique(Glasses.rbQuatSysTime_mFr); 
     Glasses_rb_Quat = Glasses.rbQuat_mFr_xyz; Glasses_rb_Quat = Glasses_rb_Quat(loc,:);
   
-%     fTS = min([fr_time(1) LFoot_rb_time(1) RFoot_rb_time(1) Glasses_rb_time(1) Spine_rb_time(1)...
-%         LFoot_mkr_time(1) RFoot_mkr_time(1) Glasses_mkr_time(1) Spine_mkr_time(1) Glasses_Quat_time(1)]);  
-    fTS = fr_time(1);
+    fTS = min([fr_time(1) LFoot_rb_time(1) RFoot_rb_time(1) Glasses_rb_time(1) Spine_rb_time(1)...
+        LFoot_mkr_time(1) RFoot_mkr_time(1) Glasses_mkr_time(1) Spine_mkr_time(1) Glasses_Quat_time(1) ...
+        ETG.ETG_ts(1)]);
+    
+%     fTS = fr_time(1);
     
     %% Zeroing different time stamps
     fr_time = fr_time - fTS;
@@ -111,10 +113,10 @@ for i = 1:sessionData.expInfo.numTrials
     Glasses_rb_Quat(loc, :) = [];
 
     CTS = unique([LFoot_rb_time'; RFoot_rb_time'; Glasses_rb_time'; Spine_rb_time'; fr_time;...
-                LFoot_mkr_time; RFoot_mkr_time; Glasses_mkr_time; Spine_mkr_time; Glasses_Quat_time']);    
+                LFoot_mkr_time; RFoot_mkr_time; Glasses_mkr_time; Spine_mkr_time; Glasses_Quat_time'; ETG.ETG_ts']);    
     
     %% Zeroing ETG time stamp and Interpolate ETG data to CTS
-    ETG.ETG_ts = ETG.ETG_ts - ETG.ETG_ts(1);
+    ETG.ETG_ts = ETG.ETG_ts - fTS(1);
     
     ETG.B_POR = interp1(ETG.ETG_ts, ETG.B_POR, CTS, 'spline', 'extrap');
     loc = CTS > ETG.ETG_ts(end) | CTS < ETG.ETG_ts(1);
